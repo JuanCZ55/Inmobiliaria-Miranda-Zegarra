@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "Crear Propietario";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>Crear Propietario</h2>
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">DNI</label>
+        <input type="text" name="Dni" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input type="text" name="Nombre" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Apellido</label>
+        <input type="text" name="Apellido" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Telefono</label>
+        <input type="text" name="Telefono" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" name="Email" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Direccion</label>
+        <input type="text" name="Direccion" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-success">Guardar</button>
+</form>
