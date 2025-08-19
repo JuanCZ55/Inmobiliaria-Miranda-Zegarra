@@ -94,6 +94,22 @@ namespace Inmobiliaria.Models
       return res;
     }
 
+    public int Eliminar(int id)
+    {
+      int res = -1;
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"DELETE FROM propietario WHERE id_propietario=@id";
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          cmd.Parameters.AddWithValue("@id", id);
+          conn.Open();
+          res = cmd.ExecuteNonQuery();
+          conn.Close();
+        }
+      }
+      return res;
+    }
     public Propietario ObtenerPorDni(string dni)
     {
       Propietario? propietario = null;
