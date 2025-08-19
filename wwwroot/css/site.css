@@ -1,6 +1,8 @@
 .big-navba {
-    background: linear-gradient(20deg,#a66f58, #a64e58 );
+  background: linear-gradient(90deg, #d8b4fe 0%, #9f67c2 50%, #8c649e 100%);
+  background: radial-gradient();
 }
-.medio-form{width : 50%;
-    margin: 0 auto;
+.medio-form {
+  width: 50%;
+  margin: 0 auto;
 }
