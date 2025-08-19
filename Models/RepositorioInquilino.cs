@@ -95,8 +95,24 @@ namespace Inmobiliaria.Models
       return res;
         }
 
-        public Inquilino ObtenerPorDni(string dni)
+    public int Eliminar(int id)
+    {
+      int res = -1;
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"DELETE FROM inquilino WHERE id_inquilino=@id";
+        using (var cmd = new MySqlCommand(sql, conn))
         {
+          cmd.Parameters.AddWithValue("@id", id);
+          conn.Open();
+          res = cmd.ExecuteNonQuery();
+          conn.Close();
+        }
+      }
+      return res;
+    }
+    public Inquilino ObtenerPorDni(string dni)
+    {
       Inquilino? inquilino = null;
       using (var conn = new MySqlConnection(connectionString))
       {
@@ -129,7 +145,7 @@ namespace Inmobiliaria.Models
         }
       }
       return inquilino;
-        }
+    }
 
         public List<Inquilino> BuscarPorNombre(string nombre)
         {
