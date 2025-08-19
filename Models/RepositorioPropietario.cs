@@ -182,6 +182,41 @@ namespace Inmobiliaria.Models
       return lista;
     }
 
+    public Propietario ObtenerPorID(int id)
+    {
+      Propietario propietario = null;
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"SELECT id_propietario, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM propietario WHERE id_propietario = @id";
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          cmd.Parameters.AddWithValue("@id", id);
+          conn.Open();
+          using (var reader = cmd.ExecuteReader())
+          {
+            if (reader.Read())
+            {
+              propietario = new Propietario
+              {
+                IdPropietario = reader.GetInt32("id_propietario"),
+                Dni = reader.GetString("dni"),
+                Nombre = reader.GetString("nombre"),
+                Apellido = reader.GetString("apellido"),
+                Telefono = reader.GetString("telefono"),
+                Email = reader.GetString("email"),
+                Direccion = reader.GetString("direccion"),
+                Estado = reader.GetInt32("estado"),
+                CreatedAt = reader.GetDateTime("created_at"),
+                UpdatedAt = reader.GetDateTime("updated_at")
+              };
+            }
+          }
+          conn.Close();
+
+        }
+      }
+      return propietario;
+    }
     public List<Propietario> ObtenerTodos()
     {
       var lista = new List<Propietario>();
