@@ -47,10 +47,24 @@ namespace Inmobiliaria.Controllers
         }
 
         // GET: Propietario/Modificar/5
+        [HttpGet]
         public IActionResult Modificar(int id)
         {
-            return View();
+            try
+            {
+                Propietario p = repositorio.ObtenerPorID(id);
+                if (p == null)
+                { 
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(p);
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
         }
+
 
         // GET: Propietario/Alta/5
 
