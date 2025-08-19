@@ -8,6 +8,7 @@ namespace Inmobiliaria.Models
         int Modificar(Propietario propietario);
         int Alta(string dni);
         int Baja(string dni);
+        int Eliminar(int id);
         Propietario ObtenerPorDni(string dni);
         List<Propietario> BuscarPorNombre(string nombre);
         List<Propietario> ObtenerTodos();
