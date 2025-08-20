@@ -1,0 +1,42 @@
+@model IEnumerable<Inmobiliaria.Models.Propietario>
+
+@{
+    ViewData["Title"] = "Listado de Propietarios";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Listado de Propietarios</h2>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.First().IdPropietario)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Dni)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Nombre)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Apellido)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Telefono)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Email)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Direccion)</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td>@p.IdPropietario</td>
+            <td>@p.Dni</td>
+            <td>@p.Nombre</td>
+            <td>@p.Apellido</td>
+            <td>@p.Telefono</td>
+            <td>@p.Email</td>
+            <td>@p.Direccion</td>
+            <td>
+                <a asp-action="Modificar" asp-route-id="@p.IdPropietario" class="btn btn-warning btn-sm">
+                    Modificar
+                </a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

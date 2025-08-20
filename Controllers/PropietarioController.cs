@@ -100,5 +100,12 @@ namespace Inmobiliaria.Controllers
         {
             return View();
         }
+                
+        // GET: Propietario
+        public IActionResult Listar()
+        {
+            var lista = repositorio.ObtenerTodos(); 
+            return View(lista);
+        }
     }
 }
