@@ -86,6 +86,25 @@ namespace Inmobiliaria.Controllers
                 throw;
             }
         }
+    [HttpPost]
+    public IActionResult Eliminar(int id)
+    {
+        try
+        {
+            if (repositorio.Eliminar(id) > 0)
+            {
+                TempData["Mensaje"] = $"Se eliminó correctamente el propietario";
+                return RedirectToAction(nameof(Listar));
+            }
+
+            TempData["Mensaje"] = "No se pudo eliminar el propietario";
+            return RedirectToAction(nameof(Listar));
+        }
+        catch (System.Exception)
+        {
+            return RedirectToAction(nameof(Listar));
+        }
+    }
 
         // GET: Propietario/Alta/5
 
