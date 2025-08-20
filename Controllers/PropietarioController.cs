@@ -54,7 +54,7 @@ namespace Inmobiliaria.Controllers
             {
                 Propietario p = repositorio.ObtenerPorID(id);
                 if (p == null)
-                { 
+                {
                     return RedirectToAction(nameof(Index));
                 }
                 return View(p);
@@ -65,6 +65,27 @@ namespace Inmobiliaria.Controllers
             }
         }
 
+
+        // POST: Propietario/Modificar/5
+        [HttpPost]
+        public IActionResult Modificar(Propietario propietario)
+        {
+            try
+            {
+                if (ModelState.IsValid) // Verifiaca que propietario tenga el formato valido
+                {
+                    repositorio.Modificar(propietario);
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                    return View(propietario);
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+        }
 
         // GET: Propietario/Alta/5
 
