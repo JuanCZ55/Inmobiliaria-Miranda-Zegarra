@@ -1,9 +1,18 @@
+using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inmobiliaria.Controllers
 {
     public class InquilinoController : Controller
     {
+        // Sin inyección de dependencias (crear dentro del ctor)
+        private readonly RepositorioInquilino repositorio;
+        // GET: Propietario
+        public InquilinoController(IConfiguration config)
+        {
+            // Sin inyección de dependencias y sin usar el config (quitar el parámetro repo del ctor)
+            this.repositorio = new RepositorioInquilino(config);
+        }
         // GET: Inquilino
         public IActionResult Index()
         {
@@ -34,6 +43,12 @@ namespace Inmobiliaria.Controllers
             return View();
         }
 
-        // Espacio para m�todos POST
+        // GET: Inquilino/Lista
+        public IActionResult Listar()
+        {
+            var lista = repositorio.ObtenerTodos();
+            return View(lista);
+        }
+        // Espacio para m�todos POST
     }
 }
