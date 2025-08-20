@@ -1,0 +1,65 @@
+@model IEnumerable<Inmobiliaria.Models.Inquilino>
+
+@{
+    ViewData["Title"] = "Listado de Inquilinos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Listado de Inquilinos</h2>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.First().IdInquilino)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Dni)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Nombre)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Apellido)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Telefono)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Email)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Direccion)</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td>@p.IdInquilino</td>
+            <td>@p.Dni</td>
+            <td>@p.Nombre</td>
+            <td>@p.Apellido</td>
+            <td>@p.Telefono</td>
+            <td>@p.Email</td>
+            <td>@p.Direccion</td>
+            <td>
+                <a asp-action="Modificar" asp-route-id="@p.IdInquilino" class="btn btn-warning btn-sm">
+                    Modificar
+                </a>
+                <form asp-action="Eliminar" asp-route-id="@p.IdInquilino" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        Eliminar
+                    </button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div id="mensajeAlerta" class="alert alert-success">
+        @TempData["Mensaje"]
+    </div>
+
+    <script>
+        setTimeout(function () {
+            var alerta = document.getElementById("mensajeAlerta");
+            if (alerta) {
+                alerta.style.transition = "opacity 0.5s ease";
+                alerta.style.opacity = "0";
+                setTimeout(() => alerta.remove(), 500);
+            }
+        }, 5000); // 5000 ms = 5 segundos
+    </script>
+}
