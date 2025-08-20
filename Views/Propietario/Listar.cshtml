@@ -35,8 +35,31 @@
                 <a asp-action="Modificar" asp-route-id="@p.IdPropietario" class="btn btn-warning btn-sm">
                     Modificar
                 </a>
+                <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        Eliminar
+                    </button>
+                </form>
             </td>
         </tr>
     }
     </tbody>
 </table>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div id="mensajeAlerta" class="alert alert-success">
+        @TempData["Mensaje"]
+    </div>
+
+    <script>
+        setTimeout(function () {
+            var alerta = document.getElementById("mensajeAlerta");
+            if (alerta) {
+                alerta.style.transition = "opacity 0.5s ease";
+                alerta.style.opacity = "0";
+                setTimeout(() => alerta.remove(), 500);
+            }
+        }, 5000); // 5000 ms = 5 segundos
+    </script>
+}
