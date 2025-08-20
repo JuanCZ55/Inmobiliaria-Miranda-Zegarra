@@ -14,7 +14,7 @@ namespace Inmobiliaria.Models
       int res = -1;
       using (var conn = new MySqlConnection(connectionString))
       {
-        var sql = @"INSERT INTO propietario (dni, nombre, apellido, telefono, email, direccion, estado) VALUES (@dni, @nombre, @apellido, @telefono, @email, @direccion, @estado); SELECT LAST_INSERT_ID();";
+        var sql = @"INSERT INTO propietario (dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at) VALUES (@dni, @nombre, @apellido, @telefono, @email, @direccion, @estado, @created_at, @updated_at ); SELECT LAST_INSERT_ID();";
         using (var cmd = new MySqlCommand(sql, conn))
         {
           cmd.Parameters.AddWithValue("@dni", propietario.Dni);
@@ -24,6 +24,8 @@ namespace Inmobiliaria.Models
           cmd.Parameters.AddWithValue("@email", propietario.Email);
           cmd.Parameters.AddWithValue("@direccion", propietario.Direccion);
           cmd.Parameters.AddWithValue("@estado", propietario.Estado);
+          cmd.Parameters.AddWithValue("@created_at", DateTime.Now);
+          cmd.Parameters.AddWithValue("@updated_at", DateTime.Now);
           conn.Open();
           res = Convert.ToInt32(cmd.ExecuteScalar());
           propietario.IdPropietario = res;
