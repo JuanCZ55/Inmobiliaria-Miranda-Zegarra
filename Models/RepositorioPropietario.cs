@@ -224,7 +224,7 @@ namespace Inmobiliaria.Models
       var lista = new List<Propietario>();
       using (var conn = new MySqlConnection(connectionString))
       {
-        var sql = @"SELECT id_propietario, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM propietario";
+        var sql = @"SELECT id_propietario, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM propietario ORDER BY id_propietario DESC;";
         using (var cmd = new MySqlCommand(sql, conn))
         {
           conn.Open();

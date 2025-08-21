@@ -188,7 +188,7 @@ namespace Inmobiliaria.Models
       var lista = new List<Inquilino>();
       using (var conn = new MySqlConnection(connectionString))
       {
-        var sql = @"SELECT id_inquilino, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM inquilino";
+        var sql = @"SELECT id_inquilino, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM inquilino ORDER BY id_inquilino DESC;";
         using (var cmd = new MySqlCommand(sql, conn))
         {
           conn.Open();
