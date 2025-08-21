@@ -1,17 +1,18 @@
 namespace Inmobiliaria.Models
 {
-    using System.Collections.Generic;
-    using System.Data;
-    using MySql.Data.MySqlClient;
-    using Microsoft.Extensions.Configuration;
+  using System.Collections.Generic;
+  using System.Data;
+  using MySql.Data.MySqlClient;
+  using Microsoft.Extensions.Configuration;
 
-    public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
+  public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
+  {
+    public RepositorioInquilino(IConfiguration configuration) : base(configuration)
     {
-        public RepositorioInquilino(IConfiguration configuration) : base(configuration)         {
-        }
+    }
 
-        public int Crear(Inquilino inquilino)
-        {
+    public int Crear(Inquilino inquilino)
+    {
       int res = -1;
       using (var conn = new MySqlConnection(connectionString))
       {
@@ -33,10 +34,10 @@ namespace Inmobiliaria.Models
         }
       }
       return res;
-        }
+    }
 
-        public int Modificar(Inquilino inquilino)
-        {
+    public int Modificar(Inquilino inquilino)
+    {
       int res = -1;
       using (var conn = new MySqlConnection(connectionString))
       {
@@ -58,10 +59,10 @@ namespace Inmobiliaria.Models
         }
       }
       return res;
-        }
+    }
 
-        public int Alta(string dni)
-        {
+    public int Alta(string dni)
+    {
       int res = -1;
       using (var conn = new MySqlConnection(connectionString))
       {
@@ -75,10 +76,10 @@ namespace Inmobiliaria.Models
         }
       }
       return res;
-        }
+    }
 
-        public int Baja(string dni)
-        {
+    public int Baja(string dni)
+    {
       int res = -1;
       using (var conn = new MySqlConnection(connectionString))
       {
@@ -93,7 +94,7 @@ namespace Inmobiliaria.Models
         }
       }
       return res;
-        }
+    }
 
     public int Eliminar(int id)
     {
@@ -110,6 +111,41 @@ namespace Inmobiliaria.Models
         }
       }
       return res;
+    }
+    public Inquilino ObtenerPorID(int id)
+    {
+      Inquilino inquilino = null;
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"SELECT id_inquilino, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM inquilino WHERE id_inquilino = @id";
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          cmd.Parameters.AddWithValue("@id", id);
+          conn.Open();
+          using (var reader = cmd.ExecuteReader())
+          {
+            if (reader.Read())
+            {
+              inquilino = new Inquilino
+              {
+                IdInquilino = reader.GetInt32("id_inquilino"),
+                Dni = reader.GetString("dni"),
+                Nombre = reader.GetString("nombre"),
+                Apellido = reader.GetString("apellido"),
+                Telefono = reader.GetString("telefono"),
+                Email = reader.GetString("email"),
+                Direccion = reader.GetString("direccion"),
+                Estado = reader.GetInt32("estado"),
+                CreatedAt = reader.GetDateTime("created_at"),
+                UpdatedAt = reader.GetDateTime("updated_at")
+              };
+            }
+          }
+          conn.Close();
+
+        }
+      }
+      return inquilino;
     }
     public Inquilino ObtenerPorDni(string dni)
     {
@@ -147,8 +183,8 @@ namespace Inmobiliaria.Models
       return inquilino;
     }
 
-        public List<Inquilino> BuscarPorNombre(string nombre)
-        {
+    public List<Inquilino> BuscarPorNombre(string nombre)
+    {
       var lista = new List<Inquilino>();
       using (var conn = new MySqlConnection(connectionString))
       {
@@ -181,10 +217,10 @@ namespace Inmobiliaria.Models
         }
       }
       return lista;
-        }
+    }
 
-        public List<Inquilino> ObtenerTodos()
-        {
+    public List<Inquilino> ObtenerTodos()
+    {
       var lista = new List<Inquilino>();
       using (var conn = new MySqlConnection(connectionString))
       {
@@ -216,6 +252,6 @@ namespace Inmobiliaria.Models
         }
       }
       return lista;
-        }
     }
+  }
 }
