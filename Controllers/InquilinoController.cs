@@ -52,7 +52,7 @@ namespace Inmobiliaria.Controllers
         Inquilino i = repositorio.ObtenerPorID(id);
         if (i == null)
         {
-          return RedirectToAction(nameof(Index));
+          return RedirectToAction(nameof(Listar));
         }
         return View(i);
       }
@@ -69,7 +69,8 @@ namespace Inmobiliaria.Controllers
         if (ModelState.IsValid) // Verifiaca que inquilino tenga el formato valido
         {
           repositorio.Modificar(inquilino);
-          return RedirectToAction(nameof(Index));
+          TempData["InquilinoCreado"] = $"Se modificado correctamente el inquilino {inquilino.Dni} {inquilino.Nombre} {inquilino.Apellido}";
+          return RedirectToAction(nameof(Listar));
         }
         else
           return View(inquilino);

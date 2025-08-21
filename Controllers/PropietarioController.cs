@@ -55,7 +55,7 @@ namespace Inmobiliaria.Controllers
                 Propietario p = repositorio.ObtenerPorID(id);
                 if (p == null)
                 {
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Listar));
                 }
                 return View(p);
             }
@@ -75,7 +75,8 @@ namespace Inmobiliaria.Controllers
                 if (ModelState.IsValid) // Verifiaca que propietario tenga el formato valido
                 {
                     repositorio.Modificar(propietario);
-                    return RedirectToAction(nameof(Index));
+                    TempData["PropietarioCreado"] = $"Se modifico correctamente el propietario {propietario.Dni} {propietario.Nombre} {propietario.Apellido}";
+                    return RedirectToAction(nameof(Listar));
                 }
                 else
                     return View(propietario);
