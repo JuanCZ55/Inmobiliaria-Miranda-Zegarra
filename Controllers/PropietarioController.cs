@@ -34,8 +34,8 @@ namespace Inmobiliaria.Controllers
                 if (ModelState.IsValid) // Verifiaca que propietario tenga el formato valido
                 {
                     repositorio.Crear(propietario);
-                    TempData["Id"] = propietario.IdPropietario;
-                    return RedirectToAction(nameof(Index));
+                    TempData["PropietarioCreado"] = $"Se agrego correctamente el propietario {propietario.Dni} {propietario.Nombre} {propietario.Apellido}";
+                    return RedirectToAction(nameof(Listar));
                 }
                 else
                     return View(propietario);
@@ -86,25 +86,25 @@ namespace Inmobiliaria.Controllers
                 throw;
             }
         }
-    [HttpPost]
-    public IActionResult Eliminar(int id)
-    {
-        try
+        [HttpPost]
+        public IActionResult Eliminar(int id)
         {
-            if (repositorio.Eliminar(id) > 0)
+            try
             {
-                TempData["Mensaje"] = $"Se eliminó correctamente el propietario";
+                if (repositorio.Eliminar(id) > 0)
+                {
+                    TempData["Mensaje"] = $"Se eliminó correctamente el propietario";
+                    return RedirectToAction(nameof(Listar));
+                }
+
+                TempData["Mensaje"] = "No se pudo eliminar el propietario";
                 return RedirectToAction(nameof(Listar));
             }
-
-            TempData["Mensaje"] = "No se pudo eliminar el propietario";
-            return RedirectToAction(nameof(Listar));
+            catch (System.Exception)
+            {
+                return RedirectToAction(nameof(Listar));
+            }
         }
-        catch (System.Exception)
-        {
-            return RedirectToAction(nameof(Listar));
-        }
-    }
 
         // GET: Propietario/Alta/5
 
@@ -119,11 +119,11 @@ namespace Inmobiliaria.Controllers
         {
             return View();
         }
-                
+
         // GET: Propietario
         public IActionResult Listar()
         {
-            var lista = repositorio.ObtenerTodos(); 
+            var lista = repositorio.ObtenerTodos();
             return View(lista);
         }
     }
