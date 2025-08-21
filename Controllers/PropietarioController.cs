@@ -126,5 +126,11 @@ namespace Inmobiliaria.Controllers
             var lista = repositorio.ObtenerTodos();
             return View(lista);
         }
+        [HttpGet]
+        public IActionResult Buscar(string dni)
+        {
+            var lista = repositorio.filtrarDNI(dni);
+            return Ok(lista);
+        }
     }
 }
