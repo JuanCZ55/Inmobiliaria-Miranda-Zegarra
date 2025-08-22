@@ -9,9 +9,7 @@
 
 <div class="container px-0 p-3 ">
     <div class="d-flex">
-        <input class="form-control w-auto" style="max-width: 200px;" type="text" id="dniInput"
-            placeholder="Ingrese DNI" />
-        <button class="btn btn-primary ms-2" type="button" onclick="buscarPropietario()">Buscar</button>
+        <input oninput="buscarPropietario()" class="form-control w-50" style="max-width: 300px;" type="text" id="dniInput" placeholder="Ingrese DNI" />
     </div>
 </div>
 
@@ -19,8 +17,8 @@
 
 
 
-<table class="table table-striped table-bordered">
-    <thead>
+<table class="table table-hover table-caption-top">
+    <thead class="table-dark">
         <tr>
             <th>@Html.DisplayNameFor(model => model.First().IdPropietario)</th>
             <th>@Html.DisplayNameFor(model => model.First().Dni)</th>
@@ -43,7 +41,7 @@
                 <td>@p.Telefono</td>
                 <td>@p.Email</td>
                 <td>@p.Direccion</td>
-                <td>
+                <td class="d-flex justify-content-evenly">
                     <a asp-action="Modificar" asp-route-id="@p.IdPropietario" class="btn btn-warning btn-sm">Modificar</a>
                     <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
@@ -57,18 +55,18 @@
 <script>
     async function buscarPropietario() {
         const dniInput = document.getElementById("dniInput");
-        const dni = dniInput.value.trim();
-
-        if (!dni) {
-            alert("Ingrese un DNI para buscar");
-            return;
-        }
-        if (!/^[0-9]+$/.test(dni)) {
-            alert("El DNI solo puede contener números positivos");
-            return;
-        }
+        const dni = dniInput.value;
         try {
-            const response = await fetch(`/Propietario/Buscar?dni=${dni}`);
+            let response;
+            if(dni){
+                if (!/^[0-9]+$/.test(dni)) {
+                    return;
+                }
+                response = await fetch(`/Propietario/Buscar?dni=${dni}`);
+            }else{
+                response = await fetch(`/Propietario/Listartodos`);
+            }
+            
             if (!response.ok) throw new Error("Error en la búsqueda");
 
             const data = await response.json();
@@ -91,7 +89,7 @@
                         <td>${p.telefono}</td>
                         <td>${p.email}</td>
                         <td>${p.direccion}</td>
-                        <td>
+                        <td class="d-flex justify-content-evenly">
                             <a href="/Propietario/Modificar/${p.idPropietario}" class="btn btn-warning btn-sm">Modificar</a>
                             <form action="/Propietario/Eliminar/${p.idPropietario}" method="post" style="display:inline;">
                                 <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
