@@ -7,8 +7,13 @@
 
 <h2>Listado de Inquilinos</h2>
 
-<input type="text" id="dniInput" placeholder="Ingrese DNI" />
-<button type="button" onclick="buscarInquilino()">Buscar</button>
+<div class="container px-0 p-3 ">
+    <div class="d-flex">
+        <input class="form-control w-auto" style="max-width: 200px;" type="text" id="dniInput"
+            placeholder="Ingrese DNI" />
+        <button class="btn btn-primary ms-2" type="button" onclick="buscarInquilino()">Buscar</button>
+    </div>
+</div>
 
 <table class="table table-striped table-bordered">
     <thead>
