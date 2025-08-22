@@ -110,5 +110,12 @@ namespace Inmobiliaria.Controllers
       return View(lista);
     }
     // Espacio para m�todos POST
+    // GET: Inquilino/Buscar
+        [HttpGet]
+        public IActionResult Buscar(string dni)
+        {
+            var lista = repositorio.filtrarDNI(dni);
+            return Ok(lista);
+        }
   }
 }
