@@ -219,6 +219,41 @@ namespace Inmobiliaria.Models
       return lista;
     }
 
+    public List<Inquilino> filtrarDNI(string dni)
+    {
+      List<Inquilino> lista = new List<Inquilino>();
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"SELECT id_inquilino, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM inquilino WHERE dni LIKE CONCAT(@dni, '%')";
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          cmd.Parameters.AddWithValue("@dni", dni);
+          conn.Open();
+          using (var reader = cmd.ExecuteReader())
+          {
+            while (reader.Read())
+            {
+              Inquilino inquilino = new Inquilino
+              {
+                IdInquilino = reader.GetInt32("id_inquilino"),
+                Dni = reader.GetString("dni"),
+                Nombre = reader.GetString("nombre"),
+                Apellido = reader.GetString("apellido"),
+                Telefono = reader.GetString("telefono"),
+                Email = reader.GetString("email"),
+                Direccion = reader.GetString("direccion"),
+                Estado = reader.GetInt32("estado"),
+                CreatedAt = reader.GetDateTime("created_at"),
+                UpdatedAt = reader.GetDateTime("updated_at")
+              };
+              lista.Add(inquilino);
+            }
+          }
+          conn.Close();
+        }
+      }
+      return lista;
+    }
     public List<Inquilino> ObtenerTodos()
     {
       var lista = new List<Inquilino>();
