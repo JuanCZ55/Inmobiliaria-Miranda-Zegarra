@@ -109,9 +109,16 @@ namespace Inmobiliaria.Controllers
       var lista = repositorio.ObtenerTodos();
       return View(lista);
     }
-    // Espacio para m�todos POST
-    // GET: Inquilino/Buscar
+
         [HttpGet]
+        public IActionResult Listartodos()
+        {
+            var lista = repositorio.ObtenerTodos();
+            return Ok(lista);
+        }
+
+    // GET: Inquilino/Buscar
+    [HttpGet]
         public IActionResult Buscar(string dni)
         {
             var lista = repositorio.filtrarDNI(dni);
