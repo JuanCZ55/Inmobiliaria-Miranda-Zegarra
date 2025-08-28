@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Inmobiliaria.Models
 {
@@ -12,6 +14,9 @@ namespace Inmobiliaria.Models
 
     [Required(ErrorMessage = "El campo Propietario es obligatorio.")]
     public int IdPropietario { get; set; }
+    [ForeignKey(nameof(IdPropietario))]
+    [BindNever]
+    public Propietario? Propieteario { get; set; }
 
     [Required(ErrorMessage = "El campo Tipo de Inmueble es obligatorio.")]
     public int IdTipoInmueble { get; set; }
