@@ -1,0 +1,96 @@
+@model IEnumerable<Inmobiliaria.Models.TipoInmueble>
+@{
+  ViewData["Title"] = "Listado de Tipos de Inmueble";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Listado de Tipos de Inmueble</h2>
+
+<div class="container px-0 p-3">
+  <div class="d-flex">
+    <input oninput="buscarTipo()" class="form-control w-50" style="max-width: 300px;" type="text" id="nombreInput"
+      placeholder="Ingrese nombre" />
+  </div>
+</div>
+
+<table class="table table-hover table-caption-top">
+  <thead class="table-dark">
+    <tr>
+      <th>@Html.DisplayNameFor(model => model.First().IdTipoInmueble)</th>
+      <th>@Html.DisplayNameFor(model => model.First().Nombre)</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody id="tablaTipo">
+    @foreach (var t in Model)
+    {
+      <tr>
+        <td>@t.IdTipoInmueble</td>
+        <td>@t.Nombre</td>
+        <td class="d-flex justify-content-evenly">
+          <a asp-action="Modificar" asp-route-id="@t.IdTipoInmueble" class="btn btn-warning btn-sm">Modificar</a>
+          <form asp-action="Eliminar" asp-route-id="@t.IdTipoInmueble" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+<script>
+  async function buscarTipo() {
+    const input = document.getElementById("nombreInput").value.trim();
+    try {
+      let response;
+      if (input) {
+        response = await fetch(`/TipoInmueble/BuscarPorNombre?nombre=${input}`);
+      } else {
+        response = await fetch(`/TipoInmueble/ListarTodos`);
+      }
+
+      if (!response.ok) throw new Error("Error en la búsqueda");
+      const data = await response.json();
+      let tbody = document.getElementById("tablaTipo");
+      tbody.innerHTML = "";
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="text-center">No se encontraron tipos de inmueble</td></tr>`;
+        return;
+      }
+
+      data.forEach(t => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${t.idTipoInmueble}</td>
+                <td>${t.nombre}</td>
+                <td class="d-flex justify-content-evenly">
+                    <a href="/TipoInmueble/Modificar/${t.idTipoInmueble}" class="btn btn-warning btn-sm">Modificar</a>
+                    <form action="/TipoInmueble/Eliminar/${t.idTipoInmueble}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>`;
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Hubo un problema al buscar");
+    }
+  }
+</script>
+
+@if (TempData["Mensaje"] != null)
+{
+  <div class="alert alert-success alertaTemp">@TempData["Mensaje"]</div>
+}
+@if (TempData["Warning"] != null)
+{
+  <div class="alert alert-warning alertaTemp">@TempData["Warning"]</div>
+}
+  <script>
+    setTimeout(function () {
+      var alerta = document.getElementById("mensajeAlerta");
+      if (alerta) { alerta.style.transition = "opacity 0.5s ease"; alerta.style.opacity = "0"; setTimeout(() => alerta.remove(), 500); }
+    }, 5000);
+  </script>
+
