@@ -63,6 +63,7 @@ namespace Inmobiliaria.Controllers
         }
 
         // GET: Inmueble/Modificar/5
+        [HttpGet]
         public IActionResult Modificar(int id)
         {
             try
@@ -72,11 +73,20 @@ namespace Inmobiliaria.Controllers
                 {
                     return RedirectToAction(nameof(Listar));
                 }
+                ViewBag.Propietarios = repoPropietario
+                    .ObtenerTodos()
+                    .Select(p => new
+                    {
+                        p.IdPropietario,
+                        NombreCompleto = p.Nombre + " " + p.Apellido + " - " + p.Dni,
+                    })
+                    .ToList();
                 ViewBag.Tipos = repoTipo.ObtenerTodos();
                 return View(i);
             }
             catch (System.Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 ViewBag.Error = "Error al cargar inmueble: " + ex.Message;
                 return RedirectToAction(nameof(Listar));
             }
@@ -95,6 +105,14 @@ namespace Inmobiliaria.Controllers
                         $"Se modifico correctamente el inmueble de {inmueble.Direccion}";
                     return RedirectToAction(nameof(Listar));
                 }
+                ViewBag.Propietarios = repoPropietario
+                    .ObtenerTodos()
+                    .Select(p => new
+                    {
+                        p.IdPropietario,
+                        NombreCompleto = p.Nombre + " " + p.Apellido + " - " + p.Dni,
+                    })
+                    .ToList();
                 ViewBag.Tipos = repoTipo.ObtenerTodos();
                 return View(inmueble);
             }
@@ -112,6 +130,11 @@ namespace Inmobiliaria.Controllers
         {
             try
             {
+                if (repositorio.SeEstaUsando(id) > 0)
+                {
+                    TempData["Mensaje"] = "No se puede eliminar el inmueble porque está en uso";
+                    return RedirectToAction(nameof(Listar));
+                }
                 if (repositorio.Eliminar(id) > 0)
                 {
                     TempData["Mensaje"] = "Se elimino correctamente el inmueble";
