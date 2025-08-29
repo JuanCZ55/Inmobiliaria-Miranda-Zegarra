@@ -102,7 +102,7 @@ namespace Inmobiliaria.Models
         c.id_Contrato, 
         c.fecha_desde, 
         c.fecha_hasta, 
-        c.fecha_fin, 
+        c.fecha_terminacion_anticipada, 
         c.monto_mensual, 
         c.multa, 
         c.estado, 
@@ -111,22 +111,22 @@ namespace Inmobiliaria.Models
         c.created_at, 
         c.updated_at,
 
-        inm.id_Propietario AS inm.id_Propietario, 
-        inm.direccion AS inm.direccion, 
-        inm.cantidad_ambientes AS inm.cantidad_ambientes, 
-        inm.descripcion AS inm.descripcion,
+        inm.id_Propietario AS inm_id_Propietario, 
+        inm.direccion AS inm_direccion, 
+        inm.cantidad_ambientes AS inm_cantidad_ambientes, 
+        inm.descripcion AS inm_descripcion,
 
-        p.dni AS p.dni, 
-        p.nombre AS p.nombre, 
-        p.apellido AS p.apellido, 
-        p.telefono AS p.telefono, 
-        p.email AS p.email,
+        p.dni AS p_dni, 
+        p.nombre AS p_nombre, 
+        p.apellido AS p_apellido, 
+        p.telefono AS p_telefono, 
+        p.email AS p_email,
 
-        inq.dni AS inq.dni, 
-        inq.nombre AS inq.nombre, 
-        inq.apellido AS inq.apellido, 
-        inq.telefono AS inq.telefono, 
-        inq.email AS inq.email,
+        inq.dni AS inq_dni, 
+        inq.nombre AS inq_nombre, 
+        inq.apellido AS inq_apellido, 
+        inq.telefono AS inq_telefono, 
+        inq.email AS inq_email,
 
         FROM contrato c JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
         JOIN propietario p ON inm.id_propietario = p.id_propietario
@@ -146,7 +146,7 @@ namespace Inmobiliaria.Models
                 IdContrato = reader.GetInt32("id_Contrato"),
                 FechaDesde = reader.GetDateTime("fecha_desde"),
                 FechaHasta = reader.GetDateTime("fecha_hasta"),
-                FechaFin = reader.GetDateTime("fecha_fin"),
+                FechaFin = reader.GetDateTime("fecha_terminacion_anticipada"),
                 MontoMensual = reader.GetDecimal("monto_mensual"),
                 Multa = reader.GetDecimal("multa"),
                 Estado = reader.GetInt32("estado"),
@@ -154,29 +154,29 @@ namespace Inmobiliaria.Models
                 Inmueble = new Inmueble
                 {
                   IdInmueble = reader.GetInt32("id_inmueble"),
-                  IdPropietario = reader.GetInt32("inm.id_Propietario"),
-                  Propieteario = new Propietario
+                  IdPropietario = reader.GetInt32("inm_id_Propietario"),
+                  Propietario = new Propietario
                   {
-                    IdPropietario = reader.GetInt32("inm.id_propietario"),
-                    Dni = reader.GetString("p.dni"),
-                    Nombre = reader.GetString("p.nombre"),
-                    Apellido = reader.GetString("p.apellido"),
-                    Telefono = reader.GetString("p.in.telefono"),
-                    Email = reader.GetString("p..email")
+                    IdPropietario = reader.GetInt32("inm_id_propietario"),
+                    Dni = reader.GetString("p_dni"),
+                    Nombre = reader.GetString("p_nombre"),
+                    Apellido = reader.GetString("p_apellido"),
+                    Telefono = reader.GetString("p_telefono"),
+                    Email = reader.GetString("p_email")
                   },
-                  Direccion = reader.GetString("inm.direccion"),
-                  CantidadAmbientes = reader.GetInt32("inm.cantidad_ambientes"),
-                  Descripcion = reader.GetString("inm.descripcion")
+                  Direccion = reader.GetString("inm_direccion"),
+                  CantidadAmbientes = reader.GetInt32("inm_cantidad_ambientes"),
+                  Descripcion = reader.GetString("inm_descripcion")
                 },
                 IdInquilino = reader.GetInt32("id_inquilino"),
                 Inquilino = new Inquilino
                 {
                   IdInquilino = reader.GetInt32("id_inquilino"),
-                  Dni = reader.GetString("inq.dni"),
-                  Nombre = reader.GetString("inq.nombre"),
-                  Apellido = reader.GetString("inq.apellido"),
-                  Telefono = reader.GetString("inq.telefono"),
-                  Email = reader.GetString("inq.email")
+                  Dni = reader.GetString("inq_dni"),
+                  Nombre = reader.GetString("inq_nombre"),
+                  Apellido = reader.GetString("inq_apellido"),
+                  Telefono = reader.GetString("inq_telefono"),
+                  Email = reader.GetString("inq_email")
                 },
                 CreatedAt = reader.GetDateTime("created_at"),
                 UpdatedAt = reader.GetDateTime("updated_at")
@@ -196,38 +196,41 @@ namespace Inmobiliaria.Models
       {
         var sql = @"
         SELECT 
-        c.id_Contrato, 
-        c.fecha_desde, 
-        c.fecha_hasta, 
-        c.fecha_fin, 
-        c.monto_mensual, 
-        c.multa, 
-        c.estado, 
-        c.id_inmueble, 
-        c.id_inquilino, 
-        c.created_at, 
-        c.updated_at,
+            c.id_Contrato, 
+            c.fecha_desde, 
+            c.fecha_hasta, 
+            c.fecha_terminacion_anticipada, 
+            c.monto_mensual, 
+            c.multa, 
+            c.estado, 
+            c.id_inmueble, 
+            c.id_inquilino, 
+            c.created_at, 
+            c.updated_at,
 
-        inm.id_Propietario AS inm.id_Propietario, 
-        inm.direccion AS inm.direccion, 
-        inm.cantidad_ambientes AS inm.cantidad_ambientes, 
-        inm.descripcion AS inm.descripcion,
+            inm.id_Propietario AS inm_id_propietario, 
+            inm.direccion AS inm_direccion, 
+            inm.cantidad_ambientes AS inm_cantidad_ambientes, 
+            inm.descripcion AS inm_descripcion,
 
-        p.dni AS p.dni, 
-        p.nombre AS p.nombre, 
-        p.apellido AS p.apellido, 
-        p.telefono AS p.telefono, 
-        p.email AS p.email,
+            p.id_propietario AS p_id_propietario,
+            p.dni AS p_dni, 
+            p.nombre AS p_nombre, 
+            p.apellido AS p_apellido, 
+            p.telefono AS p_telefono, 
+            p.email AS p_email,
 
-        inq.dni AS inq.dni, 
-        inq.nombre AS inq.nombre, 
-        inq.apellido AS inq.apellido, 
-        inq.telefono AS inq.telefono, 
-        inq.email AS inq.email,
+            inq.id_inquilino AS inq_id_inquilino,
+            inq.dni AS inq_dni, 
+            inq.nombre AS inq_nombre, 
+            inq.apellido AS inq_apellido, 
+            inq.telefono AS inq_telefono, 
+            inq.email AS inq_email
 
-        FROM contrato c JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
+        FROM contrato c 
+        JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
         JOIN propietario p ON inm.id_propietario = p.id_propietario
-        JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino
+        JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino;
 
         WHERE c.id_inmueble = @id";
         using (var cmd = new MySqlCommand(sql, conn))
@@ -243,7 +246,7 @@ namespace Inmobiliaria.Models
                 IdContrato = reader.GetInt32("id_Contrato"),
                 FechaDesde = reader.GetDateTime("fecha_desde"),
                 FechaHasta = reader.GetDateTime("fecha_hasta"),
-                FechaFin = reader.GetDateTime("fecha_fin"),
+                FechaFin = reader.GetDateTime("fecha_terminacion_anticipada"),
                 MontoMensual = reader.GetDecimal("monto_mensual"),
                 Multa = reader.GetDecimal("multa"),
                 Estado = reader.GetInt32("estado"),
@@ -251,29 +254,29 @@ namespace Inmobiliaria.Models
                 Inmueble = new Inmueble
                 {
                   IdInmueble = reader.GetInt32("id_inmueble"),
-                  IdPropietario = reader.GetInt32("inm.id_Propietario"),
-                  Propieteario = new Propietario
+                  IdPropietario = reader.GetInt32("inm_id_propietario"),
+                  Propietario = new Propietario
                   {
-                    IdPropietario = reader.GetInt32("inm.id_propietario"),
-                    Dni = reader.GetString("p.dni"),
-                    Nombre = reader.GetString("p.nombre"),
-                    Apellido = reader.GetString("p.apellido"),
-                    Telefono = reader.GetString("p.in.telefono"),
-                    Email = reader.GetString("p..email")
+                    IdPropietario = reader.GetInt32("p_id_propietario"),
+                    Dni = reader.GetString("p_dni"),
+                    Nombre = reader.GetString("p_nombre"),
+                    Apellido = reader.GetString("p_apellido"),
+                    Telefono = reader.GetString("p_telefono"),
+                    Email = reader.GetString("p_email")
                   },
-                  Direccion = reader.GetString("inm.direccion"),
-                  CantidadAmbientes = reader.GetInt32("inm.cantidad_ambientes"),
-                  Descripcion = reader.GetString("inm.descripcion")
+                  Direccion = reader.GetString("inm_direccion"),
+                  CantidadAmbientes = reader.GetInt32("inm_cantidad_ambientes"),
+                  Descripcion = reader.GetString("inm_descripcion")
                 },
                 IdInquilino = reader.GetInt32("id_inquilino"),
                 Inquilino = new Inquilino
                 {
-                  IdInquilino = reader.GetInt32("id_inquilino"),
-                  Dni = reader.GetString("inq.dni"),
-                  Nombre = reader.GetString("inq.nombre"),
-                  Apellido = reader.GetString("inq.apellido"),
-                  Telefono = reader.GetString("inq.telefono"),
-                  Email = reader.GetString("inq.email")
+                  IdInquilino = reader.GetInt32("inq_id_inquilino"),
+                  Dni = reader.GetString("inq_dni"),
+                  Nombre = reader.GetString("inq_nombre"),
+                  Apellido = reader.GetString("inq_apellido"),
+                  Telefono = reader.GetString("inq_telefono"),
+                  Email = reader.GetString("inq_email")
                 },
                 CreatedAt = reader.GetDateTime("created_at"),
                 UpdatedAt = reader.GetDateTime("updated_at")
@@ -293,40 +296,42 @@ namespace Inmobiliaria.Models
       using (var conn = new MySqlConnection(connectionString))
       {
         var sql = @"
-        SELECT 
-        c.id_Contrato, 
-        c.fecha_desde, 
-        c.fecha_hasta, 
-        c.fecha_fin, 
-        c.monto_mensual, 
-        c.multa, 
-        c.estado, 
-        c.id_inmueble, 
-        c.id_inquilino, 
-        c.created_at, 
-        c.updated_at,
+                SELECT 
+            c.id_Contrato, 
+            c.fecha_desde, 
+            c.fecha_hasta, 
+            c.fecha_terminacion_anticipada, 
+            c.monto_mensual, 
+            c.multa, 
+            c.estado, 
+            c.id_inmueble, 
+            c.id_inquilino, 
+            c.created_at, 
+            c.updated_at,
 
-        inm.id_Propietario AS inm.id_Propietario, 
-        inm.direccion AS inm.direccion, 
-        inm.cantidad_ambientes AS inm.cantidad_ambientes, 
-        inm.descripcion AS inm.descripcion,
+            inm.id_Propietario AS inm_id_propietario, 
+            inm.direccion AS inm_direccion, 
+            inm.cantidad_ambientes AS inm_cantidad_ambientes, 
+            inm.descripcion AS inm_descripcion,
 
-        p.dni AS p.dni, 
-        p.nombre AS p.nombre, 
-        p.apellido AS p.apellido, 
-        p.telefono AS p.telefono, 
-        p.email AS p.email,
+            p.id_propietario AS p_id_propietario,
+            p.dni AS p_dni, 
+            p.nombre AS p_nombre, 
+            p.apellido AS p_apellido, 
+            p.telefono AS p_telefono, 
+            p.email AS p_email,
 
-        inq.dni AS inq.dni, 
-        inq.nombre AS inq.nombre, 
-        inq.apellido AS inq.apellido, 
-        inq.telefono AS inq.telefono, 
-        inq.email AS inq.email,
+            inq.id_inquilino AS inq_id_inquilino,
+            inq.dni AS inq_dni, 
+            inq.nombre AS inq_nombre, 
+            inq.apellido AS inq_apellido, 
+            inq.telefono AS inq_telefono, 
+            inq.email AS inq_email
 
-        FROM contrato c JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
+        FROM contrato c 
+        JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
         JOIN propietario p ON inm.id_propietario = p.id_propietario
-        JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino
-
+        JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino;
         WHERE c.id_inquilino = @id";
         using (var cmd = new MySqlCommand(sql, conn))
         {
@@ -341,7 +346,7 @@ namespace Inmobiliaria.Models
                 IdContrato = reader.GetInt32("id_Contrato"),
                 FechaDesde = reader.GetDateTime("fecha_desde"),
                 FechaHasta = reader.GetDateTime("fecha_hasta"),
-                FechaFin = reader.GetDateTime("fecha_fin"),
+                FechaFin = reader.GetDateTime("fecha_terminacion_anticipada"),
                 MontoMensual = reader.GetDecimal("monto_mensual"),
                 Multa = reader.GetDecimal("multa"),
                 Estado = reader.GetInt32("estado"),
@@ -349,29 +354,29 @@ namespace Inmobiliaria.Models
                 Inmueble = new Inmueble
                 {
                   IdInmueble = reader.GetInt32("id_inmueble"),
-                  IdPropietario = reader.GetInt32("inm.id_Propietario"),
-                  Propieteario = new Propietario
+                  IdPropietario = reader.GetInt32("inm_id_propietario"),
+                  Propietario = new Propietario
                   {
-                    IdPropietario = reader.GetInt32("inm.id_propietario"),
-                    Dni = reader.GetString("p.dni"),
-                    Nombre = reader.GetString("p.nombre"),
-                    Apellido = reader.GetString("p.apellido"),
-                    Telefono = reader.GetString("p.in.telefono"),
-                    Email = reader.GetString("p..email")
+                    IdPropietario = reader.GetInt32("p_id_propietario"),
+                    Dni = reader.GetString("p_dni"),
+                    Nombre = reader.GetString("p_nombre"),
+                    Apellido = reader.GetString("p_apellido"),
+                    Telefono = reader.GetString("p_telefono"),
+                    Email = reader.GetString("p_email")
                   },
-                  Direccion = reader.GetString("inm.direccion"),
-                  CantidadAmbientes = reader.GetInt32("inm.cantidad_ambientes"),
-                  Descripcion = reader.GetString("inm.descripcion")
+                  Direccion = reader.GetString("inm_direccion"),
+                  CantidadAmbientes = reader.GetInt32("inm_cantidad_ambientes"),
+                  Descripcion = reader.GetString("inm_descripcion")
                 },
                 IdInquilino = reader.GetInt32("id_inquilino"),
                 Inquilino = new Inquilino
                 {
-                  IdInquilino = reader.GetInt32("id_inquilino"),
-                  Dni = reader.GetString("inq.dni"),
-                  Nombre = reader.GetString("inq.nombre"),
-                  Apellido = reader.GetString("inq.apellido"),
-                  Telefono = reader.GetString("inq.telefono"),
-                  Email = reader.GetString("inq.email")
+                  IdInquilino = reader.GetInt32("inq_id_inquilino"),
+                  Dni = reader.GetString("inq_dni"),
+                  Nombre = reader.GetString("inq_nombre"),
+                  Apellido = reader.GetString("inq_apellido"),
+                  Telefono = reader.GetString("inq_telefono"),
+                  Email = reader.GetString("inq_email")
                 },
                 CreatedAt = reader.GetDateTime("created_at"),
                 UpdatedAt = reader.GetDateTime("updated_at")
@@ -391,40 +396,43 @@ namespace Inmobiliaria.Models
       using (var conn = new MySqlConnection(connectionString))
       {
         var sql = @"
-        SELECT 
-        c.id_Contrato, 
-        c.fecha_desde, 
-        c.fecha_hasta, 
-        c.fecha_fin, 
-        c.monto_mensual, 
-        c.multa, 
-        c.estado, 
-        c.id_inmueble, 
-        c.id_inquilino, 
-        c.created_at, 
-        c.updated_at,
+                SELECT 
+            c.id_Contrato, 
+            c.fecha_desde, 
+            c.fecha_hasta, 
+            c.fecha_terminacion_anticipada, 
+            c.monto_mensual, 
+            c.multa, 
+            c.estado, 
+            c.id_inmueble, 
+            c.id_inquilino, 
+            c.created_at, 
+            c.updated_at,
 
-        inm.id_Propietario AS inm.id_Propietario, 
-        inm.direccion AS inm.direccion, 
-        inm.cantidad_ambientes AS inm.cantidad_ambientes, 
-        inm.descripcion AS inm.descripcion,
+            inm.id_Propietario AS inm_id_propietario, 
+            inm.direccion AS inm_direccion, 
+            inm.cantidad_ambientes AS inm_cantidad_ambientes, 
+            inm.descripcion AS inm_descripcion,
 
-        p.dni AS p.dni, 
-        p.nombre AS p.nombre, 
-        p.apellido AS p.apellido, 
-        p.telefono AS p.telefono, 
-        p.email AS p.email,
+            p.id_propietario AS p_id_propietario,
+            p.dni AS p_dni, 
+            p.nombre AS p_nombre, 
+            p.apellido AS p_apellido, 
+            p.telefono AS p_telefono, 
+            p.email AS p_email,
 
-        inq.dni AS inq.dni, 
-        inq.nombre AS inq.nombre, 
-        inq.apellido AS inq.apellido, 
-        inq.telefono AS inq.telefono, 
-        inq.email AS inq.email,
+            inq.id_inquilino AS inq_id_inquilino,
+            inq.dni AS inq_dni, 
+            inq.nombre AS inq_nombre, 
+            inq.apellido AS inq_apellido, 
+            inq.telefono AS inq_telefono, 
+            inq.email AS inq_email
 
-        FROM contrato c JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
+        FROM contrato c 
+        JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
         JOIN propietario p ON inm.id_propietario = p.id_propietario
-        JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino"
-        ;
+        JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino
+        ";
         using (var cmd = new MySqlCommand(sql, conn))
         {
           conn.Open();
@@ -437,7 +445,7 @@ namespace Inmobiliaria.Models
                 IdContrato = reader.GetInt32("id_Contrato"),
                 FechaDesde = reader.GetDateTime("fecha_desde"),
                 FechaHasta = reader.GetDateTime("fecha_hasta"),
-                FechaFin = reader.GetDateTime("fecha_fin"),
+                FechaFin = reader.GetDateTime("fecha_terminacion_anticipada"),
                 MontoMensual = reader.GetDecimal("monto_mensual"),
                 Multa = reader.GetDecimal("multa"),
                 Estado = reader.GetInt32("estado"),
@@ -445,29 +453,29 @@ namespace Inmobiliaria.Models
                 Inmueble = new Inmueble
                 {
                   IdInmueble = reader.GetInt32("id_inmueble"),
-                  IdPropietario = reader.GetInt32("inm.id_Propietario"),
-                  Propieteario = new Propietario
+                  IdPropietario = reader.GetInt32("inm_id_propietario"),
+                  Propietario = new Propietario
                   {
-                    IdPropietario = reader.GetInt32("inm.id_propietario"),
-                    Dni = reader.GetString("p.dni"),
-                    Nombre = reader.GetString("p.nombre"),
-                    Apellido = reader.GetString("p.apellido"),
-                    Telefono = reader.GetString("p.in.telefono"),
-                    Email = reader.GetString("p..email")
+                    IdPropietario = reader.GetInt32("p_id_propietario"),
+                    Dni = reader.GetString("p_dni"),
+                    Nombre = reader.GetString("p_nombre"),
+                    Apellido = reader.GetString("p_apellido"),
+                    Telefono = reader.GetString("p_telefono"),
+                    Email = reader.GetString("p_email")
                   },
-                  Direccion = reader.GetString("inm.direccion"),
-                  CantidadAmbientes = reader.GetInt32("inm.cantidad_ambientes"),
-                  Descripcion = reader.GetString("inm.descripcion")
+                  Direccion = reader.GetString("inm_direccion"),
+                  CantidadAmbientes = reader.GetInt32("inm_cantidad_ambientes"),
+                  Descripcion = reader.GetString("inm_descripcion")
                 },
                 IdInquilino = reader.GetInt32("id_inquilino"),
                 Inquilino = new Inquilino
                 {
-                  IdInquilino = reader.GetInt32("id_inquilino"),
-                  Dni = reader.GetString("inq.dni"),
-                  Nombre = reader.GetString("inq.nombre"),
-                  Apellido = reader.GetString("inq.apellido"),
-                  Telefono = reader.GetString("inq.telefono"),
-                  Email = reader.GetString("inq.email")
+                  IdInquilino = reader.GetInt32("inq_id_inquilino"),
+                  Dni = reader.GetString("inq_dni"),
+                  Nombre = reader.GetString("inq_nombre"),
+                  Apellido = reader.GetString("inq_apellido"),
+                  Telefono = reader.GetString("inq_telefono"),
+                  Email = reader.GetString("inq_email")
                 },
                 CreatedAt = reader.GetDateTime("created_at"),
                 UpdatedAt = reader.GetDateTime("updated_at")
@@ -480,6 +488,114 @@ namespace Inmobiliaria.Models
       }
       return lista;
     }
+
+
+public List<Contrato> Filtrar(string? dniInquilino, string? apellidoInquilino, string? direccion, string? dniPropietario, string? apellidoPropietario)
+{
+    var lista = new List<Contrato>();
+    using (var conn = new MySqlConnection(connectionString))
+    {
+        var sql = @"
+            SELECT c.id_Contrato, c.fecha_desde, c.fecha_hasta, c.fecha_terminacion_anticipada, 
+                  c.monto_mensual, c.multa, c.estado, c.id_inmueble, c.id_inquilino, 
+                  c.created_at, c.updated_at,
+                  inm.id_Propietario AS inm_id_propietario, inm.direccion AS inm_direccion, 
+                  inm.cantidad_ambientes AS inm_cantidad_ambientes, inm.descripcion AS inm_descripcion,
+                  p.id_propietario AS p_id_propietario, p.dni AS p_dni, p.nombre AS p_nombre, 
+                  p.apellido AS p_apellido, p.telefono AS p_telefono, p.email AS p_email,
+                  inq.id_inquilino AS inq_id_inquilino, inq.dni AS inq_dni, inq.nombre AS inq_nombre, 
+                  inq.apellido AS inq_apellido, inq.telefono AS inq_telefono, inq.email AS inq_email
+            FROM contrato c 
+            JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
+            JOIN propietario p ON inm.id_propietario = p.id_propietario
+            JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino
+            WHERE 1=1
+        ";
+
+        // Filtros dinámicos
+        if (!string.IsNullOrEmpty(dniInquilino))
+            sql += " AND inq.dni = @dniInquilino";
+
+        if (!string.IsNullOrEmpty(apellidoInquilino))
+            sql += " AND inq.apellido LIKE @apellidoInquilino";
+
+        if (!string.IsNullOrEmpty(direccion))
+            sql += " AND inm.direccion LIKE @direccion";
+
+        if (!string.IsNullOrEmpty(dniPropietario))
+            sql += " AND p.dni = @dniPropietario";
+
+        if (!string.IsNullOrEmpty(apellidoPropietario))
+            sql += " AND p.apellido LIKE @apellidoPropietario";
+
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+            if (!string.IsNullOrEmpty(dniInquilino))
+                cmd.Parameters.AddWithValue("@dniInquilino", dniInquilino);
+
+            if (!string.IsNullOrEmpty(apellidoInquilino))
+                cmd.Parameters.AddWithValue("@apellidoInquilino", "%" + apellidoInquilino + "%");
+
+            if (!string.IsNullOrEmpty(direccion))
+                cmd.Parameters.AddWithValue("@direccion", "%" + direccion + "%");
+
+            if (!string.IsNullOrEmpty(dniPropietario))
+                cmd.Parameters.AddWithValue("@dniPropietario", dniPropietario);
+
+            if (!string.IsNullOrEmpty(apellidoPropietario))
+                cmd.Parameters.AddWithValue("@apellidoPropietario", "%" + apellidoPropietario + "%");
+
+            conn.Open();
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    lista.Add(new Contrato
+                    {
+                        IdContrato = reader.GetInt32("id_Contrato"),
+                        FechaDesde = reader.GetDateTime("fecha_desde"),
+                        FechaHasta = reader.GetDateTime("fecha_hasta"),
+                        FechaFin = reader.IsDBNull("fecha_terminacion_anticipada") ? null : reader.GetDateTime("fecha_terminacion_anticipada"),
+                        MontoMensual = reader.GetDecimal("monto_mensual"),
+                        Multa = reader.GetDecimal("multa"),
+                        Estado = reader.GetInt32("estado"),
+                        IdInmueble = reader.GetInt32("id_inmueble"),
+                        Inmueble = new Inmueble
+                        {
+                            IdInmueble = reader.GetInt32("id_inmueble"),
+                            IdPropietario = reader.GetInt32("inm_id_propietario"),
+                            Propietario = new Propietario
+                            {
+                                IdPropietario = reader.GetInt32("p_id_propietario"),
+                                Dni = reader.GetString("p_dni"),
+                                Nombre = reader.GetString("p_nombre"),
+                                Apellido = reader.GetString("p_apellido"),
+                                Telefono = reader.GetString("p_telefono"),
+                                Email = reader.GetString("p_email")
+                            },
+                            Direccion = reader.GetString("inm_direccion"),
+                            CantidadAmbientes = reader.GetInt32("inm_cantidad_ambientes"),
+                            Descripcion = reader.GetString("inm_descripcion")
+                        },
+                        IdInquilino = reader.GetInt32("id_inquilino"),
+                        Inquilino = new Inquilino
+                        {
+                            IdInquilino = reader.GetInt32("inq_id_inquilino"),
+                            Dni = reader.GetString("inq_dni"),
+                            Nombre = reader.GetString("inq_nombre"),
+                            Apellido = reader.GetString("inq_apellido"),
+                            Telefono = reader.GetString("inq_telefono"),
+                            Email = reader.GetString("inq_email")
+                        },
+                        CreatedAt = reader.GetDateTime("created_at"),
+                        UpdatedAt = reader.GetDateTime("updated_at")
+                    });
+                }
+            }
+        }
+    }
+    return lista;
+}
 
   }
 }
