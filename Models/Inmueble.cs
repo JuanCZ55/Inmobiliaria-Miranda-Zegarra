@@ -9,7 +9,7 @@ namespace Inmobiliaria.Models
     {
         [Key]
         [Display(Name = "Codigo")]
-        public int IdInmueble { get; set; }
+        public int IdInmueble { get; set; } = 0;
 
         [Required(ErrorMessage = "El campo Propietario es obligatorio.")]
         public int IdPropietario { get; set; }
@@ -19,7 +19,7 @@ namespace Inmobiliaria.Models
         public Propietario? Propietario { get; set; }
 
         [Required(ErrorMessage = "El campo Tipo de Inmueble es obligatorio.")]
-        public int? IdTipoInmueble { get; set; } = 0;
+        public int IdTipoInmueble { get; set; } = 0;
 
         [ForeignKey(nameof(IdTipoInmueble))]
         public TipoInmueble? TipoInmueble { get; set; }
@@ -51,9 +51,10 @@ namespace Inmobiliaria.Models
         public string Latitud { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El precio es obligatorio.")]
-        [RegularExpression(
-            @"^\d{1,3}(,\d{3})*(\.\d{2})?$|^\d+(\.\d{2})?$",
-            ErrorMessage = "El precio debe ser un número válido con hasta 2 decimales."
+        [Range(
+            0.01,
+            double.MaxValue,
+            ErrorMessage = "El precio debe ser un número positivo y válido."
         )]
         public decimal Precio { get; set; }
 
