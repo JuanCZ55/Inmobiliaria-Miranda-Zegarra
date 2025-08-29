@@ -24,8 +24,6 @@ namespace Inmobiliaria.Models
 
     public decimal Multa { get; set; }
 
-    public string Observaciones { get; set; } = string.Empty;
-
     public int Estado { get; set; } = 1;
 
     [Required(ErrorMessage = "El Inquilino es obligatorio")]
