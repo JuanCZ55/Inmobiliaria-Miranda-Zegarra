@@ -1,0 +1,109 @@
+@model Inmobiliaria.Models.Contrato
+@{
+  ViewData["Title"] = "Crear Contrato";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+  <div class="row bg-light rounded shadow-sm">
+    <!-- Columna izquierda -->
+    <div class="col-6 d-flex align-items-start p-5" style="min-height: 80vh;">
+      <form asp-action="Crear" method="post" class="mx-auto h-100 rounded bg-white shadow p-5">
+        <div class="d-flex flex-column justify-content-between align-items-center h-100">
+          <div class="row justify-content-center">
+            <h2 class="text-center mb-4">Contrato</h2>
+            <div class="col-10 mb-3">
+              <label class="form-label">DNI del Inquilino</label>
+              <input class="form-control" />
+            </div>
+            <div class="col-10 mb-3">
+              <label class="form-label">Cod. Inmueble</label>
+              <input class="form-control" />
+            </div>
+            <div class="col-10 mb-3">
+              <label class="form-label">Fecha Desde</label>
+              <input class="form-control" type="date" />
+            </div>
+            <div class="col-10 mb-3">
+              <label class="form-label">Fecha Hasta</label>
+              <input class="form-control" type="date" />
+            </div>
+            <div class="col-10 mb-3">
+              <label class="form-label">Monto Mensual</label>
+              <input class="form-control" />
+            </div>
+            <div class="col-10 mb-3">
+              <label class="form-label">Estado</label>
+              <select class="form-control">
+                <option value="1">Vigente</option>
+                <option value="2">Finalizado</option>
+                <option value="3">Cancelado</option>
+              </select>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between mt-4 col-10">
+            <button type="submit" class="btn btn-success">Crear</button>
+            <button type="button" class="btn btn-secondary">Cancelar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Columna derecha -->
+    <div class="col-6 d-flex flex-column justify-content-between p-5" style="min-height: 80vh;">
+      <!-- Formulario derecho superior -->
+      <form class="mx-auto mb-4 rounded bg-white shadow p-5">
+        <h2 class="text-center mb-3">Inquilino</h2>
+        <div class="row justify-content-center">
+          <div class="col-4 mb-3">
+            <label class="form-label">DNI</label>
+            <input class="form-control" />
+          </div>
+          <div class="col-4 mb-3">
+            <label class="form-label">Nombre</label>
+            <input class="form-control" />
+          </div>
+          <div class="col-4 mb-3">
+            <label class="form-label">Apellido</label>
+            <input class="form-control" />
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label">Teléfono</label>
+            <input class="form-control" />
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label">Email</label>
+            <input class="form-control" />
+          </div>
+        </div>
+      </form>
+
+      <!-- Formulario derecho inferior -->
+      <form class="mx-auto rounded bg-white shadow p-5">
+        <h2 class="text-center mb-3">Inmueble</h2>
+        <div class="row justify-content-center">
+          <div class="col-4 mb-3">
+            <label class="form-label">Código</label>
+            <input class="form-control" />
+          </div>
+          <div class="col-4 mb-3">
+            <label class="form-label">Tipo de Inmueble</label>
+            <input class="form-control" />
+          </div>
+          <div class="col-4 mb-3">
+            <label class="form-label">Precio</label>
+            <input class="form-control" />
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label">Dirección</label>
+            <input class="form-control" />
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label">Descripción</label>
+            <input class="form-control" />
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
