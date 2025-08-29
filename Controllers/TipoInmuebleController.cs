@@ -42,7 +42,7 @@ namespace Inmobiliaria.Controllers
                     else
                     {
                         TempData["Warning"] =
-                            $"El tipo de inmueble {tipoInmueble.Nombre} ya existe.";
+                            $"El tipo de inmueble {tipoInmueble.Nombre} ya existe, no se creo.";
                     }
                     return RedirectToAction(nameof(Listar));
                 }
@@ -80,6 +80,13 @@ namespace Inmobiliaria.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    var ti = repositorio.BuscarPorId(tipoInmueble.IdTipoInmueble);
+                    if (ti.Nombre == tipoInmueble.Nombre)
+                    {
+                        TempData["Mensaje"] =
+                            $"Ya tiene ese nombre este tipo de inmueble: {tipoInmueble.Nombre}, no se modifico.";
+                        return RedirectToAction(nameof(Listar));
+                    }
                     repositorio.Modificar(tipoInmueble);
                     TempData["Mensaje"] =
                         $"Se modifico correctamente el tipo de inmueble: {tipoInmueble.Nombre}";
@@ -100,6 +107,12 @@ namespace Inmobiliaria.Controllers
         {
             try
             {
+                if (repositorio.SeEstaUsando(id) > 0)
+                {
+                    TempData["Warning"] =
+                        "No se puede eliminar el tipo de inmueble porque está en uso.";
+                    return RedirectToAction(nameof(Listar));
+                }
                 if (repositorio.Eliminar(id) > 0)
                 {
                     TempData["Mensaje"] =
@@ -117,6 +130,7 @@ namespace Inmobiliaria.Controllers
         }
 
         // GET: TipoInmueble/Listar
+        [HttpGet]
         public IActionResult Listar()
         {
             var lista = repositorio.ObtenerTodos();
@@ -128,6 +142,14 @@ namespace Inmobiliaria.Controllers
         public IActionResult ListarTodos()
         {
             var lista = repositorio.ObtenerTodos();
+            return Ok(lista);
+        }
+
+        // GET: TipoInmueble/ListarPorNombre
+        [HttpGet]
+        public IActionResult ListarPorNombre(string nombre)
+        {
+            var lista = repositorio.ListarPorNombre(nombre);
             return Ok(lista);
         }
     }
