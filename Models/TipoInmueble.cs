@@ -6,7 +6,7 @@ namespace Inmobiliaria.Models
     public class TipoInmueble
     {
         [Key]
-        public int IdTipoInmueble { get; set; }
+        public int IdTipoInmueble { get; set; } = 0;
 
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         [StringLength(50, ErrorMessage = "El nombre no puede superar los 50 caracteres.")]
