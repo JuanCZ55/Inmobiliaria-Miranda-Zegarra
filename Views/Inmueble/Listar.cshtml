@@ -1,0 +1,112 @@
+@model IEnumerable<Inmobiliaria.Models.Inmueble>
+@{
+  ViewData["Title"] = "Listado de Inmuebles";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Listado de Inmuebles</h2>
+
+<div class="container px-0 p-3">
+  <div class="d-flex">
+    <input oninput="buscarInmueble()" class="form-control w-50" style="max-width: 300px;" type="text"
+      id="direccionInput" placeholder="Ingrese dirección" />
+  </div>
+</div>
+
+<table class="table table-hover table-caption-top">
+  <thead class="table-dark">
+    <tr>
+      <th>@Html.DisplayNameFor(model => model.First().IdInmueble)</th>
+      <th>@Html.DisplayNameFor(model => model.First().Direccion)</th>
+      <th>@Html.DisplayNameFor(model => model.First().IdPropietario)</th>
+      <th>Tipo de Inmueble</th>
+      <th>@Html.DisplayNameFor(model => model.First().Uso)</th>
+      <th>@Html.DisplayNameFor(model => model.First().CantidadAmbientes)</th>
+      <th>@Html.DisplayNameFor(model => model.First().Descripcion)</th>
+      <th>@Html.DisplayNameFor(model => model.First().Precio)</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody id="tablaInmueble">
+    @foreach (var i in Model)
+    {
+      <tr>
+        <td>@i.IdInmueble</td>
+        <td>@i.Direccion</td>
+        <td>@i.IdPropietario</td>
+        <td>@(ViewBag.TipoDict.ContainsKey(i.IdTipoInmueble) ? ViewBag.TipoDict[i.IdTipoInmueble] : "-")</td>
+        @if (i.Uso == 1)
+        {
+          <td>Residencial</td>
+        }
+        else
+        {
+          <td>Comercial</td>
+        }
+
+        <td>@i.CantidadAmbientes</td>
+        <td>@i.Descripcion</td>
+        <td>@i.Precio</td>
+        <td class="d-flex justify-content-evenly">
+          <a asp-action="Modificar" asp-route-id="@i.IdInmueble" class="btn btn-warning btn-sm">Modificar</a>
+          <form asp-action="Eliminar" asp-route-id="@i.IdInmueble" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+<script>
+  async function buscarInmueble() {
+    const input = document.getElementById("direccionInput").value.trim();
+    try {
+      let response;
+      if (input) {
+        response = await fetch(`/Inmueble/BuscarPorPropietario?idPropietario=${input}`);
+      } else {
+        response = await fetch(`/Inmueble/ListarTodos`);
+      }
+      if (!response.ok) throw new Error("Error en la búsqueda");
+      const data = await response.json();
+      let tbody = document.getElementById("tablaInmueble");
+      tbody.innerHTML = "";
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center">No se encontraron inmuebles</td></tr>`;
+        return;
+      }
+      data.forEach(i => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${i.idInmueble}</td>
+                <td>${i.direccion}</td>
+                <td>${i.idPropietario}</td>
+                <td>${i.idTipoInmueble}</td>
+                <td>${i.uso}</td>
+                <td>${i.cantidadAmbientes}</td>
+                <td>${i.precio}</td>
+                <td class="d-flex justify-content-evenly">
+                    <a href="/Inmueble/Modificar/${i.idInmueble}" class="btn btn-warning btn-sm">Modificar</a>
+                    <form action="/Inmueble/Eliminar/${i.idInmueble}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>`;
+      });
+    } catch (err) { console.error(err); alert("Hubo un problema al buscar"); }
+  }
+</script>
+
+@if (TempData["Mensaje"] != null)
+{
+  <div id="mensajeAlerta" class="alert alert-success">
+    @TempData["Mensaje"]
+  </div>
+  <script>
+    setTimeout(function () {
+      var alerta = document.getElementById("mensajeAlerta");
+      if (alerta) { alerta.style.transition = "opacity 0.5s ease"; alerta.style.opacity = "0"; setTimeout(() => alerta.remove(), 500); }
+    }, 5000);
+  </script>
+}
