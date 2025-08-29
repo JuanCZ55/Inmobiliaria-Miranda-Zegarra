@@ -1,0 +1,78 @@
+@model Inmobiliaria.Models.Inmueble
+@{
+  ViewData["Title"] = "Modificar Inmueble";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Modificar Inmueble</h2>
+
+<form asp-action="Modificar" method="post">
+  <input type="hidden" asp-for="IdInmueble" />
+
+  <div class="mb-3">
+    <label asp-for="Direccion" class="form-label"></label>
+    <input asp-for="Direccion" class="form-control" />
+    <span asp-validation-for="Direccion" class="text-danger"></span>
+  </div>
+
+  <div class="mb-3">
+    <label asp-for="IdPropietario" class="form-label"></label>
+    <input asp-for="IdPropietario" class="form-control" />
+    <span asp-validation-for="IdPropietario" class="text-danger"></span>
+  </div>
+
+  <div class="mb-3">
+    <label asp-for="IdTipoInmueble" class="form-label"></label>
+    <select asp-for="IdTipoInmueble" class="form-select"
+      asp-items="@(new SelectList(ViewBag.Tipo, "IdTipoInmueble", "Nombre"))">
+      <option value="">Seleccione un tipo...</option>
+    </select>
+    <span asp-validation-for="IdTipoInmueble" class="text-danger"></span>
+  </div>
+  @if (ViewBag.Error != null)
+  {
+    <div class="alert alert-danger">@ViewBag.Error</div>
+  }
+
+  <div class="mb-3">
+    <label asp-for="Uso" class="form-label"></label>
+    <input asp-for="Uso" class="form-control" />
+    <span asp-validation-for="Uso" class="text-danger"></span>
+  </div>
+
+  <div class="mb-3">
+    <label asp-for="CantidadAmbientes" class="form-label"></label>
+    <input asp-for="CantidadAmbientes" class="form-control" />
+    <span asp-validation-for="CantidadAmbientes" class="text-danger"></span>
+  </div>
+
+  <div class="mb-3">
+    <label asp-for="Longitud" class="form-label"></label>
+    <input asp-for="Longitud" class="form-control" />
+    <span asp-validation-for="Longitud" class="text-danger"></span>
+  </div>
+
+  <div class="mb-3">
+    <label asp-for="Latitud" class="form-label"></label>
+    <input asp-for="Latitud" class="form-control" />
+    <span asp-validation-for="Latitud" class="text-danger"></span>
+  </div>
+
+  <div class="mb-3">
+    <label asp-for="Precio" class="form-label"></label>
+    <input asp-for="Precio" class="form-control" />
+    <span asp-validation-for="Precio" class="text-danger"></span>
+  </div>
+
+  <div class="mb-3">
+    <label asp-for="Descripcion" class="form-label"></label>
+    <input asp-for="Descripcion" class="form-control" />
+    <span asp-validation-for="Descripcion" class="text-danger"></span>
+  </div>
+
+  <button type="submit" class="btn btn-success">Guardar Cambios</button>
+</form>
+
+@section Scripts {
+  @Html.Partial("_ValidationScriptsPartial")
+}
