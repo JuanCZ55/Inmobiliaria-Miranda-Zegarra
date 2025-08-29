@@ -27,7 +27,7 @@ namespace Inmobiliaria.Models
                     cmd.Parameters.AddWithValue("@Longitud", Inmueble.Longitud);
                     cmd.Parameters.AddWithValue("@Latitud", Inmueble.Latitud);
                     cmd.Parameters.AddWithValue("@Precio", Inmueble.Precio);
-                    cmd.Parameters.AddWithValue("@Descripcion", Inmueble.Descripcion);
+                    cmd.Parameters.AddWithValue("@Descripcion", Inmueble.Descripcion ?? " - ");
                     conn.Open();
                     res = cmd.ExecuteNonQuery();
                     conn.Close();
@@ -84,7 +84,7 @@ namespace Inmobiliaria.Models
 
         public Inmueble ObtenerPorID(int IdInmueble)
         {
-            Inmueble inmueble = null;
+            var i = new Inmueble();
             using (var conn = new MySqlConnection(connectionString))
             {
                 var sql = @"SELECT * FROM inmueble WHERE id_inmueble=@IdInmueble";
@@ -96,27 +96,24 @@ namespace Inmobiliaria.Models
                     {
                         if (reader.Read())
                         {
-                            inmueble = new Inmueble
-                            {
-                                IdInmueble = reader.GetInt32("id_inmueble"),
-                                IdPropietario = reader.GetInt32("id_propietario"),
-                                IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
-                                Direccion = reader.GetString("direccion"),
-                                Uso = reader.GetInt32("uso"),
-                                CantidadAmbientes = reader.GetInt32("cantidad_ambientes"),
-                                Longitud = reader.GetString("longitud"),
-                                Latitud = reader.GetString("latitud"),
-                                Precio = reader.GetDecimal("precio"),
-                                Descripcion = reader.GetString("descripcion"),
-                                Estado = reader.GetInt32("estado"),
-                                CreatedAt = reader.GetDateTime("created_at"),
-                                UpdatedAt = reader.GetDateTime("updated_at"),
-                            };
+                            i.IdInmueble = reader.GetInt32("id_inmueble");
+                            i.IdPropietario = reader.GetInt32("id_propietario");
+                            i.IdTipoInmueble = reader.GetInt32("id_tipo_inmueble");
+                            i.Direccion = reader.GetString("direccion");
+                            i.Uso = reader.GetInt32("uso");
+                            i.CantidadAmbientes = reader.GetInt32("cantidad_ambientes");
+                            i.Longitud = reader.GetString("longitud");
+                            i.Latitud = reader.GetString("latitud");
+                            i.Precio = reader.GetDecimal("precio");
+                            i.Descripcion = reader.GetString("descripcion");
+                            i.Estado = reader.GetInt32("estado");
+                            i.CreatedAt = reader.GetDateTime("created_at");
+                            i.UpdatedAt = reader.GetDateTime("updated_at");
                         }
                     }
                 }
             }
-            return inmueble;
+            return i;
         }
 
         public List<Inmueble> ObtenerTodos()
@@ -143,9 +140,7 @@ namespace Inmobiliaria.Models
                                 Longitud = reader.GetString("longitud"),
                                 Latitud = reader.GetString("latitud"),
                                 Precio = reader.GetDecimal("precio"),
-                                Descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion"))
-                                    ? null
-                                    : reader.GetString("descripcion"),
+                                Descripcion = reader.GetString("descripcion"),
                                 Estado = reader.GetInt32("estado"),
                                 CreatedAt = reader.GetDateTime("created_at"),
                                 UpdatedAt = reader.GetDateTime("updated_at"),
@@ -313,6 +308,24 @@ namespace Inmobiliaria.Models
                 }
             }
             return lista;
+        }
+
+        public int SeEstaUsando(int IdInmueble)
+        {
+            int res = -1;
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                var sql =
+                    @"SELECT COUNT(*) FROM contrato WHERE id_inmueble = @IdInmueble AND estado = 1";
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@IdInmueble", IdInmueble);
+                    conn.Open();
+                    res = Convert.ToInt32(cmd.ExecuteScalar());
+                    conn.Close();
+                }
+            }
+            return res;
         }
 
         public int SetEstado(int IdInmueble, int Estado)
