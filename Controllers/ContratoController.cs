@@ -20,59 +20,61 @@ namespace Inmobiliaria.Controllers
       return RedirectToAction("Index", "Home");
     }
 
-    // GET: Contrato/Crear
-    [HttpGet]
-    public IActionResult Crear()
-    {
-      return View();
-    }
-
-    //POST: Contrato/Crear
-    [HttpPost]
-    public IActionResult Crear(Contrato contrato)
-    {
-      try
-      {
-        if (ModelState.IsValid)
+        // GET: Contrato/Gestion
+        [HttpGet]
+        public IActionResult Gestion()
         {
-          repositorio.Crear(contrato);
-          TempData["ContratoCreado"] = "Se agrego correctamente el contrato";
-          return RedirectToAction(nameof(Crear));
+          return View();
         }
-        else
-          return View(contrato);
-      }
-      catch (System.Exception)
-      {
-        throw;
-      }
-    }
 
-    // POST: Contrato/Finalizar/5
-    [HttpPost]
-    public IActionResult Finalizar(int id)
-    {
-      try
-      {
-        Contrato c = repositorio.ObtenerPorID(id);
-        if (c == null)
+    /*
+        //POST: Contrato/Crear
+        [HttpPost]
+        public IActionResult Crear(Contrato contrato)
         {
-          return RedirectToAction(nameof(Listar));
+          try
+          {
+            if (ModelState.IsValid)
+            {
+              repositorio.Crear(contrato);
+              TempData["ContratoCreado"] = "Se agrego correctamente el contrato";
+              return RedirectToAction(nameof(Crear));
+            }
+            else
+              return View(contrato);
+          }
+          catch (System.Exception)
+          {
+            throw;
+          }
         }
-        if (c.Estado == 1)
+    */
+    /*
+        // POST: Contrato/Finalizar/5
+        [HttpPost]
+        public IActionResult Finalizar(int id)
         {
-          repositorio.Finalizar(c);
-          return View(c);
+          try
+          {
+            Contrato c = repositorio.ObtenerPorID(id);
+            if (c == null)
+            {
+              return RedirectToAction(nameof(Listar));
+            }
+            if (c.Estado == 1)
+            {
+              repositorio.Finalizar(c);
+              return View(c);
+            }
+            TempData["ContratoNoVigente"] = "Contrato no finalizado";
+            return View(c);
+          }
+          catch (System.Exception)
+          {
+            throw;
+          }
         }
-        TempData["ContratoNoVigente"] = "Contrato no finalizado";
-        return View(c);
-      }
-      catch (System.Exception)
-      {
-        throw;
-      }
-    }
-
+    */
 
     // POST: Contrato/Cancelado/5
     [HttpPost]
@@ -89,7 +91,7 @@ namespace Inmobiliaria.Controllers
           }
           if (c.Estado == 1)
           {
-          repositorio.Cancelado(contrato);
+            repositorio.Cancelado(contrato);
             return RedirectToAction(nameof(Listar));
           }
           TempData["ContratoNoCancelado"] = "Contrato no cancelado";
@@ -133,10 +135,10 @@ namespace Inmobiliaria.Controllers
     }
 
     [HttpGet]
-    public IActionResult Listartodos()
+    public IActionResult Listartodos(string? dniInquilino, string? apellidoInquilino, string? direccion, string? dniPropietario, string? apellidoPropietario)
     {
-      var lista = repositorio.ObtenerTodos();
-      return Ok(lista);
+      var contratos = repositorio.Filtrar(dniInquilino, apellidoInquilino, direccion, dniPropietario, apellidoPropietario);
+      return Ok(contratos);
     }
 
   }
