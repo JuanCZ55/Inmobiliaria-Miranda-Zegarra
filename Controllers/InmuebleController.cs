@@ -242,5 +242,13 @@ namespace Inmobiliaria.Controllers
                 return RedirectToAction(nameof(Listar));
             }
         }
+        // GET: Inquilino/Inquilino
+        [HttpGet]
+        public IActionResult Inmueble(int idInmueble)
+        {
+            var inmueble = repositorio.ObtenerPorID(idInmueble);
+            return Ok(inmueble);
+
+        }
     }
 }

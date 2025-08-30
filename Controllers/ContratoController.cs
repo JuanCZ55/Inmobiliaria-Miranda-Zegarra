@@ -22,12 +22,12 @@ namespace Inmobiliaria.Controllers
 
         // GET: Contrato/Gestion
         [HttpGet]
-        public IActionResult Gestion()
+        public IActionResult Crear()
         {
-          return View();
+          return View("Gestion");
         }
 
-    /*
+
         //POST: Contrato/Crear
         [HttpPost]
         public IActionResult Crear(Contrato contrato)
@@ -48,7 +48,7 @@ namespace Inmobiliaria.Controllers
             throw;
           }
         }
-    */
+
     /*
         // POST: Contrato/Finalizar/5
         [HttpPost]
@@ -135,9 +135,10 @@ namespace Inmobiliaria.Controllers
     }
 
     [HttpGet]
-    public IActionResult Listartodos(string? dniInquilino, string? apellidoInquilino, string? direccion, string? dniPropietario, string? apellidoPropietario)
+    public IActionResult Listartodos(string idContrato, string? dniInquilino, string? idInmueble, string? estado, string? Fecha_desde, string? Fecha_hasta)
     {
-      var contratos = repositorio.Filtrar(dniInquilino, apellidoInquilino, direccion, dniPropietario, apellidoPropietario);
+
+      var contratos = repositorio.Filtrar(idContrato, dniInquilino, idInmueble, estado, Fecha_desde, Fecha_hasta);
       return Ok(contratos);
     }
 

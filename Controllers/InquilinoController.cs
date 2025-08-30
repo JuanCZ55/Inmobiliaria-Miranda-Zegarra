@@ -110,19 +110,31 @@ namespace Inmobiliaria.Controllers
       return View(lista);
     }
 
-        [HttpGet]
-        public IActionResult Listartodos()
-        {
-            var lista = repositorio.ObtenerTodos();
-            return Ok(lista);
-        }
+    [HttpGet]
+    public IActionResult Listartodos()
+    {
+      var lista = repositorio.ObtenerTodos();
+      return Ok(lista);
+    }
 
     // GET: Inquilino/Buscar
     [HttpGet]
-        public IActionResult Buscar(string dni)
-        {
-            var lista = repositorio.filtrarDNI(dni);
-            return Ok(lista);
-        }
+    public IActionResult Buscar(string dni)
+    {
+      var lista = repositorio.filtrarDNI(dni);
+      return Ok(lista);
+    }
+
+    // GET: Inquilino/Inquilino
+    [HttpGet]
+    public IActionResult Inquilino(string dni)
+    {
+      var inquilino = repositorio.ObtenerPorDni(dni);
+      if (inquilino.Estado == 1)
+      {
+        return Ok(inquilino);
+      }
+        return Ok(null);
+    }
   }
 }
