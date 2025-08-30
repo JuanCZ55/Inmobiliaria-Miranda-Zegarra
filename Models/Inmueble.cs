@@ -11,6 +11,7 @@ namespace Inmobiliaria.Models
         [Display(Name = "Codigo")]
         public int IdInmueble { get; set; } = 0;
 
+        [Display(Name = "Propietario")]
         [Required(ErrorMessage = "El campo Propietario es obligatorio.")]
         public int IdPropietario { get; set; }
 
@@ -21,6 +22,7 @@ namespace Inmobiliaria.Models
         [Required(ErrorMessage = "El campo Tipo de Inmueble es obligatorio.")]
         public int IdTipoInmueble { get; set; } = 0;
 
+        [Display(Name = "Tipo de Inmueble")]
         [ForeignKey(nameof(IdTipoInmueble))]
         public TipoInmueble? TipoInmueble { get; set; }
 
@@ -32,6 +34,7 @@ namespace Inmobiliaria.Models
         [Range(1, 2, ErrorMessage = "Seleccione 1 (Residencial) o 2 (Comercial)")]
         public int Uso { get; set; }
 
+        [Display(Name = "Cantidad de Ambientes")]
         [Required(ErrorMessage = "La cantidad de ambientes es obligatoria.")]
         [Range(1, 20, ErrorMessage = "Debe tener al menos 1 ambiente.")]
         public int CantidadAmbientes { get; set; }
