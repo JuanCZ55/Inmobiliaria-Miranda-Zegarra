@@ -6,10 +6,53 @@
 
 <h2>Listado de Inmuebles</h2>
 
-<div class="container px-0 p-3">
-  <div class="d-flex">
-    <input oninput="buscarInmueble()" class="form-control w-50" style="max-width: 300px;" type="text"
-      id="direccionInput" placeholder="Ingrese dirección" />
+<div class="container px-0 p-3 row">
+  <div class="col-md-3 mb-1">
+    <input type="text" id="propietario" class="form-control " style="max-width: 300px;"
+      placeholder="Ingrese Direccion" />
+  </div>
+  <div class="col-md-3 mb-1">
+    <input type="text" id="propietario" class="form-control " style="max-width: 300px;"
+      placeholder="Ingrese DNI propietario" />
+  </div>
+  <div class="col-md-3 mb-1">
+    <select id="tipo" class="form-control " style="max-width: 300px;">
+      <option value="">Seleccione tipo</option>
+      <option value="casa">Casa</option>
+      <option value="departamento">Departamento</option>
+      <option value="local">Local</option>
+      <option value="deposito">Depósito</option>
+    </select>
+  </div>
+
+
+
+  <div class="col-md-3 mb-1">
+    <select id="uso" class="form-control " style="max-width: 300px;">
+      <option value="">Seleccione uso</option>
+      <option value="comercial">Comercial</option>
+      <option value="residencial">Residencial</option>
+    </select>
+  </div>
+
+
+  <div class="col-md-3 mb-1">
+    <input type="number" id="ambientes" class="form-control " style="max-width: 300px;"
+      placeholder="Cantidad de ambientes" />
+  </div>
+
+  <div class="col-md-3">
+    <input type="number" id="precioMin" class="form-control " style="max-width: 300px;" placeholder="Precio mínimo" />
+  </div>
+  <div class="col-md-3">
+    <input type="number" id="precioMax" class="form-control " style="max-width: 300px;" placeholder="Precio máximo" />
+  </div>
+  <div class="col-md-3 mb-1">
+    <select id="estado" class="form-control " style="max-width: 300px;">
+      <option value="">Seleccione estado</option>
+      <option value="disponible">Disponible</option>
+      <option value="suspendido">Suspendido</option>
+    </select>
   </div>
 </div>
 
@@ -24,6 +67,7 @@
       <th>@Html.DisplayNameFor(model => model.First().CantidadAmbientes)</th>
       <th>@Html.DisplayNameFor(model => model.First().Descripcion)</th>
       <th>@Html.DisplayNameFor(model => model.First().Precio)</th>
+      <th>@Html.DisplayNameFor(model => model.First().Estado)</th>
       <th>Acciones</th>
     </tr>
   </thead>
@@ -44,9 +88,15 @@
           <td>Comercial</td>
         }
 
-        <td>@i.CantidadAmbientes</td>
-        <td>@i.Descripcion</td>
-        <td>@i.Precio</td>
+      <td>@i.CantidadAmbientes</td>
+      <td>@i.Descripcion</td>
+      <td>@i.Precio</td>
+      <td>
+        @(i.Estado == 1 ? "Disponible" :
+                i.Estado == 2 ? "Ocupado" :
+                i.Estado == 3 ? "Suspendido" :
+                "Error")
+        </td>
         <td class="d-flex justify-content-evenly">
           <a asp-action="Modificar" asp-route-id="@i.IdInmueble" class="btn btn-warning btn-sm">Modificar</a>
           <form asp-action="Eliminar" asp-route-id="@i.IdInmueble" method="post" style="display:inline;">
