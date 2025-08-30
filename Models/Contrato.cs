@@ -22,7 +22,7 @@ namespace Inmobiliaria.Models
     [Required(ErrorMessage = "El monto es obligatorio")]
     public decimal MontoMensual { get; set; }
 
-    public decimal Multa { get; set; }
+    public decimal? Multa { get; set; }
 
     public int Estado { get; set; } = 1;
 

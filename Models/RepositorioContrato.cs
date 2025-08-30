@@ -16,7 +16,7 @@ namespace Inmobiliaria.Models
       int res = -1;
       using (var conn = new MySqlConnection(connectionString))
       {
-        var sql = @"INSERT INTO contrato (id_inquilino, id_inmueble, fecha_desde, fecha_hasta, monto_mensual, estado) VALUES (@id_inquilino, @id_inmueble, @id_usuario_creador, @fecha_desde, @fecha_hasta, @monto_mensual, @estado); SELECT LAST_INSERT_ID();";
+        var sql = @"INSERT INTO contrato (id_inquilino, id_inmueble, fecha_desde, fecha_hasta, monto_mensual, estado) VALUES (@id_inquilino, @id_inmueble, @fecha_desde, @fecha_hasta, @monto_mensual, @estado); SELECT LAST_INSERT_ID();";
 
         using (var cmd = new MySqlCommand(sql, conn))
         {
@@ -445,9 +445,13 @@ namespace Inmobiliaria.Models
                 IdContrato = reader.GetInt32("id_Contrato"),
                 FechaDesde = reader.GetDateTime("fecha_desde"),
                 FechaHasta = reader.GetDateTime("fecha_hasta"),
-                FechaFin = reader.GetDateTime("fecha_terminacion_anticipada"),
+                FechaFin = reader.IsDBNull(reader.GetOrdinal("fecha_terminacion_anticipada")) 
+                                  ? (DateTime?)null 
+                                  : reader.GetDateTime("fecha_terminacion_anticipada"),
                 MontoMensual = reader.GetDecimal("monto_mensual"),
-                Multa = reader.GetDecimal("multa"),
+                Multa = reader.IsDBNull(reader.GetOrdinal("multa")) 
+                                  ? (decimal?)null 
+                                  : reader.GetDecimal(reader.GetOrdinal("multa")),
                 Estado = reader.GetInt32("estado"),
                 IdInmueble = reader.GetInt32("id_inmueble"),
                 Inmueble = new Inmueble
@@ -490,7 +494,7 @@ namespace Inmobiliaria.Models
     }
 
 
-public List<Contrato> Filtrar(string? dniInquilino, string? apellidoInquilino, string? direccion, string? dniPropietario, string? apellidoPropietario)
+public List<Contrato> Filtrar(string? idContrato,string? dniInquilino, string? idInmueble, string? estado, string? Fecha_desde, string? Fecha_hasta)
 {
     var lista = new List<Contrato>();
     using (var conn = new MySqlConnection(connectionString))
@@ -512,38 +516,45 @@ public List<Contrato> Filtrar(string? dniInquilino, string? apellidoInquilino, s
             WHERE 1=1
         ";
 
-        // Filtros dinámicos
+        // Filtros dinámicos con LIKE
+        if (!string.IsNullOrEmpty(idContrato))
+            sql += " AND c.id_contrato LIKE @idContrato";
+
         if (!string.IsNullOrEmpty(dniInquilino))
-            sql += " AND inq.dni = @dniInquilino";
+            sql += " AND inq.dni LIKE @dniInquilino";
 
-        if (!string.IsNullOrEmpty(apellidoInquilino))
-            sql += " AND inq.apellido LIKE @apellidoInquilino";
+        if (!string.IsNullOrEmpty(idInmueble))
+            sql += " AND inm.id_inmueble LIKE @idInmueble";
 
-        if (!string.IsNullOrEmpty(direccion))
-            sql += " AND inm.direccion LIKE @direccion";
+        if (!string.IsNullOrEmpty(estado))
+            sql += " AND c.estado = @estado";
 
-        if (!string.IsNullOrEmpty(dniPropietario))
-            sql += " AND p.dni = @dniPropietario";
+        if (!string.IsNullOrEmpty(Fecha_desde))
+            sql += " AND DATE(c.fecha_desde) >= @fechaDesde";
 
-        if (!string.IsNullOrEmpty(apellidoPropietario))
-            sql += " AND p.apellido LIKE @apellidoPropietario";
+        if (!string.IsNullOrEmpty(Fecha_hasta))
+            sql += " AND c.fecha_hasta <= @fechaHasta";
 
         using (var cmd = new MySqlCommand(sql, conn))
         {
+            if (!string.IsNullOrEmpty(idContrato))
+                cmd.Parameters.AddWithValue("@idContrato", "%" + idContrato + "%");
+
             if (!string.IsNullOrEmpty(dniInquilino))
-                cmd.Parameters.AddWithValue("@dniInquilino", dniInquilino);
+                cmd.Parameters.AddWithValue("@dniInquilino", "%" + dniInquilino + "%");
 
-            if (!string.IsNullOrEmpty(apellidoInquilino))
-                cmd.Parameters.AddWithValue("@apellidoInquilino", "%" + apellidoInquilino + "%");
+            if (!string.IsNullOrEmpty(idInmueble))
+                cmd.Parameters.AddWithValue("@idInmueble", "%" + idInmueble + "%");
 
-            if (!string.IsNullOrEmpty(direccion))
-                cmd.Parameters.AddWithValue("@direccion", "%" + direccion + "%");
+            if (!string.IsNullOrEmpty(estado))
+                cmd.Parameters.AddWithValue("@estado", estado);
 
-            if (!string.IsNullOrEmpty(dniPropietario))
-                cmd.Parameters.AddWithValue("@dniPropietario", dniPropietario);
+            if (!string.IsNullOrEmpty(Fecha_desde))
+                cmd.Parameters.AddWithValue("@fechaDesde", Fecha_desde);
 
-            if (!string.IsNullOrEmpty(apellidoPropietario))
-                cmd.Parameters.AddWithValue("@apellidoPropietario", "%" + apellidoPropietario + "%");
+            if (!string.IsNullOrEmpty(Fecha_hasta))
+                cmd.Parameters.AddWithValue("@fechaHasta", Fecha_hasta);
+
 
             conn.Open();
             using (var reader = cmd.ExecuteReader())
@@ -555,9 +566,13 @@ public List<Contrato> Filtrar(string? dniInquilino, string? apellidoInquilino, s
                         IdContrato = reader.GetInt32("id_Contrato"),
                         FechaDesde = reader.GetDateTime("fecha_desde"),
                         FechaHasta = reader.GetDateTime("fecha_hasta"),
-                        FechaFin = reader.IsDBNull("fecha_terminacion_anticipada") ? null : reader.GetDateTime("fecha_terminacion_anticipada"),
+                        FechaFin = reader.IsDBNull("fecha_terminacion_anticipada")
+                                          ? (DateTime?)null 
+                                          : reader.GetDateTime("fecha_terminacion_anticipada"),
                         MontoMensual = reader.GetDecimal("monto_mensual"),
-                        Multa = reader.GetDecimal("multa"),
+                        Multa = reader.IsDBNull(reader.GetOrdinal("multa")) 
+                                          ? (decimal?)null 
+                                          : reader.GetDecimal(reader.GetOrdinal("multa")),
                         Estado = reader.GetInt32("estado"),
                         IdInmueble = reader.GetInt32("id_inmueble"),
                         Inmueble = new Inmueble
