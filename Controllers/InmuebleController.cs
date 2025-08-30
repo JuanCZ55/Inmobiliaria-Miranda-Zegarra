@@ -201,6 +201,31 @@ namespace Inmobiliaria.Controllers
             return Ok(lista);
         }
 
+        [HttpGet]
+        public IActionResult SupaFiltro(
+            string direccion,
+            string dni,
+            int tipo,
+            int uso,
+            int ambientes,
+            int precioMin,
+            int precioMax,
+            int estado
+        )
+        {
+            var lista = repositorio.SupaFiltro(
+                direccion,
+                dni,
+                tipo,
+                uso,
+                ambientes,
+                precioMin,
+                precioMax,
+                estado
+            );
+            return Ok(lista);
+        }
+
         // POST: Inmueble/SetEstado/5
         [HttpPost]
         public IActionResult SetEstado(int id, int estado)
