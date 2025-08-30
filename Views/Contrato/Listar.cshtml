@@ -7,7 +7,7 @@
 
 <h2>Listado de Contratos</h2>
 
-<div class="row g-2">
+<div class="row g-2 pb-3">
   <div class="col-md-4">
     <input oninput="buscarContrato()" class="form-control" type="text" id="IdContrato" placeholder="Cod. Contrato" />
     <span id="errorIdContrato" class="text-danger d-none">IdContrato inválido (solo números positivos)</span>
@@ -15,11 +15,11 @@
   <div class="col-md-4">
     <input oninput="buscarContrato()" class="form-control" type="text" id="DniInquilino" placeholder="DNI Inquilino"
       maxlength="8" />
-    <span id="errorDniInquilino" class="text-danger d-none">DNI inválido (7 u 8 dígitos)</span>
+    <span id="errorDniInquilino" class="text-danger d-none">DNI inválido, 8 digitos maximo</span>
   </div>
   <div class="col-md-4">
     <input oninput="buscarContrato()" class="form-control" type="text" id="IdInmueble" placeholder="Cod. Inmueble" />
-    <span id="errorIdInmueble" class="text-danger d-none">IdInmueble inválido (solo números positivos)</span>
+    <span id="errorIdInmueble" class="text-danger d-none">Cod. Inmueble inválido (solo números positivos)</span>
   </div>
   <div class="col-md-4">
     <select id="Estado" class="form-control" onchange="buscarContrato()">
@@ -43,25 +43,25 @@
 <table class="table table-hover table-caption-top">
   <thead class="table-dark">
     <tr>
-      <th>@Html.DisplayNameFor(model => model.First().IdContrato)</th>
-      <th>@Html.DisplayNameFor(model => model.First().IdInquilino)</th>
-      <th>@Html.DisplayNameFor(model => model.First().IdInmueble)</th>
-      <th>@Html.DisplayNameFor(model => model.First().MontoMensual)</th>
-      <th>Fecha</th>
-      <th>@Html.DisplayNameFor(model => model.First().Estado)</th>
-      <th>Acciones</th>
+      <th class="text-center">@Html.DisplayNameFor(model => model.First().IdContrato)</th>
+      <th class="text-center">@Html.DisplayNameFor(model => model.First().IdInquilino)</th>
+      <th class="text-center">@Html.DisplayNameFor(model => model.First().IdInmueble)</th>
+      <th class="text-center">@Html.DisplayNameFor(model => model.First().MontoMensual)</th>
+      <th  class="text-center">Fecha</th>
+      <th class="text-center">@Html.DisplayNameFor(model => model.First().Estado)</th>
+      <th class="text-center">Acciones</th>
     </tr>
   </thead>
   <tbody id="tablaContrato">
     @foreach (var c in Model)
     {
       <tr>
-        <td>@c.IdContrato</td>
-        <td>@c.IdInquilino</td>
-        <td>@c.IdInmueble</td>
-        <td>@c.MontoMensual</td>
-        <td>@c.FechaDesde @c.FechaHasta</td>
-        <td>@(c.Estado == 1 ? "Vigente" : c.Estado == 2 ? "Finalizado" : c.Estado == 3 ? "Cancelado" : "Desconocido")</td>
+        <td class="text-center">@c.IdContrato</td>
+        <td class="text-center">@c.IdInquilino</td>
+        <td class="text-center">@c.IdInmueble</td>
+        <td class="text-center">@c.MontoMensual</td>
+        <td class="text-center">@c.FechaDesde.ToShortDateString() - @c.FechaHasta.ToShortDateString()</td>
+        <td class="text-center">@(c.Estado == 1 ? "Vigente" : c.Estado == 2 ? "Finalizado" : c.Estado == 3 ? "Cancelado" : "Desconocido")</td>
         <td class="d-flex justify-content-evenly">
           <a asp-action="Modificar" asp-route-id="@c.IdContrato" class="btn btn-warning btn-sm">
             Ver
@@ -73,7 +73,7 @@
 </table>
 
 <script>
-async function buscarContrato() {
+  async function buscarContrato() {
     const IdContrato = document.getElementById("IdContrato").value.trim();
     const DniInquilino = document.getElementById("DniInquilino").value.trim();
     const IdInmueble = document.getElementById("IdInmueble").value.trim();
@@ -89,31 +89,30 @@ async function buscarContrato() {
     document.getElementById("errorFechaHasta").classList.add("d-none");
 
     let error = false;
-
     if (IdContrato && (!/^[1-9]\d*$/.test(IdContrato))) {
-        document.getElementById("errorIdContrato").classList.remove("d-none");
-        error = true;
+      document.getElementById("errorIdContrato").classList.remove("d-none");
+      error = true;
     }
     if (IdInmueble && (!/^[1-9]\d*$/.test(IdInmueble))) {
-        document.getElementById("errorIdInmueble").classList.remove("d-none");
-        error = true;
+      document.getElementById("errorIdInmueble").classList.remove("d-none");
+      error = true;
     }
-    if (DniInquilino && (!/^\d{7,8}$/.test(DniInquilino))) {
-        document.getElementById("errorDniInquilino").classList.remove("d-none");
-        error = true;
+    if (DniInquilino && (!/^[0-9]{1,8}$/.test(DniInquilino))) {
+      document.getElementById("errorDniInquilino").classList.remove("d-none");
+      error = true;
     }
     if (Fecha_desde && isNaN(Date.parse(Fecha_desde))) {
-        document.getElementById("errorFechaDesde").classList.remove("d-none");
-        error = true;
+      document.getElementById("errorFechaDesde").classList.remove("d-none");
+      error = true;
     }
     if (Fecha_hasta && isNaN(Date.parse(Fecha_hasta))) {
-        document.getElementById("errorFechaHasta").classList.remove("d-none");
-        error = true;
+      document.getElementById("errorFechaHasta").classList.remove("d-none");
+      error = true;
     }
     if (Fecha_desde && Fecha_hasta && new Date(Fecha_desde) > new Date(Fecha_hasta)) {
-        document.getElementById("errorFechaDesde").classList.remove("d-none");
-        document.getElementById("errorFechaHasta").classList.remove("d-none");
-        error = true;
+      document.getElementById("errorFechaDesde").classList.remove("d-none");
+      document.getElementById("errorFechaHasta").classList.remove("d-none");
+      error = true;
     }
 
     if (error) return;
@@ -127,27 +126,27 @@ async function buscarContrato() {
     params.append("Fecha_hasta", Fecha_hasta);
 
     try {
-        const response = await fetch(`/Contrato/Listartodos?${params.toString()}`);
-        if (!response.ok) throw new Error("Error en la búsqueda");
+      const response = await fetch(`/Contrato/Listartodos?${params.toString()}`);
+      if (!response.ok) throw new Error("Error en la búsqueda");
 
-        const data = await response.json();
-        let tbody = document.getElementById("tablaContrato");
-        tbody.innerHTML = "";
+      const data = await response.json();
+      let tbody = document.getElementById("tablaContrato");
+      tbody.innerHTML = "";
 
-        if (data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center">No se encontraron Contratos</td></tr>`;
-            return;
-        }
-
-        data.forEach(p => {
-            let row = `
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center">No se encontraron Contratos</td></tr>`;
+        return;
+      }
+      console.warn(data)
+      data.forEach(p => {
+        let row = `
                 <tr>
-                    <td>${p.idContrato}</td>
-                    <td>${p.idInquilino}</td>
-                    <td>${p.idInmueble}</td>
-                    <td>${p.montoMensual}</td>
-                    <td>${p.fechaDesde} - ${p.fechaHasta}</td>
-                    <td>${p.estado}</td>
+                    <td class="text-center">${p.idContrato}</td>
+                    <td class="text-center">${p.idInquilino}</td>
+                    <td class="text-center">${p.idInmueble}</td>
+                    <td class="text-center">${p.montoMensual}</td>
+                    <td class="text-center">${p.fechaDesde} - ${p.fechaHasta}</td>
+                    <td class="text-center">${p.estado}</td>
                     <td class="d-flex justify-content-evenly">
                         <a href="/Contrato/Modificar/${p.idContrato}" class="btn btn-warning btn-sm">Modificar</a>
                         <form action="/Contrato/Eliminar/${p.idContrato}" method="post" style="display:inline;">
@@ -155,11 +154,11 @@ async function buscarContrato() {
                         </form>
                     </td>
                 </tr>`;
-            tbody.innerHTML += row;
-        });
+        tbody.innerHTML += row;
+      });
     } catch (error) {
-        alert("Hubo un problema al buscar");
-        console.error(error);
+      alert("Hubo un problema al buscar");
+      console.error(error);
     }
-}
+  }
 </script>
