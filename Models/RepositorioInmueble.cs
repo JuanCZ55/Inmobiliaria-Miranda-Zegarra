@@ -328,6 +328,128 @@ namespace Inmobiliaria.Models
             return res;
         }
 
+        public List<Inmueble> SupaFiltro(
+            string? direccion,
+            string? dni,
+            int? idTipoInmueble,
+            int? uso,
+            int? cantidadAmbientesMin,
+            decimal? precioMin,
+            decimal? precioMax,
+            int? estado
+        )
+        {
+            var lista = new List<Inmueble>();
+
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+
+                var sql =
+                    @"
+            SELECT
+                i.id_inmueble           AS IdInmueble,
+                i.id_propietario        AS Inmueble_IdPropietario,
+                i.direccion             AS Inmueble_Direccion,
+                i.id_tipo_inmueble      AS IdTipoInmueble,
+                i.uso                   AS Uso,
+                i.cantidad_ambientes    AS CantidadAmbientes,
+                i.longitud              AS Inmueble_Longitud,
+                i.latitud               AS Inmueble_Latitud,
+                i.precio                AS Precio,
+                i.descripcion           AS Descripcion,
+                i.estado                AS Inmueble_Estado,
+                i.created_at            AS Inmueble_CreatedAt,
+                i.updated_at            AS Inmueble_UpdatedAt,
+                pr.id_propietario       AS Propietario_IdPropietario,
+                pr.nombre               AS Propietario_Nombre,
+                pr.apellido             AS Propietario_Apellido,
+                pr.dni                  AS Propietario_Dni
+            FROM inmueble i
+            JOIN propietario pr 
+                ON i.id_propietario = pr.id_propietario
+            WHERE 1=1
+        ";
+
+                // filtros dinámicos
+                if (!string.IsNullOrEmpty(direccion))
+                    sql += " AND i.direccion LIKE CONCAT(@Direccion, '%')";
+                if (!string.IsNullOrEmpty(dni))
+                    sql += " AND pr.dni LIKE CONCAT(@Dni, '%')";
+                if (idTipoInmueble.HasValue && idTipoInmueble.Value != 0)
+                    sql += " AND i.id_tipo_inmueble = @IdTipoInmueble";
+                if (uso.HasValue && uso.Value != 0)
+                    sql += " AND i.uso = @Uso";
+                if (cantidadAmbientesMin.HasValue && cantidadAmbientesMin.Value > 0)
+                    sql += " AND i.cantidad_ambientes >= @CantidadAmbientesMin";
+                if (precioMin.HasValue && precioMin.Value > 0)
+                    sql += " AND i.precio >= @PrecioMin";
+                if (precioMax.HasValue && precioMax.Value > 0)
+                    sql += " AND i.precio <= @PrecioMax";
+                if (estado.HasValue && estado.Value != 0)
+                    sql += " AND i.estado = @Estado";
+
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    // parámetros dinámicos
+                    if (!string.IsNullOrEmpty(direccion))
+                        cmd.Parameters.AddWithValue("@Direccion", direccion);
+                    if (!string.IsNullOrEmpty(dni))
+                        cmd.Parameters.AddWithValue("@Dni", dni);
+                    if (idTipoInmueble.HasValue && idTipoInmueble.Value != 0)
+                        cmd.Parameters.AddWithValue("@IdTipoInmueble", idTipoInmueble.Value);
+                    if (uso.HasValue && uso.Value != 0)
+                        cmd.Parameters.AddWithValue("@Uso", uso.Value);
+                    if (cantidadAmbientesMin.HasValue && cantidadAmbientesMin.Value > 0)
+                        cmd.Parameters.AddWithValue(
+                            "@CantidadAmbientesMin",
+                            cantidadAmbientesMin.Value
+                        );
+                    if (precioMin.HasValue && precioMin.Value > 0)
+                        cmd.Parameters.AddWithValue("@PrecioMin", precioMin.Value);
+                    if (precioMax.HasValue && precioMax.Value > 0)
+                        cmd.Parameters.AddWithValue("@PrecioMax", precioMax.Value);
+                    if (estado.HasValue && estado.Value != 0)
+                        cmd.Parameters.AddWithValue("@Estado", estado.Value);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var inmueble = new Inmueble
+                            {
+                                IdInmueble = reader.GetInt32("IdInmueble"),
+                                IdPropietario = reader.GetInt32("Inmueble_IdPropietario"),
+                                Direccion = reader.GetString("Inmueble_Direccion"),
+                                IdTipoInmueble = reader.GetInt32("IdTipoInmueble"),
+                                Uso = reader.GetInt32("Uso"),
+                                CantidadAmbientes = reader.GetInt32("CantidadAmbientes"),
+                                Longitud = reader.GetString("Inmueble_Longitud"),
+                                Latitud = reader.GetString("Inmueble_Latitud"),
+                                Precio = reader.GetDecimal("Precio"),
+                                Descripcion = reader.GetString("Descripcion"),
+                                Estado = reader.GetInt32("Inmueble_Estado"),
+                                CreatedAt = reader.GetDateTime("Inmueble_CreatedAt"),
+                                UpdatedAt = reader.GetDateTime("Inmueble_UpdatedAt"),
+
+                                Propietario = new Propietario
+                                {
+                                    IdPropietario = reader.GetInt32("Propietario_IdPropietario"),
+                                    Nombre = reader.GetString("Propietario_Nombre"),
+                                    Apellido = reader.GetString("Propietario_Apellido"),
+                                    Dni = reader.GetString("Propietario_Dni"),
+                                },
+                            };
+
+                            lista.Add(inmueble);
+                        }
+                    }
+                }
+            }
+
+            return lista;
+        }
+
         public int SetEstado(int IdInmueble, int Estado)
         {
             int res = -1;
