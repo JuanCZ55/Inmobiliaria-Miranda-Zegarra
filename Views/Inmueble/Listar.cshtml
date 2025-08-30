@@ -8,50 +8,52 @@
 
 <div class="container px-0 p-3 row">
   <div class="col-md-3 mb-1">
-    <input type="text" id="propietario" class="form-control " style="max-width: 300px;"
-      placeholder="Ingrese Direccion" />
+    <input type="text" id="direccion" class="form-control" style="max-width: 300px;" placeholder="Ingrese Direccion"
+      oninput="filtrarInmuebles()" />
   </div>
   <div class="col-md-3 mb-1">
-    <input type="text" id="propietario" class="form-control " style="max-width: 300px;"
-      placeholder="Ingrese DNI propietario" />
+    <input type="text" id="dni" class="form-control" style="max-width: 300px;" placeholder="Ingrese DNI propietario"
+      oninput="filtrarInmuebles()" />
   </div>
   <div class="col-md-3 mb-1">
-    <select id="tipo" class="form-control " style="max-width: 300px;">
+    <select id="tipo" class="form-control" style="max-width: 300px;" onchange="filtrarInmuebles()">
       <option value="">Seleccione tipo</option>
-      <option value="casa">Casa</option>
-      <option value="departamento">Departamento</option>
-      <option value="local">Local</option>
-      <option value="deposito">Depósito</option>
+      @foreach (var tipo in ViewBag.Tipos ?? new List<Inmobiliaria.Models.TipoInmueble>())
+      {
+        <option value="@tipo.IdTipoInmueble">@tipo.Nombre</option>
+      }
     </select>
   </div>
 
 
 
   <div class="col-md-3 mb-1">
-    <select id="uso" class="form-control " style="max-width: 300px;">
+    <select id="uso" class="form-control" style="max-width: 300px;" onchange="filtrarInmuebles()">
       <option value="">Seleccione uso</option>
-      <option value="comercial">Comercial</option>
-      <option value="residencial">Residencial</option>
+      <option value="1">Residencial</option>
+      <option value="2">Comercial</option>
     </select>
   </div>
 
 
   <div class="col-md-3 mb-1">
-    <input type="number" id="ambientes" class="form-control " style="max-width: 300px;"
-      placeholder="Cantidad de ambientes" />
-  </div>
-
-  <div class="col-md-3">
-    <input type="number" id="precioMin" class="form-control " style="max-width: 300px;" placeholder="Precio mínimo" />
+    <input type="number" id="ambientes" class="form-control" style="max-width: 300px;"
+      placeholder="Min Cantidad de ambientes" oninput="filtrarInmuebles()" />
   </div>
   <div class="col-md-3">
-    <input type="number" id="precioMax" class="form-control " style="max-width: 300px;" placeholder="Precio máximo" />
+    <input type="number" id="precioMin" class="form-control" style="max-width: 300px;" placeholder="Precio mínimo"
+      oninput="filtrarInmuebles()" />
+  </div>
+  <div class="col-md-3">
+    <input type="number" id="precioMax" class="form-control" style="max-width: 300px;" placeholder="Precio máximo"
+      oninput="filtrarInmuebles()" />
   </div>
   <div class="col-md-3 mb-1">
-    <select id="estado" class="form-control " style="max-width: 300px;">
+    <select id="estado" class="form-control" style="max-width: 300px;" onchange="filtrarInmuebles()">
       <option value="">Seleccione estado</option>
-      <option value="disponible">Disponible</option>
-      <option value="suspendido">Suspendido</option>
+      <option value="1">Disponible</option>
+      <option value="2">Ocupado</option>
+      <option value="3">Suspendido</option>
     </select>
   </div>
 </div>
@@ -108,34 +110,54 @@
   </tbody>
 </table>
 
+
 <script>
-  async function buscarInmueble() {
-    const input = document.getElementById("direccionInput").value.trim();
-    try {
-      let response;
-      if (input) {
-        response = await fetch(`/Inmueble/BuscarPorPropietario?idPropietario=${input}`);
-      } else {
-        response = await fetch(`/Inmueble/ListarTodos`);
-      }
-      if (!response.ok) throw new Error("Error en la búsqueda");
-      const data = await response.json();
-      let tbody = document.getElementById("tablaInmueble");
-      tbody.innerHTML = "";
-      if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center">No se encontraron inmuebles</td></tr>`;
-        return;
-      }
-      data.forEach(i => {
-        tbody.innerHTML += `
+  function filtrarInmuebles() {
+    const direccion = document.getElementById("direccion").value;
+    const dni = document.getElementById("dni").value;
+    const tipo = document.getElementById("tipo").value;
+    const uso = document.getElementById("uso").value;
+    const ambientes = document.getElementById("ambientes").value;
+    const precioMin = document.getElementById("precioMin").value;
+    const precioMax = document.getElementById("precioMax").value;
+    const estado = document.getElementById("estado").value;
+
+    const params = new URLSearchParams();
+    if (direccion) params.append("direccion", direccion);
+    if (dni) params.append("dni", dni);
+    if (tipo) params.append("tipo", tipo);
+    if (uso) params.append("uso", uso);
+    if (ambientes) params.append("ambientes", ambientes);
+    if (precioMin) params.append("precioMin", precioMin);
+    if (precioMax) params.append("precioMax", precioMax);
+    if (estado) params.append("estado", estado);
+
+    let url = "/Inmueble/SupaFiltro?" + params.toString();
+    // Si no hay ningún filtro, usar ListarTodos
+    if (!direccion && !dni && !tipo && !uso && !ambientes && !precioMin && !precioMax && !estado) {
+      url = "/Inmueble/ListarTodos";
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        let tbody = document.getElementById("tablaInmueble");
+        tbody.innerHTML = "";
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="10" class="text-center">No se encontraron inmuebles</td></tr>`;
+          return;
+        }
+        data.forEach(i => {
+          tbody.innerHTML += `
             <tr>
                 <td>${i.idInmueble}</td>
                 <td>${i.direccion}</td>
                 <td>${i.idPropietario}</td>
                 <td>${i.idTipoInmueble}</td>
-                <td>${i.uso}</td>
+                <td>${i.uso == 1 ? 'Residencial' : 'Comercial'}</td>
                 <td>${i.cantidadAmbientes}</td>
+                <td>${i.descripcion}</td>
                 <td>${i.precio}</td>
+                <td>${i.estado == 1 ? 'Disponible' : i.estado == 2 ? 'Ocupado' : i.estado == 3 ? 'Suspendido' : 'Error'}</td>
                 <td class="d-flex justify-content-evenly">
                     <a href="/Inmueble/Modificar/${i.idInmueble}" class="btn btn-warning btn-sm">Modificar</a>
                     <form action="/Inmueble/Eliminar/${i.idInmueble}" method="post" style="display:inline;">
@@ -143,9 +165,13 @@
                     </form>
                 </td>
             </tr>`;
-      });
-    } catch (err) { console.error(err); alert("Hubo un problema al buscar"); }
+        });
+      })
+      .catch(err => { console.error(err); alert("Hubo un problema al filtrar"); });
   }
+
+  // Llamar al cargar la página para mostrar todos
+  window.onload = filtrarInmuebles;
 </script>
 
 @if (TempData["Mensaje"] != null)
