@@ -48,7 +48,6 @@ namespace Inmobiliaria.Controllers
     public IActionResult Ver(int id)
     {
       Contrato contrato = repositorio.ObtenerPorID(id);
-      TempData["MensajeError"] = JsonSerializer.Serialize(contrato.Estado);
       return View("Gestion", contrato);
 
     }
