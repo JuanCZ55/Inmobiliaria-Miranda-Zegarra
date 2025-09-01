@@ -1,6 +1,7 @@
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Mysqlx.Crud;
 
 namespace Inmobiliaria.Controllers
 {
@@ -60,7 +61,7 @@ namespace Inmobiliaria.Controllers
         {
             try
             {
-                var tipo = repositorio.ObtenerTodos().FirstOrDefault(x => x.IdTipoInmueble == id);
+                var tipo = repositorio.BuscarPorId(id);
                 if (tipo == null)
                     return RedirectToAction(nameof(Listar));
 
@@ -133,24 +134,48 @@ namespace Inmobiliaria.Controllers
         [HttpGet]
         public IActionResult Listar()
         {
-            var lista = repositorio.ObtenerTodos();
+            var lista = repositorio.TenerTodos();
             return View(lista);
         }
 
         // GET: TipoInmueble/ListarTodos
         [HttpGet]
-        public IActionResult ListarTodos()
+        public IActionResult ListarTodos(int PaginaActual = 1)
         {
-            var lista = repositorio.ObtenerTodos();
-            return Ok(lista);
+            int registrosPorPagina = 5;
+            var total = repositorio.ContarPorTodos();
+            int offset = (PaginaActual - 1) * registrosPorPagina;
+            int limite = Math.Min(registrosPorPagina, total - offset);
+
+            var lista = repositorio.ObtenerTodos(limite, offset);
+
+            return Ok(
+                new
+                {
+                    lista = lista,
+                    totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina),
+                }
+            );
         }
 
         // GET: TipoInmueble/ListarPorNombre
         [HttpGet]
-        public IActionResult ListarPorNombre(string nombre)
+        public IActionResult ListarPorNombre(string nombre, int PaginaActual = 1)
         {
-            var lista = repositorio.ListarPorNombre(nombre);
-            return Ok(lista);
+            int registrosPorPagina = 5;
+            var total = repositorio.ContarPorNombre(nombre);
+            int offset = (PaginaActual - 1) * registrosPorPagina;
+            int limite = Math.Min(registrosPorPagina, total - offset);
+
+            var lista = repositorio.ListarPorNombre(nombre, limite, offset);
+
+            return Ok(
+                new
+                {
+                    lista = lista,
+                    totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina),
+                }
+            );
         }
     }
 }
