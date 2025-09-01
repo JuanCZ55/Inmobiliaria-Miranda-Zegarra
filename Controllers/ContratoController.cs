@@ -8,46 +8,101 @@ namespace Inmobiliaria.Controllers
     // Sin inyección de dependencias (crear dentro del ctor)
     private readonly RepositorioContraro repositorio;
     private readonly RepositorioPago repositorioPago;
+    private readonly RepositorioInmueble repositorioInmueble;
+    private readonly RepositorioInquilino repositorioInquilino;
     // GET: Contrato
     public ContratoController(IConfiguration config)
     {
       // Sin inyección de dependencias y sin usar el config (quitar el parámetro repo del ctor)
       this.repositorio = new RepositorioContraro(config);
       this.repositorioPago = new RepositorioPago(config);
+      this.repositorioInmueble = new RepositorioInmueble(config);
+      this.repositorioInquilino = new RepositorioInquilino(config);
     }
     public IActionResult Index()
     {
       return RedirectToAction("Index", "Home");
     }
 
-        // GET: Contrato/Gestion
-        [HttpGet]
-        public IActionResult Crear()
+    [HttpGet]
+    public IActionResult Crear(int? idInmueble)
+    {
+      Contrato contrato = new Contrato();
+      if (idInmueble == null)
+      {
+        return View("Gestion", contrato);
+      }
+      else
+      {
+        contrato = new Contrato
         {
-          return View("Gestion");
-        }
+          IdInmueble = idInmueble.Value,
+          Inmueble = repositorioInmueble.ObtenerPorID(idInmueble.Value)
+        };
+        return View("Gestion", contrato);
+      }
+    }
 
 
-        //POST: Contrato/Crear
-        [HttpPost]
-        public IActionResult Crear(Contrato contrato)
+    [HttpGet]
+    public IActionResult Ver(int id)
+    {
+      Contrato contrato = repositorio.ObtenerPorID(id);
+      TempData["MensajeError"] = JsonSerializer.Serialize(contrato.Estado);
+      return View("Gestion", contrato);
+
+    }
+
+
+
+    //POST: Contrato/Crear
+    [HttpPost]
+    public IActionResult Crear(Contrato contrato)
+    {
+      try
+      {
+
+        TempData["MensajeError"] = "Modelo invalido";
+        if (ModelState.IsValid)
         {
-          try
+          if (repositorioInmueble.ObtenerPorID(contrato.IdInmueble).Estado != 1)
           {
-            if (ModelState.IsValid)
-            {
-              repositorio.Crear(contrato);
-              TempData["ContratoCreado"] = "Se agrego correctamente el contrato";
-              return RedirectToAction(nameof(Crear));
-            }
-            else
-              return View(contrato);
+            TempData["MensajeError"] = "Inmueble inactivo";
+            return View("Gestion", contrato);
           }
-          catch (System.Exception)
+
+          Inquilino inqui =  (repositorioInquilino.ObtenerPorID(contrato.IdInquilino));
+          if (inqui == null)
           {
-            throw;
+            TempData["MensajeError"] = "Inquilino inactivo";
+            return View("Gestion", contrato);
           }
+
+          if (contrato.FechaDesde < DateTime.Now || contrato.FechaHasta < contrato.FechaDesde)
+          {
+            TempData["MensajeError"] = "Fachas Invalidas";
+            return View("Gestion", contrato);
+          }
+
+          int cont = repositorio.ExisteSolapamiento(contrato.IdInmueble, contrato.FechaDesde, contrato.FechaHasta);
+          if (cont != 0)
+          {
+            TempData["MensajeError"] = "Se solapa con otro contrato";
+            return View("Gestion", contrato);
+          }
+
+          Contrato nuevo =  repositorio.ObtenerPorID(repositorio.Crear(contrato));
+          TempData["MensajeError"] = "Contrato Creado";
+          return View("Gestion", nuevo);
         }
+
+        return View("Gestion", contrato);
+      }
+      catch (System.Exception)
+      {
+        return View("Gestion", contrato);
+      }
+    }
 
     /*
         // POST: Contrato/Finalizar/5
