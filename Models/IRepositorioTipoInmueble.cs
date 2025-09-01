@@ -8,6 +8,5 @@ namespace Inmobiliaria.Models
         int Modificar(TipoInmueble tipoInmueble);
         int Eliminar(int idInmueble);
         int ExisteTipoInmueble(string nombre);
-        List<TipoInmueble> ObtenerTodos();
     }
 }
