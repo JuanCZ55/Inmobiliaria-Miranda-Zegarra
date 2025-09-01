@@ -26,7 +26,7 @@ namespace Inmobiliaria.Controllers
         // GET: Inmueble/Crear
         public IActionResult Crear()
         {
-            ViewBag.Tipos = repoTipo.ObtenerTodos();
+            ViewBag.Tipos = repoTipo.TenerTodos();
             ViewBag.Propietarios = repoPropietario
                 .ObtenerTodos()
                 .Select(p => new
@@ -51,13 +51,13 @@ namespace Inmobiliaria.Controllers
                         $"Se agrego correctamente el inmueble en {inmueble.Direccion}";
                     return RedirectToAction(nameof(Listar));
                 }
-                ViewBag.Tipos = repoTipo.ObtenerTodos();
+                ViewBag.Tipos = repoTipo.TenerTodos();
                 return View(inmueble);
             }
             catch (System.Exception ex)
             {
                 ViewBag.Error = "Error al crear inmueble: " + ex.Message;
-                ViewBag.Tipos = repoTipo.ObtenerTodos();
+                ViewBag.Tipos = repoTipo.TenerTodos();
                 return View(inmueble);
             }
         }
@@ -81,7 +81,7 @@ namespace Inmobiliaria.Controllers
                         NombreCompleto = p.Nombre + " " + p.Apellido + " - " + p.Dni,
                     })
                     .ToList();
-                ViewBag.Tipos = repoTipo.ObtenerTodos();
+                ViewBag.Tipos = repoTipo.TenerTodos();
                 return View(i);
             }
             catch (System.Exception ex)
@@ -113,13 +113,13 @@ namespace Inmobiliaria.Controllers
                         NombreCompleto = p.Nombre + " " + p.Apellido + " - " + p.Dni,
                     })
                     .ToList();
-                ViewBag.Tipos = repoTipo.ObtenerTodos();
+                ViewBag.Tipos = repoTipo.TenerTodos();
                 return View(inmueble);
             }
             catch (System.Exception ex)
             {
                 ViewBag.Error = "Error al modificar inmueble: " + ex.Message;
-                ViewBag.Tipos = repoTipo.ObtenerTodos();
+                ViewBag.Tipos = repoTipo.TenerTodos();
                 return View(inmueble);
             }
         }
@@ -154,7 +154,7 @@ namespace Inmobiliaria.Controllers
         public IActionResult Listar()
         {
             var lista = repositorio.ObtenerTodos();
-            var tipos = repoTipo.ObtenerTodos();
+            var tipos = repoTipo.TenerTodos();
             ViewBag.Tipos = tipos;
             // Crear diccionario para acceso rápido en la vista
             ViewBag.TipoDict = tipos.ToDictionary(t => t.IdTipoInmueble, t => t.Nombre);
@@ -242,13 +242,13 @@ namespace Inmobiliaria.Controllers
                 return RedirectToAction(nameof(Listar));
             }
         }
+
         // GET: Inquilino/Inquilino
         [HttpGet]
         public IActionResult Inmueble(int idInmueble)
         {
             var inmueble = repositorio.ObtenerPorID(idInmueble);
             return Ok(inmueble);
-
         }
     }
 }
