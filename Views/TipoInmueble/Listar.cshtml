@@ -2,17 +2,13 @@
 @{
   ViewData["Title"] = "Listado de Tipos de Inmueble";
   Layout = "~/Views/Shared/_Layout.cshtml";
-  var paginaActual = ViewBag.PaginaActual;
-  var totalPaginas = ViewBag.TotalPaginas;
-  paginaActual = 2;
-  totalPaginas = 5;
 }
 
 <h2>Listado de Tipos de Inmueble</h2>
 
 <div class="container px-0 p-3">
   <div class="d-flex">
-    <input oninput="ListarNombre()" class="form-control w-50" style="max-width: 300px;" type="text" id="nombreInput"
+    <input id="nombreInput" type="text" class="form-control w-50" style="max-width: 300px;"
       placeholder="Ingrese nombre" />
   </div>
 </div>
@@ -20,89 +16,21 @@
 <table class="table table-hover table-caption-top">
   <thead class="table-dark">
     <tr>
-      <th>@Html.DisplayNameFor(model => model.First().IdTipoInmueble)</th>
-      <th>@Html.DisplayNameFor(model => model.First().Nombre)</th>
+      <th>IdTipoInmueble</th>
+      <th>Nombre</th>
       <th>Acciones</th>
     </tr>
   </thead>
   <tbody id="tablaTipo">
-    @foreach (var t in Model)
-    {
-      <tr>
-        <td>@t.IdTipoInmueble</td>
-        <td>@t.Nombre</td>
-        <td class="d-flex justify-content-evenly">
-          <a asp-action="Modificar" asp-route-id="@t.IdTipoInmueble" class="btn btn-warning btn-sm">Modificar</a>
-          <form asp-action="Eliminar" asp-route-id="@t.IdTipoInmueble" method="post" style="display:inline;">
-            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-          </form>
-        </td>
-      </tr>
-    }
+    <!-- Se llenara dinamicamente -->
   </tbody>
 </table>
+
 <div class="d-flex justify-content-between align-items-center">
   <button type="button" onclick="cambiarPagina(-1)">&lt;</button>
-
-  <select id="paginas" onchange="ListarNombre()">
-    @for (int i = 1; i <= totalPaginas; i++)
-    {@if (i == paginaActual)
-      {
-        <option value="@i" selected>
-          @i
-        </option>
-      }
-        else
-      {
-        <option value="@i">
-          @i
-        </option>
-      }
-    }
-
-  </select>
+  <select id="paginas"></select>
   <button type="button" onclick="cambiarPagina(1)">&gt;</button>
 </div>
-<script>
-  async function ListarNombre() {
-    const input = document.getElementById("nombreInput").value.trim();
-    try {
-      let response;
-      if (input) {
-        response = await fetch(`/TipoInmueble/ListarPorNombre?nombre=${input}`);
-      } else {
-        response = await fetch(`/TipoInmueble/ListarTodos`);
-      }
-
-      if (!response.ok) throw new Error("Error en la búsqueda");
-      const data = await response.json();
-      let tbody = document.getElementById("tablaTipo");
-      tbody.innerHTML = "";
-
-      if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" class="text-center">No se encontraron tipos de inmueble</td></tr>`;
-        return;
-      }
-
-      data.forEach(t => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${t.idTipoInmueble}</td>
-                <td>${t.nombre}</td>
-                <td class="d-flex justify-content-evenly">
-                    <a href="/TipoInmueble/Modificar/${t.idTipoInmueble}" class="btn btn-warning btn-sm">Modificar</a>
-                    <form action="/TipoInmueble/Eliminar/${t.idTipoInmueble}" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
-                </td>
-            </tr>`;
-      });
-    } catch (err) {
-      console.error(err);
-      alert("Hubo un problema al buscar");
-    }
-  }
-</script>
 
 @if (TempData["Mensaje"] != null)
 {
@@ -112,9 +40,76 @@
 {
   <div class="alert alert-warning alertaTemp">@TempData["Warning"]</div>
 }
+
 <script>
-  setTimeout(function () {
-    var alerta = document.getElementById("mensajeAlerta");
-    if (alerta) { alerta.style.transition = "opacity 0.5s ease"; alerta.style.opacity = "0"; setTimeout(() => alerta.remove(), 500); }
-  }, 5000);
+  let paginaActual = 1;
+
+  async function ListarNombre() {
+    const input = document.getElementById("nombreInput").value.trim();
+    try {
+      let url = input
+        ? `/TipoInmueble/ListarPorNombre?nombre=${encodeURIComponent(input)}&PaginaActual=${paginaActual}`
+        : `/TipoInmueble/ListarTodos?PaginaActual=${paginaActual}`;
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Error en la busqueda");
+
+      const data = await response.json();
+      const tbody = document.getElementById("tablaTipo");
+      tbody.innerHTML = "";
+
+      if (!data.lista || data.lista.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="text-center">No se encontraron tipos de inmueble</td></tr>`;
+        document.getElementById("paginas").innerHTML = "";
+        return;
+      }
+
+      data.lista.forEach(t => {
+        tbody.innerHTML += `
+                    <tr>
+                        <td>${t.idTipoInmueble}</td>
+                        <td>${t.nombre}</td>
+                        <td class="d-flex justify-content-evenly">
+                            <a href="/TipoInmueble/Modificar/${t.idTipoInmueble}" class="btn btn-warning btn-sm">Modificar</a>
+                            <form action="/TipoInmueble/Eliminar/${t.idTipoInmueble}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>`;
+      });
+
+      // Actualizamos el select de paginas
+      const select = document.getElementById("paginas");
+      select.innerHTML = "";
+      for (let i = 1; i <= data.totalPaginas; i++) {
+        select.innerHTML += `<option value="${i}" ${i === paginaActual ? "selected" : ""}>${i}</option>`;
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Hubo un problema al buscar");
+    }
+  }
+
+  function cambiarPagina(valor) {
+    const select = document.getElementById("paginas");
+    let nuevaPagina = paginaActual + valor;
+    const maxPagina = select.options.length;
+    if (nuevaPagina < 1) nuevaPagina = 1;
+    if (nuevaPagina > maxPagina) nuevaPagina = maxPagina;
+    paginaActual = nuevaPagina;
+    ListarNombre();
+  }
+
+  document.getElementById("paginas").addEventListener("change", function () {
+    paginaActual = parseInt(this.value);
+    ListarNombre();
+  });
+
+  document.getElementById("nombreInput").addEventListener("input", function () {
+    paginaActual = 1;
+    ListarNombre();
+  });
+
+  window.onload = ListarNombre;
 </script>
