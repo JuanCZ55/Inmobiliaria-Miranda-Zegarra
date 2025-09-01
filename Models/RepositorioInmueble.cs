@@ -87,7 +87,8 @@ namespace Inmobiliaria.Models
             var i = new Inmueble();
             using (var conn = new MySqlConnection(connectionString))
             {
-                var sql = @"SELECT * FROM inmueble WHERE id_inmueble=@IdInmueble";
+                var sql =
+                    @"SELECT * FROM inmueble JOIN tipo_inmueble ON inmueble.id_tipo_inmueble = tipo_inmueble.id_tipo_inmueble WHERE id_inmueble=@IdInmueble";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@IdInmueble", IdInmueble);
@@ -109,6 +110,11 @@ namespace Inmobiliaria.Models
                             i.Estado = reader.GetInt32("estado");
                             i.CreatedAt = reader.GetDateTime("created_at");
                             i.UpdatedAt = reader.GetDateTime("updated_at");
+                            i.TipoInmueble = new TipoInmueble
+                            {
+                                IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
+                                Nombre = reader.GetString("nombre"),
+                            };
                         }
                     }
                 }
