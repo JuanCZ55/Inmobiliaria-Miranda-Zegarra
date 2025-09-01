@@ -2,6 +2,10 @@
 @{
   ViewData["Title"] = "Listado de Tipos de Inmueble";
   Layout = "~/Views/Shared/_Layout.cshtml";
+  var paginaActual = ViewBag.PaginaActual;
+  var totalPaginas = ViewBag.TotalPaginas;
+  paginaActual = 2;
+  totalPaginas = 5;
 }
 
 <h2>Listado de Tipos de Inmueble</h2>
@@ -37,7 +41,28 @@
     }
   </tbody>
 </table>
+<div class="d-flex justify-content-between align-items-center">
+  <button type="button" onclick="cambiarPagina(-1)">&lt;</button>
 
+  <select id="paginas" onchange="ListarNombre()">
+    @for (int i = 1; i <= totalPaginas; i++)
+    {@if (i == paginaActual)
+      {
+        <option value="@i" selected>
+          @i
+        </option>
+      }
+        else
+      {
+        <option value="@i">
+          @i
+        </option>
+      }
+    }
+
+  </select>
+  <button type="button" onclick="cambiarPagina(1)">&gt;</button>
+</div>
 <script>
   async function ListarNombre() {
     const input = document.getElementById("nombreInput").value.trim();
