@@ -63,7 +63,7 @@
         <td class="text-center">@c.FechaDesde.ToShortDateString() - @c.FechaHasta.ToShortDateString()</td>
         <td class="text-center">@(c.Estado == 1 ? "Vigente" : c.Estado == 2 ? "Finalizado" : c.Estado == 3 ? "Cancelado" : "Desconocido")</td>
         <td class="d-flex justify-content-evenly">
-          <a asp-action="Modificar" asp-route-id="@c.IdContrato" class="btn btn-warning btn-sm">
+          <a asp-action="Ver" asp-route-id="@c.IdContrato" class="btn btn-warning btn-sm">
             Ver
           </a>
         </td>
@@ -148,11 +148,9 @@
                     <td class="text-center">${p.fechaDesde} - ${p.fechaHasta}</td>
                     <td class="text-center">${p.estado}</td>
                     <td class="d-flex justify-content-evenly">
-                        <a href="/Contrato/Modificar/${p.idContrato}" class="btn btn-warning btn-sm">Modificar</a>
-                        <form action="/Contrato/Eliminar/${p.idContrato}" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                        </form>
+                        <a href="/Contrato/Ver/${p.idContrato}" class="btn btn-warning btn-sm">Ver</a>
                     </td>
+
                 </tr>`;
         tbody.innerHTML += row;
       });
