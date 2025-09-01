@@ -7,19 +7,26 @@
   <div class="row bg-light rounded shadow-sm">
     <!-- Columna izquierda -->
     <div class="col-6 d-flex align-items-start p-5">
-      <form asp-action="@(Model == null ? "Crear" : (Model.Estado == 1 ? "Cancelar" : null))" method="post"
+      <form asp-action="@(Model.IdContrato == 0 ? "Crear" : "Cancelar")" method="post"
         class="mx-auto h-100 rounded bg-white shadow p-5">
         <div class="d-flex flex-column justify-content-between align-items-center h-100">
           <div class="row justify-content-center">
             <h2 class="text-center mb-4">Contrato</h2>
-            <div class="col-10 mb-3">
-              <label class="form-label">DNI del Inquilino</label>
-              <input id="DniInquilino" oninput="buscarInquilino()" class="form-control" />
-            </div>
-            <div class="col-10 mb-3 d-none">
-              <label asp-for="IdInquilino" class="form-label">Cod. Inquilino</label>
-              <input asp-for=" IdInquilino" class="form-control" />
-            </div>
+            @if(Model != null && Model.Inquilino != null){
+              <div class="col-10 mb-3">
+                <label class="form-label">ID del Inquilino</label>
+                <input asp-for="IdInquilino" class="form-control" readonly/>
+              </div>
+            }
+            else{
+              <div class="col-10 mb-3">
+                <label class="form-label">DNI del Inquilino</label>
+                <input id="DniInquilino" oninput="buscarInquilino()" class="form-control" />
+              </div>
+              <div class="d-none">
+                <input asp-for="IdInquilino" type="hidden" id="IdInquilino" />
+              </div>
+            }
 
             <div class="col-10 mb-3">
               <label asp-for="IdInmueble" class="form-label">Cod. Inmueble</label>
@@ -35,36 +42,34 @@
             </div>
             <div class="col-10 mb-3">
               <label asp-for="MontoMensual" class="form-label">Monto Mensual</label>
-              <input asp-for="MontoMensual" class="form-control" />
+              <input asp-for="MontoMensual" class="form-control"/>
             </div>
 
-            @if (Model != null)
+            @if (Model != null && Model.IdContrato != 0)
             {
               <div class="col-10 mb-3">
-                <label asp-for="Estado" class="form-label">Estado</label>
-                <input asp-for="Estado" class="form-control" />
+                <label class="form-label">Estado</label>
+                <input class="form-control" 
+                      type="text" 
+                      readonly 
+                      value="@(Model.Estado == 1 ? "Vigente" : Model.Estado == 3 ? "Cancelado" : Model.Estado == 2 ? "Finalizado" : "")" />
+
               </div>
-              @if (Model.Estado == 1)
-              {
-                <div class="col-10 mb-3">
-                  <label asp-for="Multa" class="form-label">Multa</label>
-                  <input asp-for="Multa" class="form-control" />
-                </div>
-              }
             }
+
           </div>
 
           <div class="d-flex justify-content-between col-10">
             <!-- Botones condicionales -->
-            @if (Model == null)
+            @if (Model != null && Model.IdContrato == 0)
             {
               <button type="submit" class="btn btn-success">Crear</button>
             }
-            else
+            else if(Model != null && Model.IdContrato == 1)
             {
-              <button type="submit" class="btn btn-secondary">Cancelar</button>
+              <button class="btn btn-success">Cancelar Contrato <br> (No Activo)</button>
             }
-            <button class="btn btn-secondary">Cancelar</button>
+            <a href="/Contrato/Listar" class="btn btn-secondary">Cancelar</a>
           </div>
         </div>
       </form>
@@ -78,23 +83,23 @@
         <div class="row justify-content-center">
           <div class="col-4 mb-3">
             <label for="dni" class="form-label">DNI</label>
-            <input type="text" id="dni" name="dni" class="form-control" />
+            <input type="text" id="dni" name="dni" class="form-control" value="@Model.Inquilino?.Dni" readonly/>
           </div>
           <div class="col-4 mb-3">
             <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" id="nombre" name="nombre" class="form-control" />
+            <input type="text" id="nombre" name="nombre" class="form-control" value="@Model.Inquilino?.Nombre" readonly/>
           </div>
           <div class="col-4 mb-3">
             <label for="apellido" class="form-label">Apellido</label>
-            <input type="text" id="apellido" name="apellido" class="form-control" />
+            <input type="text" id="apellido" name="apellido" class="form-control" value="@Model.Inquilino?.Apellido" readonly/>
           </div>
           <div class="col-6 mb-3">
             <label for="telefono" class="form-label">Teléfono</label>
-            <input type="text" id="telefono" name="telefono" class="form-control" />
+            <input type="text" id="telefono" name="telefono" class="form-control" value="@Model.Inquilino?.Telefono" readonly/>
           </div>
           <div class="col-6 mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" name="email" class="form-control" />
+            <input type="email" id="email" name="email" class="form-control" value="@Model.Inquilino?.Email" readonly/>
           </div>
         </div>
       </form>
@@ -105,23 +110,23 @@
         <div class="row justify-content-center">
           <div class="col-4 mb-3">
             <label for="idInmueble" class="form-label">Código</label>
-            <input type="text" id="idInmueble" name="idInmueble" class="form-control" />
+            <input type="text" id="idInmueble" name="idInmueble" class="form-control" value="@Model.Inmueble?.IdInmueble" readonly/>
           </div>
           <div class="col-4 mb-3">
             <label for="tipoInmueble" class="form-label">Tipo de Inmueble</label>
-            <input type="text" id="tipoInmueble" name="tipoInmueble" class="form-control" />
+            <input type="text" id="tipoInmueble" name="tipoInmueble" class="form-control" value="@Model.Inmueble?.IdTipoInmueble" readonly/>
           </div>
           <div class="col-4 mb-3">
             <label for="precio" class="form-label">Precio</label>
-            <input type="text" id="precio" name="precio" class="form-control" />
+            <input type="text" id="precio" name="precio" class="form-control" value="@Model.Inmueble?.Precio" readonly/>
           </div>
           <div class="col-6 mb-3">
             <label for="direccion" class="form-label">Dirección</label>
-            <input type="text" id="direccion" name="direccion" class="form-control" />
+            <input type="text" id="direccion" name="direccion" class="form-control" value="@Model.Inmueble?.Direccion" readonly/>
           </div>
           <div class="col-6 mb-3">
             <label for="cantidad_ambientes" class="form-label">Descripción</label>
-            <input type="text" id="cantidad_ambientes" name="cantidad_ambientes" class="form-control" />
+            <input type="text" id="cantidad_ambientes" name="cantidad_ambientes" class="form-control" value="@Model.Inmueble?.Descripcion" readonly/>
           </div>
         </div>
       </form>
@@ -157,8 +162,9 @@
         console.warn("No se encontró el inquilino");
         return;
       }
+      console.warn(data)
       document.getElementById("dni").value = data.dni || "";
-      document.getElementById("IdInquilino").value = data.idInquilino || "";
+      document.getElementById('IdInquilino').value = data.idInquilino || "";
       document.getElementById("nombre").value = data.nombre || "";
       document.getElementById("apellido").value = data.apellido || "";
       document.getElementById("telefono").value = data.telefono || "";
