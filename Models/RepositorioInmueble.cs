@@ -127,7 +127,8 @@ namespace Inmobiliaria.Models
             var lista = new List<Inmueble>();
             using (var conn = new MySqlConnection(connectionString))
             {
-                var sql = @"SELECT * FROM inmueble";
+                var sql =
+                    @"SELECT * FROM inmueble JOIN tipo_inmueble ON inmueble.id_tipo_inmueble = tipo_inmueble.id_tipo_inmueble";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
                     conn.Open();
