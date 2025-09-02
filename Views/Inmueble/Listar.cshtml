@@ -99,7 +99,9 @@
                 i.Estado == 3 ? "Suspendido" :
                 "Error")
         </td>
-        <td class="d-flex justify-content-evenly">
+        <td class="d-flex ">
+          <a asp-controller="Contrato" asp-action="Crear" asp-route-idInmueble="@i.IdInmueble"
+            class="btn btn-primary btn-sm">Crear contrato</a>
           <a asp-action="Modificar" asp-route-id="@i.IdInmueble" class="btn btn-warning btn-sm">Modificar</a>
           <form asp-action="Eliminar" asp-route-id="@i.IdInmueble" method="post" style="display:inline;">
             <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
@@ -159,6 +161,7 @@
                 <td>${i.precio}</td>
                 <td>${i.estado == 1 ? 'Disponible' : i.estado == 2 ? 'Ocupado' : i.estado == 3 ? 'Suspendido' : 'Error'}</td>
                 <td class="d-flex justify-content-evenly">
+                    <a href="/Contrato/Crear?idInmueble=${i.idInmueble}" class="btn btn-primary btn-sm">Crear contrato</a>
                     <a href="/Inmueble/Modificar/${i.idInmueble}" class="btn btn-warning btn-sm">Modificar</a>
                     <form action="/Inmueble/Eliminar/${i.idInmueble}" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
