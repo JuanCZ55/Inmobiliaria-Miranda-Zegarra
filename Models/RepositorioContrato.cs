@@ -59,11 +59,11 @@ namespace Inmobiliaria.Models
       int res = -1;
       using (var conn = new MySqlConnection(connectionString))
       {
-        var sql = @"UPDATE contrato SET fecha_fin=@fecha_fin, multa=@multa, estado=3, updated_at=NOW() WHERE id_contrato=@id_contrato";
+        var sql = @"UPDATE contrato SET fecha_terminacion_anticipada=@fecha_fin, multa=@multa, estado=3, updated_at=NOW() WHERE id_contrato=@id_contrato";
         using (var cmd = new MySqlCommand(sql, conn))
         {
 
-          cmd.Parameters.AddWithValue("@fecha_fin", DateTime.Now);
+          cmd.Parameters.AddWithValue("@fecha_fin", contrato.FechaFin ?? (object)DBNull.Value);
           cmd.Parameters.AddWithValue("@multa", contrato.Multa);
           cmd.Parameters.AddWithValue("@id_contrato", contrato.IdContrato);
           conn.Open();
@@ -118,6 +118,9 @@ namespace Inmobiliaria.Models
             inm.precio AS inm_precio,
             inm.id_tipo_inmueble AS id_tipo_inmueble,
 
+            ti.id_tipo_inmueble AS ti_id_tipo_inmueble,
+            ti.nombre AS ti_nombre,
+
             p.id_propietario AS p_id_propietario,
             p.dni AS p_dni, 
             p.nombre AS p_nombre, 
@@ -134,6 +137,7 @@ namespace Inmobiliaria.Models
 
         FROM contrato c 
         JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
+        JOIN tipo_inmueble ti ON inm.id_tipo_inmueble = ti.id_tipo_inmueble
         JOIN propietario p ON inm.id_propietario = p.id_propietario
         JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino
         WHERE c.id_contrato = @id
@@ -172,6 +176,11 @@ namespace Inmobiliaria.Models
                     Apellido = reader.GetString("p_apellido"),
                     Telefono = reader.GetString("p_telefono"),
                     Email = reader.GetString("p_email")
+                  },
+                  TipoInmueble = new TipoInmueble
+                  {
+                    IdTipoInmueble = reader.GetInt32("ti_id_tipo_inmueble"),
+                    Nombre = reader.GetString("ti_nombre"),
                   },
                   Direccion = reader.GetString("inm_direccion"),
                   CantidadAmbientes = reader.GetInt32("inm_cantidad_ambientes"),
@@ -505,7 +514,7 @@ namespace Inmobiliaria.Models
     }
 
 
-    public List<Contrato> Filtrar(string? idContrato, string? dniInquilino, string? idInmueble, string? estado, string? Fecha_desde, string? Fecha_hasta)
+    public List<Contrato> Filtrar(string? idContrato, string? dniInquilino, string? idInmueble, string? estado, string? Fecha_desde, string? Fecha_hasta, int offset, int limite)
     {
       var lista = new List<Contrato>();
       using (var conn = new MySqlConnection(connectionString))
@@ -546,6 +555,8 @@ namespace Inmobiliaria.Models
         if (!string.IsNullOrEmpty(Fecha_hasta))
           sql += " AND c.fecha_hasta <= @fechaHasta";
 
+        sql += " LIMIT @limite OFFSET @offset";
+
         using (var cmd = new MySqlCommand(sql, conn))
         {
           if (!string.IsNullOrEmpty(idContrato))
@@ -566,7 +577,8 @@ namespace Inmobiliaria.Models
           if (!string.IsNullOrEmpty(Fecha_hasta))
             cmd.Parameters.AddWithValue("@fechaHasta", Fecha_hasta);
 
-
+          cmd.Parameters.AddWithValue("@limite", limite);
+          cmd.Parameters.AddWithValue("@offset", offset);
           conn.Open();
           using (var reader = cmd.ExecuteReader())
           {
@@ -625,6 +637,7 @@ namespace Inmobiliaria.Models
 
     public int ExisteSolapamiento(int idInmueble, DateTime fechaDesde, DateTime fechaHasta)
     {
+      int cont = 0;
       using (var conn = new MySqlConnection(connectionString))
       {
         var sql = @"
@@ -640,6 +653,58 @@ namespace Inmobiliaria.Models
           cmd.Parameters.AddWithValue("@fechaDesde", fechaDesde);
           cmd.Parameters.AddWithValue("@fechaHasta", fechaHasta);
           conn.Open();
+          using (var reader = cmd.ExecuteReader())
+          {
+            if (reader.Read())
+            {
+              cont = reader.GetInt32("total");
+            }
+          }
+          conn.Close();
+          return cont;
+        }
+      }
+    }
+
+    public int validarContratoCancelar(int idContrato, DateTime? fechaCancelar)
+    {
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"
+                  SELECT COUNT(1) AS total
+                  FROM contrato
+                  WHERE id_contrato = @idContrato
+                  AND Estado = 1
+                  AND fecha_hasta > @fechaCancelar;";
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          cmd.Parameters.AddWithValue("@idContrato", idContrato);
+          cmd.Parameters.AddWithValue("@fechaCancelar", fechaCancelar ?? (object)DBNull.Value);
+          conn.Open();
+          return Convert.ToInt32(cmd.ExecuteScalar());
+        }
+      }
+    }
+
+    public int validarFechaMayorMulta(int idContrato, DateTime? fechaCancelar)
+    {
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"
+                  SELECT
+                    COUNT(1)
+                  FROM contrato
+                  WHERE id_contrato = @idContrato
+                  AND DATE_ADD(
+                    fecha_desde,
+                    INTERVAL TIMESTAMPDIFF(SECOND, fecha_desde, fecha_hasta) / 2 SECOND
+                  ) < @fechaCancelar;";
+
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          cmd.Parameters.AddWithValue("@idContrato", idContrato);
+          cmd.Parameters.AddWithValue("@fechaCancelar", fechaCancelar);
+          conn.Open();
 
           int cont = Convert.ToInt32(cmd.ExecuteScalar());
 
@@ -648,7 +713,64 @@ namespace Inmobiliaria.Models
       }
     }
 
+    public int CantidadFiltro(string? idContrato, string? dniInquilino, string? idInmueble, string? estado, string? Fecha_desde, string? Fecha_hasta)
+    {
+      int total = 0;
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"
+            SELECT COUNT(*)
+            FROM contrato c 
+            JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
+            JOIN propietario p ON inm.id_propietario = p.id_propietario
+            JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino
+            WHERE 1=1
+        ";
+        // Filtros dinámicos con LIKE
+        if (!string.IsNullOrEmpty(idContrato))
+          sql += " AND c.id_contrato LIKE @idContrato";
 
+        if (!string.IsNullOrEmpty(dniInquilino))
+          sql += " AND inq.dni LIKE @dniInquilino";
+
+        if (!string.IsNullOrEmpty(idInmueble))
+          sql += " AND inm.id_inmueble LIKE @idInmueble";
+
+        if (!string.IsNullOrEmpty(estado))
+          sql += " AND c.estado = @estado";
+
+        if (!string.IsNullOrEmpty(Fecha_desde))
+          sql += " AND DATE(c.fecha_desde) >= @fechaDesde";
+
+        if (!string.IsNullOrEmpty(Fecha_hasta))
+          sql += " AND c.fecha_hasta <= @fechaHasta";
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          if (!string.IsNullOrEmpty(idContrato))
+            cmd.Parameters.AddWithValue("@idContrato", "%" + idContrato + "%");
+
+          if (!string.IsNullOrEmpty(dniInquilino))
+            cmd.Parameters.AddWithValue("@dniInquilino", "%" + dniInquilino + "%");
+
+          if (!string.IsNullOrEmpty(idInmueble))
+            cmd.Parameters.AddWithValue("@idInmueble", "%" + idInmueble + "%");
+
+          if (!string.IsNullOrEmpty(estado))
+            cmd.Parameters.AddWithValue("@estado", estado);
+
+          if (!string.IsNullOrEmpty(Fecha_desde))
+            cmd.Parameters.AddWithValue("@fechaDesde", Fecha_desde);
+
+          if (!string.IsNullOrEmpty(Fecha_hasta))
+            cmd.Parameters.AddWithValue("@fechaHasta", Fecha_hasta);
+
+          conn.Open();
+          total = Convert.ToInt32(cmd.ExecuteScalar());
+          conn.Close();
+        }
+      }
+      return total;
+    }
   }
 
 }
