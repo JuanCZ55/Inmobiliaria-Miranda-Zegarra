@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Inmobiliaria.Models;
+using System.Text.Json;
 namespace Inmobiliaria.Controllers
 {
 
@@ -70,8 +71,8 @@ namespace Inmobiliaria.Controllers
             return View("Gestion", contrato);
           }
 
-          Inquilino inqui =  (repositorioInquilino.ObtenerPorID(contrato.IdInquilino));
-          if (inqui == null)
+          Inquilino inqui = repositorioInquilino.ObtenerPorID(contrato.IdInquilino);
+          if (inqui.IdInquilino == 0)
           {
             TempData["MensajeError"] = "Inquilino inactivo";
             return View("Gestion", contrato);
@@ -90,7 +91,7 @@ namespace Inmobiliaria.Controllers
             return View("Gestion", contrato);
           }
 
-          Contrato nuevo =  repositorio.ObtenerPorID(repositorio.Crear(contrato));
+          Contrato nuevo = repositorio.ObtenerPorID(repositorio.Crear(contrato));
           TempData["MensajeError"] = "Contrato Creado";
           return View("Gestion", nuevo);
         }
@@ -130,33 +131,44 @@ namespace Inmobiliaria.Controllers
         }
     */
 
-    // POST: Contrato/Cancelado/5
+    // POST: Contrato/Cancelado
     [HttpPost]
-    public IActionResult Cancelado(Contrato contrato)
+    public IActionResult Cancelar(Contrato contrato)
     {
       try
       {
         if (ModelState.IsValid)
         {
-          Contrato c = repositorio.ObtenerPorID(contrato.IdContrato);
-          if (c == null)
+          if (contrato.FechaFin?.Date != DateTime.Today)
           {
-            return RedirectToAction(nameof(Listar));
+            TempData["MensajeError"] = "Fecha invalida";
+            return View("Gestion", contrato);
           }
-          if (c.Estado == 1)
+          if (contrato.FechaFin != null && repositorio.validarContratoCancelar(contrato.IdContrato, contrato.FechaFin) != 1)
           {
-            repositorio.Cancelado(contrato);
-            return RedirectToAction(nameof(Listar));
+            TempData["MensajeError"] = "Contrato no cancelable";
+            return View("Gestion", contrato);
           }
-          TempData["ContratoNoCancelado"] = "Contrato no cancelado";
-          return RedirectToAction(nameof(Listar));
+          if (repositorio.validarFechaMayorMulta(contrato.IdContrato, contrato.FechaFin) == 1)
+          {
+            TempData["MensajeError"] = "Multa de un mes";
+            contrato.Multa = contrato.MontoMensual;
+          }
+          else
+          {
+            TempData["MensajeError"] = "Multa de dos meses";
+            contrato.Multa = contrato.MontoMensual * 2;
+          }
+          repositorio.Cancelado(contrato);
+          return View("Gestion", contrato);
         }
         else
-          return View(contrato);
+          return View("Gestion", contrato);
       }
       catch (System.Exception)
       {
-        throw;
+        TempData["MensajeError"] = JsonSerializer.Serialize(contrato);
+        return View("Gestion", contrato);
       }
     }
 
@@ -182,19 +194,37 @@ namespace Inmobiliaria.Controllers
     }
 
     // GET: Contrato/Listar
-    public IActionResult Listar()
-    {
-      var lista = repositorio.ObtenerTodos();
-      return View(lista);
-    }
-
     [HttpGet]
-    public IActionResult Listartodos(string idContrato, string? dniInquilino, string? idInmueble, string? estado, string? Fecha_desde, string? Fecha_hasta)
+    public IActionResult Listar(string? idContrato, string? dniInquilino, string? idInmueble, string? estado, string? Fecha_desde, string? Fecha_hasta, int PaginaActual = 1)
     {
+      int registrosPorPagina = 7;
+      int total = 0;
+      int offset = (PaginaActual - 1) * registrosPorPagina;
+      int limite = registrosPorPagina;
+      List<Contrato> lista;
+      try
+      {
+        total = repositorio.CantidadFiltro(idContrato, dniInquilino, idInmueble, estado, Fecha_desde, Fecha_hasta);
+        limite = Math.Min(registrosPorPagina, total - offset);
+        lista = repositorio.Filtrar(idContrato, dniInquilino, idInmueble, estado, Fecha_desde, Fecha_hasta, offset, limite);
 
-      var contratos = repositorio.Filtrar(idContrato, dniInquilino, idInmueble, estado, Fecha_desde, Fecha_hasta);
-      return Ok(contratos);
+        int totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina);
+
+        ViewBag.PaginaActual = PaginaActual;
+        ViewBag.TotalPaginas = totalPaginas;
+        ViewBag.IdContrato = idContrato;
+        ViewBag.DniInquilino = dniInquilino;
+        ViewBag.IdInmueble = idInmueble;
+        ViewBag.Estado = estado;
+        ViewBag.FechaDesde = Fecha_desde;
+        ViewBag.FechaHasta = Fecha_hasta;
+
+        return View(lista);
+      }
+      catch (System.Exception)
+      {
+        return View(new List<Contrato>());
+      }
     }
-
   }
 }
