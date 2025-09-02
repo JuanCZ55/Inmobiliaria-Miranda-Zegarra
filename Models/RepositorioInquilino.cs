@@ -289,5 +289,82 @@ namespace Inmobiliaria.Models
             }
             return lista;
         }
+
+        public int ContarFiltro(string dni)
+        {
+            int count = 0;
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                var sql = @"SELECT COUNT(*) FROM inquilino WHERE 1=1 ";
+                if (!string.IsNullOrEmpty(dni))
+                {
+                    sql += "AND dni LIKE @dni ";
+                }
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    if (!string.IsNullOrEmpty(dni))
+                    {
+                        cmd.Parameters.AddWithValue("@dni", dni + "%");
+                    }
+                    conn.Open();
+                    count = Convert.ToInt32(cmd.ExecuteScalar());
+                    conn.Close();
+                }
+            }
+            return count;
+        }
+
+        public List<Inquilino> Filtro(string dni, int limit, int offset)
+        {
+            var lista = new List<Inquilino>();
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                var sql =
+                    @"SELECT id_inquilino, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM inquilino WHERE 1=1 ";
+                if (!string.IsNullOrEmpty(dni))
+                {
+                    sql += "AND dni LIKE @dni ORDER BY dni ";
+                }
+                else
+                {
+                    sql += "ORDER BY id_inquilino DESC ";
+                }
+                sql += "LIMIT @limit OFFSET @offset;";
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    if (!string.IsNullOrEmpty(dni))
+                    {
+                        cmd.Parameters.AddWithValue("@dni", dni + "%");
+                    }
+
+                    cmd.Parameters.AddWithValue("@limit", limit);
+                    cmd.Parameters.AddWithValue("@offset", offset);
+                    conn.Open();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(
+                                new Inquilino
+                                {
+                                    IdInquilino = reader.GetInt32("id_inquilino"),
+                                    Dni = reader.GetString("dni"),
+                                    Nombre = reader.GetString("nombre"),
+                                    Apellido = reader.GetString("apellido"),
+                                    Telefono = reader.GetString("telefono"),
+                                    Email = reader.GetString("email"),
+                                    Direccion = reader.GetString("direccion"),
+                                    Estado = reader.GetInt32("estado"),
+                                    CreatedAt = reader.GetDateTime("created_at"),
+                                    UpdatedAt = reader.GetDateTime("updated_at"),
+                                }
+                            );
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+            return lista;
+        }
     }
 }
