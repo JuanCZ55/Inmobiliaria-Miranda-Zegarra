@@ -115,7 +115,7 @@ namespace Inmobiliaria.Models
 
         public Propietario ObtenerPorDni(string dni)
         {
-            Propietario? propietario = null;
+            Propietario p = new Propietario();
             using (var conn = new MySqlConnection(connectionString))
             {
                 var sql =
@@ -128,25 +128,22 @@ namespace Inmobiliaria.Models
                     {
                         if (reader.Read())
                         {
-                            propietario = new Propietario
-                            {
-                                IdPropietario = reader.GetInt32("id_propietario"),
-                                Dni = reader.GetString("dni"),
-                                Nombre = reader.GetString("nombre"),
-                                Apellido = reader.GetString("apellido"),
-                                Telefono = reader.GetString("telefono"),
-                                Email = reader.GetString("email"),
-                                Direccion = reader.GetString("direccion"),
-                                Estado = reader.GetInt32("estado"),
-                                CreatedAt = reader.GetDateTime("created_at"),
-                                UpdatedAt = reader.GetDateTime("updated_at"),
-                            };
+                            p.IdPropietario = reader.GetInt32("id_propietario");
+                            p.Dni = reader.GetString("dni");
+                            p.Nombre = reader.GetString("nombre");
+                            p.Apellido = reader.GetString("apellido");
+                            p.Telefono = reader.GetString("telefono");
+                            p.Email = reader.GetString("email");
+                            p.Direccion = reader.GetString("direccion");
+                            p.Estado = reader.GetInt32("estado");
+                            p.CreatedAt = reader.GetDateTime("created_at");
+                            p.UpdatedAt = reader.GetDateTime("updated_at");
                         }
                     }
                     conn.Close();
                 }
             }
-            return propietario;
+            return p;
         }
 
         public List<Propietario> filtrarDNI(string dni)
@@ -226,7 +223,7 @@ namespace Inmobiliaria.Models
 
         public Propietario ObtenerPorID(int id)
         {
-            Propietario propietario = null;
+            Propietario p = new Propietario();
             using (var conn = new MySqlConnection(connectionString))
             {
                 var sql =
@@ -239,25 +236,22 @@ namespace Inmobiliaria.Models
                     {
                         if (reader.Read())
                         {
-                            propietario = new Propietario
-                            {
-                                IdPropietario = reader.GetInt32("id_propietario"),
-                                Dni = reader.GetString("dni"),
-                                Nombre = reader.GetString("nombre"),
-                                Apellido = reader.GetString("apellido"),
-                                Telefono = reader.GetString("telefono"),
-                                Email = reader.GetString("email"),
-                                Direccion = reader.GetString("direccion"),
-                                Estado = reader.GetInt32("estado"),
-                                CreatedAt = reader.GetDateTime("created_at"),
-                                UpdatedAt = reader.GetDateTime("updated_at"),
-                            };
+                            p.IdPropietario = reader.GetInt32("id_propietario");
+                            p.Dni = reader.GetString("dni");
+                            p.Nombre = reader.GetString("nombre");
+                            p.Apellido = reader.GetString("apellido");
+                            p.Telefono = reader.GetString("telefono");
+                            p.Email = reader.GetString("email");
+                            p.Direccion = reader.GetString("direccion");
+                            p.Estado = reader.GetInt32("estado");
+                            p.CreatedAt = reader.GetDateTime("created_at");
+                            p.UpdatedAt = reader.GetDateTime("updated_at");
                         }
                     }
                     conn.Close();
                 }
             }
-            return propietario;
+            return p;
         }
 
         public List<Propietario> ObtenerTodos()
