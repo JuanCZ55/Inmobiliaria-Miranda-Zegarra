@@ -1,141 +1,78 @@
 @model IEnumerable<Inmobiliaria.Models.Propietario>
 
 @{
-    ViewData["Title"] = "Listado de Propietarios";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewData["Title"] = "Listado de Propietarios";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  var paginaActual = ViewBag.PaginaActual ?? 1;
+  var totalPaginas = ViewBag.TotalPaginas ?? 1;
+  var nombreFiltro = ViewBag.Nombre ?? "";
 }
 
 <h2>Listado de Propietarios</h2>
 
-<div class="container px-0 p-3 ">
-    <div class="d-flex">
-        <input oninput="buscarPropietario()" class="form-control w-50" style="max-width: 300px;" type="text" id="dniInput" placeholder="Ingrese DNI" />
-    </div>
+<div class="container px-0 p-3">
+  <form method="get" asp-action="Listar" class="d-flex mb-3">
+    <input type="text" name="nombre" value="@nombreFiltro" class="form-control w-50" style="max-width: 300px;"
+      placeholder="Filtrar por nombre" />
+    <button type="submit" class="btn btn-primary ms-2">Buscar</button>
+  </form>
 </div>
 
-
-
-
-
 <table class="table table-hover table-caption-top">
-    <thead class="table-dark">
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.First().IdPropietario)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Dni)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Nombre)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Apellido)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Telefono)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Email)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Direccion)</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody id="tablaPropietarios">
-        @foreach (var p in Model)
-        {
-            <tr>
-                <td>@p.IdPropietario</td>
-                <td>@p.Dni</td>
-                <td>@p.Nombre</td>
-                <td>@p.Apellido</td>
-                <td>@p.Telefono</td>
-                <td>@p.Email</td>
-                <td>@p.Direccion</td>
-                <td class="d-flex justify-content-evenly">
-                    <a asp-action="Modificar" asp-route-id="@p.IdPropietario" class="btn btn-warning btn-sm">Modificar</a>
-                    <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
+  <thead class="table-dark">
+    <tr>
+      <th>@Html.DisplayNameFor(m => m.First().IdPropietario)</th>
+      <th>@Html.DisplayNameFor(m => m.First().Dni)</th>
+      <th>@Html.DisplayNameFor(m => m.First().Nombre)</th>
+      <th>@Html.DisplayNameFor(m => m.First().Apellido)</th>
+      <th>@Html.DisplayNameFor(m => m.First().Telefono)</th>
+      <th>@Html.DisplayNameFor(m => m.First().Email)</th>
+      <th>@Html.DisplayNameFor(m => m.First().Direccion)</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (var p in Model)
+    {
+      <tr>
+        <td>@p.IdPropietario</td>
+        <td>@p.Dni</td>
+        <td>@p.Nombre</td>
+        <td>@p.Apellido</td>
+        <td>@p.Telefono</td>
+        <td>@p.Email</td>
+        <td>@p.Direccion</td>
+        <td class="d-flex justify-content-evenly">
+          <a asp-action="Modificar" asp-route-id="@p.IdPropietario" class="btn btn-warning btn-sm">Modificar</a>
+          <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+    }
+  </tbody>
 </table>
 
-<script>
-    async function buscarPropietario() {
-        const dniInput = document.getElementById("dniInput");
-        const dni = dniInput.value;
-        try {
-            let response;
-            if(dni){
-                if (!/^[0-9]+$/.test(dni)) {
-                    return;
-                }
-                response = await fetch(`/Propietario/Buscar?dni=${dni}`);
-            }else{
-                response = await fetch(`/Propietario/Listartodos`);
-            }
-            
-            if (!response.ok) throw new Error("Error en la búsqueda");
-
-            const data = await response.json();
-
-            let tbody = document.getElementById("tablaPropietarios");
-            tbody.innerHTML = "";
-
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center">No se encontraron propietarios</td></tr>`;
-                return;
-            }
-
-            data.forEach(p => {
-                let row = `
-                    <tr>
-                        <td>${p.idPropietario}</td>
-                        <td>${p.dni}</td>
-                        <td>${p.nombre}</td>
-                        <td>${p.apellido}</td>
-                        <td>${p.telefono}</td>
-                        <td>${p.email}</td>
-                        <td>${p.direccion}</td>
-                        <td class="d-flex justify-content-evenly">
-                            <a href="/Propietario/Modificar/${p.idPropietario}" class="btn btn-warning btn-sm">Modificar</a>
-                            <form action="/Propietario/Eliminar/${p.idPropietario}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>`;
-                tbody.innerHTML += row;
-            });
-        } catch (error) {
-            console.error(error);
-            alert("Hubo un problema al buscar");
-        }
-    }
-</script>
+<!-- Paginación -->
+@if (totalPaginas > 1)
+{
+  <nav>
+    <ul class="pagination">
+      @for (int i = 1; i <= totalPaginas; i++)
+      {
+        <li class="page-item @(i == paginaActual ? "active" : "")">
+          <a class="page-link" asp-action="Listar" asp-route-nombre="@nombreFiltro" asp-route-PaginaActual="@i">@i</a>
+        </li>
+      }
+    </ul>
+  </nav>
+}
 
 @if (TempData["Mensaje"] != null)
 {
-    <div id="mensajeAlerta" class="alert alert-success">
-        @TempData["Mensaje"]
-    </div>
-
-    <script>
-        setTimeout(function () {
-            var alerta = document.getElementById("mensajeAlerta");
-            if (alerta) {
-                alerta.style.transition = "opacity 0.5s ease";
-                alerta.style.opacity = "0";
-                setTimeout(() => alerta.remove(), 500);
-            }
-        }, 5000); // 5000 ms = 5 segundos
-    </script>
+  <div class="alert alert-success">@TempData["Mensaje"]</div>
 }
 @if (TempData["PropietarioCreado"] != null)
 {
-    <div id="mensajeAlerta" class="alert alert-primary">
-        @TempData["PropietarioCreado"]
-    </div>
-
-    <script>
-        setTimeout(function () {
-            var alerta = document.getElementById("mensajeAlerta");
-            if (alerta) {
-                alerta.style.transition = "opacity 0.5s ease";
-                alerta.style.opacity = "0";
-                setTimeout(() => alerta.remove(), 500);
-            }
-        }, 5000); // 5000 ms = 5 segundos
-    </script>
+  <div class="alert alert-primary">@TempData["PropietarioCreado"]</div>
 }
