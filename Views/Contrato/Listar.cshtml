@@ -1,162 +1,141 @@
 @model IEnumerable<Inmobiliaria.Models.Contrato>
 
 @{
-  ViewData["Title"] = "Listado de Inquilinos";
+  ViewData["Title"] = "Listado de Contratos";
   Layout = "~/Views/Shared/_Layout.cshtml";
+  var PaginaActual = ViewBag.PaginaActual ?? 1;
+  var totalPaginas = ViewBag.TotalPaginas ?? 1;
+  var idContrato = ViewBag.IdContrato ?? "";
+  var dniInquilino = ViewBag.DniInquilino ?? "";
+  var idInmueble = ViewBag.IdInmueble ?? "";
+  var estado = ViewBag.Estado ?? "";
+  var Fecha_desde = ViewBag.FechaDesde ?? "";
+  var Fecha_hasta = ViewBag.FechaHasta ?? "";
 }
 
 <h2>Listado de Contratos</h2>
 
-<div class="row g-2 pb-3">
-  <div class="col-md-4">
-    <input oninput="buscarContrato()" class="form-control" type="text" id="IdContrato" placeholder="Cod. Contrato" />
-    <span id="errorIdContrato" class="text-danger d-none">IdContrato inválido (solo números positivos)</span>
-  </div>
-  <div class="col-md-4">
-    <input oninput="buscarContrato()" class="form-control" type="text" id="DniInquilino" placeholder="DNI Inquilino"
-      maxlength="8" />
-    <span id="errorDniInquilino" class="text-danger d-none">DNI inválido, 8 digitos maximo</span>
-  </div>
-  <div class="col-md-4">
-    <input oninput="buscarContrato()" class="form-control" type="text" id="IdInmueble" placeholder="Cod. Inmueble" />
-    <span id="errorIdInmueble" class="text-danger d-none">Cod. Inmueble inválido (solo números positivos)</span>
-  </div>
-  <div class="col-md-4">
-    <select id="Estado" class="form-control" onchange="buscarContrato()">
-      <option value="">Seleccionar estado</option>
-      <option value="1">Vigente</option>
-      <option value="2">Finalizado</option>
-      <option value="3">Cancelado</option>
-    </select>
-    <span id="errorEstado" class="text-danger d-none">Estado inválido</span>
-  </div>
-  <div class="col-md-4">
-    <input oninput="buscarContrato()" class="form-control" type="date" id="Fecha_desde" placeholder="Fecha desde" />
-    <span id="errorFechaDesde" class="text-danger d-none">Fecha desde inválida</span>
-  </div>
-  <div class="col-md-4">
-    <input oninput="buscarContrato()" class="form-control" type="date" id="Fecha_hasta" placeholder="Fecha hasta" />
-    <span id="errorFechaHasta" class="text-danger d-none">Fecha hasta inválida</span>
-  </div>
+<div class="row mb-3">
+  <form action="Listar" method="get" class="row g-2 align-items-end">
+    <div class="col-md-2">
+      <label for="idContrato" class="form-label">Cod. Contrato</label>
+      <input class="form-control" type="text" id="idContrato" name="idContrato" value="@idContrato"
+        placeholder="Cod. Contrato" />
+    </div>
+    <div class="col-md-2">
+      <label for="dniInquilino" class="form-label">DNI Inquilino</label>
+      <input class="form-control" type="text" id="dniInquilino" name="dniInquilino" value="@dniInquilino"
+        placeholder="DNI Inquilino" maxlength="8" />
+    </div>
+    <div class="col-md-2">
+      <label for="idInmueble" class="form-label">Cod. Inmueble</label>
+      <input class="form-control" type="text" id="idInmueble" name="idInmueble" value="@idInmueble"
+        placeholder="Cod. Inmueble" />
+    </div>
+
+      <div class="col-md-2">
+        <select class="form-control" name="estado">
+            <option value="">Seleccionar estado</option>
+            @if (estado == "1")
+            {
+                <option value="1" selected>Vigente</option>
+            }
+            else
+            {
+                <option value="1">Vigente</option>
+            }
+
+            @if (estado == "2")
+            {
+                <option value="2" selected>Finalizado</option>
+            }
+            else
+            {
+                <option value="2">Finalizado</option>
+            }
+
+            @if (estado == "3")
+            {
+                <option value="3" selected>Cancelado</option>
+            }
+            else
+            {
+                <option value="3">Cancelado</option>
+            }
+        </select>
+
+      </div>
+
+    <div class="col-md-2">
+      <label for="Fecha_desde" class="form-label">Fecha desde</label>
+      <input class="form-control" type="date" id="Fecha_desde" name="Fecha_desde" value="@Fecha_desde" />
+    </div>
+    <div class="col-md-2">
+      <label for="Fecha_hasta" class="form-label">Fecha hasta</label>
+      <input class="form-control" type="date" id="Fecha_hasta" name="Fecha_hasta" value="@Fecha_hasta" />
+    </div>
+    <div class="col-md-12 text-end mt-2">
+      <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+  </form>
 </div>
 
-<table class="table table-hover table-caption-top">
-  <thead class="table-dark">
+<table class="table table-hover table-striped table-bordered">
+  <thead class="table-dark text-center">
     <tr>
-      <th class="text-center">@Html.DisplayNameFor(model => model.First().IdContrato)</th>
-      <th class="text-center">@Html.DisplayNameFor(model => model.First().IdInquilino)</th>
-      <th class="text-center">@Html.DisplayNameFor(model => model.First().IdInmueble)</th>
-      <th class="text-center">@Html.DisplayNameFor(model => model.First().MontoMensual)</th>
-      <th  class="text-center">Fecha</th>
-      <th class="text-center">@Html.DisplayNameFor(model => model.First().Estado)</th>
-      <th class="text-center">Acciones</th>
+      <th>@Html.DisplayNameFor(model => model.First().IdContrato)</th>
+      <th>@Html.DisplayNameFor(model => model.First().IdInquilino)</th>
+      <th>@Html.DisplayNameFor(model => model.First().IdInmueble)</th>
+      <th>@Html.DisplayNameFor(model => model.First().MontoMensual)</th>
+      <th>Fecha</th>
+      <th>@Html.DisplayNameFor(model => model.First().Estado)</th>
+      <th>Acciones</th>
     </tr>
   </thead>
-  <tbody id="tablaContrato">
-    @foreach (var c in Model)
+  <tbody class="text-center">
+    @if (Model != null && Model.Any())
+    {
+      foreach (var c in Model)
+      {
+        <tr>
+          <td>@c.IdContrato</td>
+          <td>@c.IdInquilino</td>
+          <td>@c.IdInmueble</td>
+          <td>@c.MontoMensual</td>
+          <td>@c.FechaDesde.ToShortDateString() - @c.FechaHasta.ToShortDateString()</td>
+          <td>@(c.Estado == 1 ? "Vigente" : c.Estado == 2 ? "Finalizado" : c.Estado == 3 ? "Cancelado" : "Desconocido")</td>
+          <td>
+            <a asp-action="Ver" asp-route-id="@c.IdContrato" class="btn btn-warning btn-sm">Ver</a>
+          </td>
+        </tr>
+      }
+    }
+    else
     {
       <tr>
-        <td class="text-center">@c.IdContrato</td>
-        <td class="text-center">@c.IdInquilino</td>
-        <td class="text-center">@c.IdInmueble</td>
-        <td class="text-center">@c.MontoMensual</td>
-        <td class="text-center">@c.FechaDesde.ToShortDateString() - @c.FechaHasta.ToShortDateString()</td>
-        <td class="text-center">@(c.Estado == 1 ? "Vigente" : c.Estado == 2 ? "Finalizado" : c.Estado == 3 ? "Cancelado" : "Desconocido")</td>
-        <td class="d-flex justify-content-evenly">
-          <a asp-action="Ver" asp-route-id="@c.IdContrato" class="btn btn-warning btn-sm">
-            Ver
-          </a>
-        </td>
+        <td colspan="7">No se encontraron Contratos</td>
       </tr>
     }
   </tbody>
 </table>
 
-<script>
-  async function buscarContrato() {
-    const IdContrato = document.getElementById("IdContrato").value.trim();
-    const DniInquilino = document.getElementById("DniInquilino").value.trim();
-    const IdInmueble = document.getElementById("IdInmueble").value.trim();
-    const Estado = document.getElementById("Estado").value.trim();
-    const Fecha_desde = document.getElementById("Fecha_desde").value.trim();
-    const Fecha_hasta = document.getElementById("Fecha_hasta").value.trim();
-
-    document.getElementById("errorIdContrato").classList.add("d-none");
-    document.getElementById("errorDniInquilino").classList.add("d-none");
-    document.getElementById("errorIdInmueble").classList.add("d-none");
-    document.getElementById("errorEstado").classList.add("d-none");
-    document.getElementById("errorFechaDesde").classList.add("d-none");
-    document.getElementById("errorFechaHasta").classList.add("d-none");
-
-    let error = false;
-    if (IdContrato && (!/^[1-9]\d*$/.test(IdContrato))) {
-      document.getElementById("errorIdContrato").classList.remove("d-none");
-      error = true;
-    }
-    if (IdInmueble && (!/^[1-9]\d*$/.test(IdInmueble))) {
-      document.getElementById("errorIdInmueble").classList.remove("d-none");
-      error = true;
-    }
-    if (DniInquilino && (!/^[0-9]{1,8}$/.test(DniInquilino))) {
-      document.getElementById("errorDniInquilino").classList.remove("d-none");
-      error = true;
-    }
-    if (Fecha_desde && isNaN(Date.parse(Fecha_desde))) {
-      document.getElementById("errorFechaDesde").classList.remove("d-none");
-      error = true;
-    }
-    if (Fecha_hasta && isNaN(Date.parse(Fecha_hasta))) {
-      document.getElementById("errorFechaHasta").classList.remove("d-none");
-      error = true;
-    }
-    if (Fecha_desde && Fecha_hasta && new Date(Fecha_desde) > new Date(Fecha_hasta)) {
-      document.getElementById("errorFechaDesde").classList.remove("d-none");
-      document.getElementById("errorFechaHasta").classList.remove("d-none");
-      error = true;
-    }
-
-    if (error) return;
-
-    const params = new URLSearchParams();
-    params.append("IdContrato", IdContrato);
-    params.append("DniInquilino", DniInquilino);
-    params.append("IdInmueble", IdInmueble);
-    params.append("Estado", Estado);
-    params.append("Fecha_desde", Fecha_desde);
-    params.append("Fecha_hasta", Fecha_hasta);
-
-    try {
-      const response = await fetch(`/Contrato/Listartodos?${params.toString()}`);
-      if (!response.ok) throw new Error("Error en la búsqueda");
-
-      const data = await response.json();
-      let tbody = document.getElementById("tablaContrato");
-      tbody.innerHTML = "";
-
-      if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center">No se encontraron Contratos</td></tr>`;
-        return;
+@if (totalPaginas > 1)
+{
+  <nav aria-label="Paginación">
+    <ul class="pagination justify-content-center">
+      @for (int i = 1; i <= totalPaginas; i++)
+      {
+        <li class="page-item @(i == PaginaActual ? "active" : "")">
+          <a class="page-link" asp-action="Listar" asp-route-idContrato="@idContrato" asp-route-dniInquilino="@dniInquilino"
+            asp-route-idInmueble="@idInmueble" asp-route-estado="@estado" asp-route-Fecha_desde="@Fecha_desde"
+            asp-route-Fecha_hasta="@Fecha_hasta" asp-route-PaginaActual="@i">@i</a>
+        </li>
       }
-      console.warn(data)
-      data.forEach(p => {
-        let row = `
-                <tr>
-                    <td class="text-center">${p.idContrato}</td>
-                    <td class="text-center">${p.idInquilino}</td>
-                    <td class="text-center">${p.idInmueble}</td>
-                    <td class="text-center">${p.montoMensual}</td>
-                    <td class="text-center">${p.fechaDesde} - ${p.fechaHasta}</td>
-                    <td class="text-center">${p.estado}</td>
-                    <td class="d-flex justify-content-evenly">
-                        <a href="/Contrato/Ver/${p.idContrato}" class="btn btn-warning btn-sm">Ver</a>
-                    </td>
+    </ul>
+  </nav>
+}
 
-                </tr>`;
-        tbody.innerHTML += row;
-      });
-    } catch (error) {
-      alert("Hubo un problema al buscar");
-      console.error(error);
-    }
-  }
-</script>
+@if (TempData["Mensaje"] != null)
+{
+  <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
