@@ -1,18 +1,20 @@
-using Microsoft.AspNetCore.Mvc;
 using Inmobiliaria.Models;
+using Microsoft.AspNetCore.Mvc;
+
 namespace Inmobiliaria.Controllers
 {
-
     public class PropietarioController : Controller
     {
         // Sin inyección de dependencias (crear dentro del ctor)
         private readonly RepositorioPropietario repositorio;
+
         // GET: Propietario
         public PropietarioController(IConfiguration config)
         {
             // Sin inyección de dependencias y sin usar el config (quitar el parámetro repo del ctor)
             this.repositorio = new RepositorioPropietario(config);
         }
+
         public IActionResult Index()
         {
             return RedirectToAction("Index", "Home");
@@ -34,7 +36,8 @@ namespace Inmobiliaria.Controllers
                 if (ModelState.IsValid) // Verifiaca que propietario tenga el formato valido
                 {
                     repositorio.Crear(propietario);
-                    TempData["PropietarioCreado"] = $"Se agrego correctamente el propietario {propietario.Dni} {propietario.Nombre} {propietario.Apellido}";
+                    TempData["PropietarioCreado"] =
+                        $"Se agrego correctamente el propietario {propietario.Dni} {propietario.Nombre} {propietario.Apellido}";
                     return RedirectToAction(nameof(Listar));
                 }
                 else
@@ -65,7 +68,6 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-
         // POST: Propietario/Modificar/5
         [HttpPost]
         public IActionResult Modificar(Propietario propietario)
@@ -75,7 +77,8 @@ namespace Inmobiliaria.Controllers
                 if (ModelState.IsValid) // Verifiaca que propietario tenga el formato valido
                 {
                     repositorio.Modificar(propietario);
-                    TempData["PropietarioCreado"] = $"Se modifico correctamente el propietario {propietario.Dni} {propietario.Nombre} {propietario.Apellido}";
+                    TempData["PropietarioCreado"] =
+                        $"Se modifico correctamente el propietario {propietario.Dni} {propietario.Nombre} {propietario.Apellido}";
                     return RedirectToAction(nameof(Listar));
                 }
                 else
@@ -83,10 +86,10 @@ namespace Inmobiliaria.Controllers
             }
             catch (System.Exception)
             {
-
                 throw;
             }
         }
+
         [HttpPost]
         public IActionResult Eliminar(int id)
         {
@@ -122,22 +125,34 @@ namespace Inmobiliaria.Controllers
         }
 
         // GET: Propietario
-        public IActionResult Listar()
+        public IActionResult Listar(string nombre, int PaginaActual = 1)
         {
-            var lista = repositorio.ObtenerTodos();
-            return View(lista);
-        }
-        [HttpGet]
-        public IActionResult Listartodos()
-        {
-            var lista = repositorio.ObtenerTodos();
-            return Ok(lista);
-        }
-        [HttpGet]
-        public IActionResult Buscar(string dni)
-        {
-            var lista = repositorio.filtrarDNI(dni);
-            return Ok(lista);
+            int registrosPorPagina = 9;
+            int total = 0;
+            int offset = 0;
+            int limite = 0;
+            List<Propietario> propietarios;
+            offset = (PaginaActual - 1) * registrosPorPagina;
+            if (string.IsNullOrEmpty(nombre))
+            {
+                total = repositorio.ContarTodos();
+                limite = Math.Min(registrosPorPagina, total - offset);
+                propietarios = repositorio.ObtenerTodosPaginado(offset, limite);
+            }
+            else
+            {
+                total = repositorio.ContarPorNombre(nombre);
+                limite = Math.Min(registrosPorPagina, total - offset);
+                propietarios = repositorio.ObtenerPaginado(nombre, offset, limite);
+            }
+
+            int totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina);
+
+            ViewBag.PaginaActual = PaginaActual;
+            ViewBag.TotalPaginas = totalPaginas;
+            ViewBag.Nombre = nombre;
+
+            return View(propietarios);
         }
     }
 }
