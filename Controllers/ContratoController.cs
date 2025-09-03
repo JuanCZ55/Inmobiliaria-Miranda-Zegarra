@@ -31,6 +31,11 @@ namespace Inmobiliaria.Controllers
       Contrato contrato = new Contrato();
       if (idInmueble == null)
       {
+        string? contratoJson = TempData["Contrato"] as string;
+        if (!string.IsNullOrEmpty(contratoJson))
+        {
+          contrato = JsonSerializer.Deserialize<Contrato>(contratoJson) ?? new Contrato();
+        }
         return View("Gestion", contrato);
       }
       else
@@ -48,12 +53,18 @@ namespace Inmobiliaria.Controllers
     [HttpGet]
     public IActionResult Ver(int id)
     {
-      Contrato contrato = repositorio.ObtenerPorID(id);
-      return View("Gestion", contrato);
-
+      Contrato contrato;
+      try
+      {
+        contrato = repositorio.ObtenerPorID(id);
+        return View("Gestion", contrato);
+      }
+      catch (System.Exception)
+      {
+        contrato = new Contrato();
+        return View("Gestion", contrato);
+      }
     }
-
-
 
     //POST: Contrato/Crear
     [HttpPost]
@@ -61,77 +72,55 @@ namespace Inmobiliaria.Controllers
     {
       try
       {
-
-        TempData["MensajeError"] = "Modelo invalido";
         if (ModelState.IsValid)
         {
           if (repositorioInmueble.ObtenerPorID(contrato.IdInmueble).Estado != 1)
           {
             TempData["MensajeError"] = "Inmueble inactivo";
-            return View("Gestion", contrato);
+            TempData["Contrato"] = JsonSerializer.Serialize(contrato);
+            return RedirectToAction("Crear");
           }
 
           Inquilino inqui = repositorioInquilino.ObtenerPorID(contrato.IdInquilino);
           if (inqui.IdInquilino == 0)
           {
             TempData["MensajeError"] = "Inquilino inactivo";
-            return View("Gestion", contrato);
+            TempData["Contrato"] = JsonSerializer.Serialize(contrato);
+            return RedirectToAction("Crear");
           }
 
           if (contrato.FechaDesde < DateTime.Now || contrato.FechaHasta < contrato.FechaDesde)
           {
             TempData["MensajeError"] = "Fachas Invalidas";
-            return View("Gestion", contrato);
+            TempData["Contrato"] = JsonSerializer.Serialize(contrato);
+            return RedirectToAction("Crear");
           }
 
           int cont = repositorio.ExisteSolapamiento(contrato.IdInmueble, contrato.FechaDesde, contrato.FechaHasta);
           if (cont != 0)
           {
             TempData["MensajeError"] = "Se solapa con otro contrato";
-            return View("Gestion", contrato);
+            TempData["Contrato"] = JsonSerializer.Serialize(contrato);
+            return RedirectToAction("Crear");
           }
 
           Contrato nuevo = repositorio.ObtenerPorID(repositorio.Crear(contrato));
           TempData["MensajeError"] = "Contrato Creado";
-          return View("Gestion", nuevo);
+          return RedirectToAction("Ver", new { id = nuevo.IdContrato });
         }
-
-        return View("Gestion", contrato);
+        TempData["MensajeError"] = "Modelo invalido";
+        TempData["Contrato"] = JsonSerializer.Serialize(contrato);
+        return RedirectToAction("Crear");
       }
       catch (System.Exception)
       {
-        return View("Gestion", contrato);
+        TempData["MensajeError"] = "Modelo invalido";
+        TempData["Contrato"] = JsonSerializer.Serialize(contrato);
+        return RedirectToAction("Crear");
       }
     }
 
-    /*
-        // POST: Contrato/Finalizar/5
-        [HttpPost]
-        public IActionResult Finalizar(int id)
-        {
-          try
-          {
-            Contrato c = repositorio.ObtenerPorID(id);
-            if (c == null)
-            {
-              return RedirectToAction(nameof(Listar));
-            }
-            if (c.Estado == 1)
-            {
-              repositorio.Finalizar(c);
-              return View(c);
-            }
-            TempData["ContratoNoVigente"] = "Contrato no finalizado";
-            return View(c);
-          }
-          catch (System.Exception)
-          {
-            throw;
-          }
-        }
-    */
-
-    // POST: Contrato/Cancelado
+    // POST: Contrato/Cancelar
     [HttpPost]
     public IActionResult Cancelar(Contrato contrato)
     {
@@ -160,7 +149,8 @@ namespace Inmobiliaria.Controllers
             contrato.Multa = contrato.MontoMensual * 2;
           }
           repositorio.Cancelado(contrato);
-          return View("Gestion", contrato);
+          Contrato nuevo = repositorio.ObtenerPorID(contrato.IdContrato);
+          return RedirectToAction("Ver", new { id = nuevo.IdContrato });
         }
         else
           return View("Gestion", contrato);
