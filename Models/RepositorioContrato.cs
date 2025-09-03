@@ -94,7 +94,7 @@ namespace Inmobiliaria.Models
 
     public Contrato ObtenerPorID(int id)
     {
-      Contrato Contrato = null;
+      Contrato Contrato = new Contrato();
       using (var conn = new MySqlConnection(connectionString))
       {
         var sql = @"
@@ -653,13 +653,7 @@ namespace Inmobiliaria.Models
           cmd.Parameters.AddWithValue("@fechaDesde", fechaDesde);
           cmd.Parameters.AddWithValue("@fechaHasta", fechaHasta);
           conn.Open();
-          using (var reader = cmd.ExecuteReader())
-          {
-            if (reader.Read())
-            {
-              cont = reader.GetInt32("total");
-            }
-          }
+          cont = Convert.ToInt32(cmd.ExecuteScalar());
           conn.Close();
           return cont;
         }
