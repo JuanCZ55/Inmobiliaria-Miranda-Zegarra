@@ -110,20 +110,20 @@ namespace Inmobiliaria.Controllers
         }
 
         // GET: Inquilino/Lista
-        public IActionResult Listar(string dni, int PaginaActual = 1)
+        public IActionResult Listar(string Dni, int PaginaActual = 1)
         {
             int registrosPorPagina = 9;
             int offset = (PaginaActual - 1) * registrosPorPagina;
-            int total = repositorio.ContarFiltro(dni);
+            int total = repositorio.ContarFiltro(Dni);
             int limit = Math.Max(0, Math.Min(registrosPorPagina, total - offset));
 
-            var inquilinos = repositorio.Filtro(dni, limit, offset);
+            var inquilinos = repositorio.Filtro(Dni, limit, offset);
 
             int totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina);
 
             ViewBag.PaginaActual = PaginaActual;
             ViewBag.TotalPaginas = totalPaginas;
-            ViewBag.dni = dni;
+            ViewBag.Dni = Dni;
 
             return View(inquilinos);
         }
