@@ -1,139 +1,99 @@
 @model IEnumerable<Inmobiliaria.Models.Inquilino>
 
 @{
-    ViewData["Title"] = "Listado de Inquilinos";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewData["Title"] = "Listado de Inquilinos";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  var paginaActual = ViewBag.PaginaActual ?? 1;
+  var totalPaginas = ViewBag.TotalPaginas ?? 1;
+  var dniFiltro = ViewBag.Dni ?? "";
 }
 
 <h2>Listado de Inquilinos</h2>
 
 <div class="container px-0 p-3">
-    <div class="d-flex">
-        <input oninput="buscarInquilino()" class="form-control w-50" style="max-width: 300px;" type="text" id="dniInput" placeholder="Ingrese DNI" />
-    </div>
+  <form method="get" asp-action="Listar" class="d-flex mb-3">
+    <input type="text" name="dni" id="dni" class="form-control w-50" style="max-width: 300px;" placeholder="Ingrese DNI"
+      value="@dniFiltro" />
+    <button type="submit" class="btn btn-primary ms-2">Buscar</button>
+  </form>
 </div>
 
 <table class="table table-hover table-caption-top">
-    <thead class="table-dark">
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.First().IdInquilino)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Dni)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Nombre)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Apellido)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Telefono)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Email)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Direccion)</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody id="tablaInquilino">
-        @foreach (var p in Model)
-        {
-            <tr>
-                <td>@p.IdInquilino</td>
-                <td>@p.Dni</td>
-                <td>@p.Nombre</td>
-                <td>@p.Apellido</td>
-                <td>@p.Telefono</td>
-                <td>@p.Email</td>
-                <td>@p.Direccion</td>
-                <td class="d-flex justify-content-evenly">
-                    <a asp-action="Modificar" asp-route-id="@p.IdInquilino" class="btn btn-warning btn-sm">
-                        Modificar
-                    </a>
-                    <form asp-action="Eliminar" asp-route-id="@p.IdInquilino" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            Eliminar
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
+  <thead class="table-dark">
+    <tr>
+      <th>@Html.DisplayNameFor(model => model.First().IdInquilino)</th>
+      <th>@Html.DisplayNameFor(model => model.First().Dni)</th>
+      <th>@Html.DisplayNameFor(model => model.First().Nombre)</th>
+      <th>@Html.DisplayNameFor(model => model.First().Apellido)</th>
+      <th>@Html.DisplayNameFor(model => model.First().Telefono)</th>
+      <th>@Html.DisplayNameFor(model => model.First().Email)</th>
+      <th>@Html.DisplayNameFor(model => model.First().Direccion)</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (var i in Model)
+    {
+      <tr>
+        <td>@i.IdInquilino</td>
+        <td>@i.Dni</td>
+        <td>@i.Nombre</td>
+        <td>@i.Apellido</td>
+        <td>@i.Telefono</td>
+        <td>@i.Email</td>
+        <td>@i.Direccion</td>
+        <td class="d-flex justify-content-evenly">
+          <a asp-action="Modificar" asp-route-id="@i.IdInquilino" class="btn btn-warning btn-sm">Modificar</a>
+          <form asp-action="Eliminar" asp-route-id="@i.IdInquilino" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+    }
+  </tbody>
 </table>
 
-<script>
-    async function buscarInquilino() {
-        const dniInput = document.getElementById("dniInput");
-        const dni = dniInput.value.trim();
-        try {
-            let response;
-            if(dni){
-                if (!/^[0-9]+$/.test(dni)) {
-                    return;
-                }
-                response = await fetch(`/Inquilino/Buscar?dni=${dni}`);
-            }else{
-                response = await fetch(`/Inquilino/Listartodos`);
-            }
-            if (!response.ok) throw new Error("Error en la búsqueda");
-
-            const data = await response.json();
-            let tbody = document.getElementById("tablaInquilino");
-            tbody.innerHTML = "";
-
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center">No se encontraron inquilinos</td></tr>`;
-                return;
-            }
-
-            data.forEach(p => {
-                let row = `
-                    <tr>
-                        <td>${p.idInquilino}</td>
-                        <td>${p.dni}</td>
-                        <td>${p.nombre}</td>
-                        <td>${p.apellido}</td>
-                        <td>${p.telefono}</td>
-                        <td>${p.email}</td>
-                        <td>${p.direccion}</td>
-                        <td class="d-flex justify-content-evenly">
-                            <a href="/Inquilino/Modificar/${p.idInquilino}" class="btn btn-warning btn-sm">Modificar</a>
-                            <form action="/Inquilino/Eliminar/${p.idInquilino}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>`;
-                tbody.innerHTML += row;
-            });
-        } catch (error) {
-            console.error(error);
-            alert("Hubo un problema al buscar");
-        }
-    }
-</script>
+<!-- Paginacion -->
+@if (totalPaginas > 1)
+{
+  <nav>
+    <ul class="pagination">
+      @for (int i = 1; i <= totalPaginas; i++)
+      {
+        <li class="page-item @(i == paginaActual ? "active" : "")">
+          <a class="page-link" asp-action="Listar" asp-route-dni="@dniFiltro" asp-route-PaginaActual="@i">@i</a>
+        </li>
+      }
+    </ul>
+  </nav>
+}
 
 @if (TempData["Mensaje"] != null)
 {
-    <div id="mensajeAlerta" class="alert alert-success">
-        @TempData["Mensaje"]
-    </div>
-
-    <script>
-        setTimeout(function () {
-            var alerta = document.getElementById("mensajeAlerta");
-            if (alerta) {
-                alerta.style.transition = "opacity 0.5s ease";
-                alerta.style.opacity = "0";
-                setTimeout(() => alerta.remove(), 500);
-            }
-        }, 5000); // 5000 ms = 5 segundos
-    </script>
+  <div id="mensajeAlerta" class="alert alert-success">@TempData["Mensaje"]</div>
+  <script>
+    setTimeout(function () {
+      var alerta = document.getElementById("mensajeAlerta");
+      if (alerta) {
+        alerta.style.transition = "opacity 0.5s ease";
+        alerta.style.opacity = "0";
+        setTimeout(() => alerta.remove(), 500);
+      }
+    }, 5000);
+  </script>
 }
+
 @if (TempData["InquilinoCreado"] != null)
 {
-    <div id="mensajeAlerta" class="alert alert-primary">
-        @TempData["InquilinoCreado"]
-    </div>
-
-    <script>
-        setTimeout(function () {
-            var alerta = document.getElementById("mensajeAlerta");
-            if (alerta) {
-                alerta.style.transition = "opacity 0.5s ease";
-                alerta.style.opacity = "0";
-                setTimeout(() => alerta.remove(), 500);
-            }
-        }, 5000); // 5000 ms = 5 segundos
-    </script>
+  <div id="mensajeAlerta" class="alert alert-primary">@TempData["InquilinoCreado"]</div>
+  <script>
+    setTimeout(function () {
+      var alerta = document.getElementById("mensajeAlerta");
+      if (alerta) {
+        alerta.style.transition = "opacity 0.5s ease";
+        alerta.style.opacity = "0";
+        setTimeout(() => alerta.remove(), 500);
+      }
+    }, 5000);
+  </script>
 }
