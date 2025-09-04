@@ -1,0 +1,279 @@
+@model Inmobiliaria.Models.Pago
+@{
+  ViewData["Title"] = "Crear Contrato";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container bg-light rounded shadow-sm p-5">
+
+  <div class="row shadow-lg rounded border p-4">
+    <div class="col-md-6 border-end">
+      <form asp-action="@(Model.IdPago == 0 ? "Crear" : "Cancelar")" method="post">
+        <h2 class="text-center">Pago</h2>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label asp-for="numeroPago" class="form-label">Número de pago</label>
+            <input asp-for="numeroPago" type="number" class="form-control" />
+          </div>
+          <div class="col-md-6">
+            <label asp-for="FechaPago" class="form-label">Fecha de Pago</label>
+            <input asp-for="FechaPago" type="date" class="form-control" />
+
+          </div>
+          <div class="col-md-6">
+            <label asp-for="Concepto" class="form-label">Concepto</label>
+            <input asp-for="Concepto" type="text" class="form-control" />
+          </div>
+          <div class="col-md-6">
+            <label asp-for="Monto" class="form-label">Monto a pagar</label>
+            <input asp-for="Monto" type="number" class="form-control" />
+          </div>
+          <div class="col-md-6">
+            <label asp-for="IdContrato" class="form-label">Cod. Contrato</label>
+            <input asp-for="IdContrato" oninput="buscarContrato()" type="number" class="form-control" />
+          </div>
+          @if (Model.IdPago > 0)
+          {
+            <div class="col-md-6">
+              <label class="form-label">Estado</label>
+              <input class="form-control" type="text" readonly
+                value="@(Model.Estado == 1 ? "Activo" : Model.Estado == 2 ? "Cancelado" : "")"
+                readonly />
+            </div>
+              <div class="d-none">
+                <input asp-for="IdPago" type="hidden" id="IdContrato" />
+              </div>
+          }
+        </div>
+        <div class="d-flex justify-content-between pt-4 mt-4 gap-2">
+          @if (Model != null && Model.IdPago == 0)
+          {
+            <button type="submit" class="btn btn-success">Crear</button>
+          }
+          else if (Model != null && Model.IdPago > 0 && Model.Estado == 1)
+          {
+            <button type="submit" class="btn btn-danger">Cancelar Pago</button>
+          }
+          <a href="/Pago/Listar" class="btn btn-secondary">Volver</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-md-6">
+      <form asp-action="..." method="post">
+        <h2 class="text-center">Contrato</h2>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Cod. Inquilino</label>
+            <input type="text" class="form-control" id="Contrato_Inquilino"
+              value="@Model.contrato?.Inquilino?.IdInquilino" readonly />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Cod. Inmueble</label>
+            <input type="text" class="form-control" id="Contrato_Inmueble" value="@Model.contrato?.Inmueble?.IdInmueble"
+              readonly />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Fecha Desde</label>
+            <input type="text" class="form-control" id="Contrato_FechaDesde" value="@Model.contrato?.FechaDesde"
+              readonly />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Fecha Hasta</label>
+            <input type="text" class="form-control" id="Contrato_FechaHasta" value="@Model.contrato?.FechaHasta"
+              readonly />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Monto Mensual</label>
+            <input type="text" class="form-control" id="Contrato_MontoMensual" value="@Model.contrato?.MontoMensual"
+              readonly />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Estado</label>
+            <input type="text" class="form-control" id="Contrato_Estado"
+              value="@(Model.contrato?.Estado == 1 ? "Vigente" : Model.Estado == 3 ? "Cancelado" : Model.Estado == 2 ? "Finalizado" : "")"
+              readonly />
+          </div>
+          <div class="col-md-6 @(Model.contrato?.FechaFin == null ? "d-none" : "")">
+            <label class="form-label">Fecha de Cancelación</label>
+            <input type="text" class="form-control" id="Contrato_FechaFin"
+              value="@(Model.contrato?.FechaFin?.ToString("yyyy-MM-dd") ?? "")" readonly />
+          </div>
+
+          <div class="col-md-6 @(Model.contrato?.Multa == null ? "d-none" : "")">
+            <label class="form-label">Multa</label>
+            <input type="text" class="form-control" id="Contrato_Multa"
+              value="@(Model.contrato?.Multa?.ToString() ?? "")" readonly />
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+
+  <div class="row shadow-lg rounded border p-5 mt-5">
+    <div class="col-md-6 border-end">
+      <form asp-action="@(Model.IdContrato == 0 ? "Crear" : "Cancelar")" method="post">
+        <h2 class="text-center mb-3">Inquilino</h2>
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label">DNI</label>
+            <input type="text" class="form-control" id="Inquilino_Dni" value="@Model.contrato?.Inquilino?.Dni"
+              readonly />
+          </div>
+          <div class="col-6">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="Inquilino_Nombre"" value=" @Model.contrato?.Inquilino?.Nombre"
+              readonly />
+          </div>
+          <div class="col-6">
+            <label class="form-label">Apellido</label>
+            <input type="text" class="form-control" id="Inquilino_Apellido""  value="
+              @Model.contrato?.Inquilino?.Apellido" readonly />
+          </div>
+          <div class="col-6">
+            <label class="form-label">Teléfono</label>
+            <input type="text" class="form-control" id="Inquilino_Telefono" value="@Model.contrato?.Inquilino?.Telefono"
+              readonly />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="Inquilino_Email" value="@Model.contrato?.Inquilino?.Email"
+              readonly />
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-md-6 p-4">
+      <form asp-action="..." method="post">
+        <h2 class="text-center mb-3">Inmueble</h2>
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label">Código</label>
+            <input type="text" class="form-control" id="Inmueble_Id" value="@Model.contrato?.Inmueble?.IdInmueble"
+              readonly />
+          </div>
+          <div class="col-6">
+            <label class="form-label">Tipo de Inmueble</label>
+            <input type="text" class="form-control" id="Inmueble_Tipo"
+              value="@Model.contrato?.Inmueble?.TipoInmueble?.Nombre" readonly />
+          </div>
+          <div class="col-6">
+            <label class="form-label">Precio</label>
+            <input type="text" class="form-control" id="Inmueble_Precio" value="@Model.contrato?.Inmueble?.Precio"
+              readonly />
+          </div>
+          <div class="col-6">
+            <label class="form-label">Dirección</label>
+            <input type="text" class="form-control" id="Inmueble_Direccion" value="@Model.contrato?.Inmueble?.Direccion"
+              readonly />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Descripción</label>
+            <input type="text" class="form-control" id="Inmueble_Descripcion"
+              value="@Model.contrato?.Inmueble?.Descripcion" readonly />
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function buscarContrato() {
+    const idContratoInput = document.getElementById("IdContrato");
+    const idContrato = idContratoInput.value.trim();
+
+    document.getElementById("Contrato_Inquilino").value = "";
+    document.getElementById("Contrato_Inmueble").value = "";
+    document.getElementById("Contrato_FechaDesde").value = null;
+    document.getElementById("Contrato_FechaHasta").value = null;
+    document.getElementById("Contrato_MontoMensual").value = "";
+    document.getElementById("Contrato_Estado").value = "";
+
+    const fechaFinDiv = document.getElementById("Contrato_FechaFin")?.closest(".col-md-6");
+    if (fechaFinDiv) {
+      fechaFinDiv.classList.add("d-none");
+      document.getElementById("Contrato_FechaFin").value = "";
+    }
+
+    const multaDiv = document.getElementById("Contrato_Multa")?.closest(".col-md-6");
+    if (multaDiv) {
+      multaDiv.classList.add("d-none");
+      document.getElementById("Contrato_Multa").value = "";
+    }
+
+    document.getElementById("Inquilino_Dni").value = "";
+    document.getElementById("Inquilino_Nombre").value = "";
+    document.getElementById("Inquilino_Apellido").value = "";
+    document.getElementById("Inquilino_Telefono").value = "";
+    document.getElementById("Inquilino_Email").value = "";
+
+    document.getElementById("Inmueble_Id").value = "";
+    document.getElementById("Inmueble_Tipo").value = "";
+    document.getElementById("Inmueble_Precio").value = "";
+    document.getElementById("Inmueble_Direccion").value = "";
+    document.getElementById("Inmueble_Descripcion").value = "";
+
+    try {
+      if (!/^[0-9]+$/.test(idContrato) || idContrato.value < 1) {
+        return;
+      }
+
+      const response = await fetch(`/Contrato/Contrato?idContrato=${idContrato}`);
+      if (!response.ok) {
+        return;
+      }
+
+      const text = await response.text();
+      if (!text) {
+        return;
+      }
+
+      const data = JSON.parse(text);
+      if (!data) {
+        return;
+      }
+      if (data.idContrato == 0) {
+        return;
+      }
+
+      document.getElementById("Contrato_Inquilino").value = data.idInquilino || "";
+      document.getElementById("Contrato_Inmueble").value = data.idInmueble || "";
+      document.getElementById("Contrato_FechaDesde").value = data.fechaDesde?.split("T")[0] || "";
+      document.getElementById("Contrato_FechaHasta").value = data.fechaHasta?.split("T")[0] || "";
+      document.getElementById("Contrato_MontoMensual").value = data.montoMensual || "";
+      document.getElementById("Contrato_Estado").value = data.estado == 1 ? "Vigente" : data.estado == 2 ? "Finalizado" : data.estado == 3 ? "Cancelado" : "";
+
+      if (data.fechaFin) {
+        const fechaFinDiv = document.getElementById("Contrato_FechaFin").closest(".col-md-6");
+        fechaFinDiv.classList.remove("d-none");
+        document.getElementById("Contrato_FechaFin").value = data.fechaFin.split("T")[0];
+      }
+      if (data.multa) {
+        const multaDiv = document.getElementById("Contrato_Multa").closest(".col-md-6");
+        multaDiv.classList.remove("d-none");
+        document.getElementById("Contrato_Multa").value = data.multa;
+      }
+
+      document.getElementById("Inquilino_Dni").value = data.inquilino?.dni || "";
+      document.getElementById("Inquilino_Nombre").value = data.inquilino?.nombre || "";
+      document.getElementById("Inquilino_Apellido").value = data.inquilino?.apellido || "";
+      document.getElementById("Inquilino_Telefono").value = data.inquilino?.telefono || "";
+      document.getElementById("Inquilino_Email").value = data.inquilino?.email || "";
+
+      document.getElementById("Inmueble_Id").value = data.inmueble?.idInmueble || "";
+      document.getElementById("Inmueble_Tipo").value = data.inmueble?.tipoInmueble?.nombre || "";
+      document.getElementById("Inmueble_Precio").value = data.inmueble?.precio || "";
+      document.getElementById("Inmueble_Direccion").value = data.inmueble?.direccion || "";
+      document.getElementById("Inmueble_Descripcion").value = data.inmueble?.descripcion || "";
+
+      idContratoInput.value = data.idContrato;
+    } catch (error) {
+      console.error("Hubo un problema al buscar");
+      console.error(error);
+    }
+  }
+</script>
