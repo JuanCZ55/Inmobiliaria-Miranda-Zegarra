@@ -216,5 +216,21 @@ namespace Inmobiliaria.Controllers
         return View(new List<Contrato>());
       }
     }
+    [HttpGet]
+    public IActionResult Contrato(int idContrato)
+    {
+      Contrato contrato = new Contrato();
+      try
+      {
+        contrato = repositorio.ObtenerPorID(idContrato);
+        return Ok(contrato);
+      }
+      catch (System.Exception)
+      {
+        return Ok(contrato);
+      }
+    }
+
   }
+
 }
