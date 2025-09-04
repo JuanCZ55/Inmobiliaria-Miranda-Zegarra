@@ -6,19 +6,21 @@ namespace Inmobiliaria.Controllers
 
   public class ContratoController : Controller
   {
-    // Sin inyección de dependencias (crear dentro del ctor)
-    private readonly RepositorioContraro repositorio;
-    private readonly RepositorioPago repositorioPago;
-    private readonly RepositorioInmueble repositorioInmueble;
-    private readonly RepositorioInquilino repositorioInquilino;
+    private readonly IRepositorioContrato repositorio;
+    private readonly IRepositorioPago repositorioPago;
+    private readonly IRepositorioInmueble repositorioInmueble;
+    private readonly IRepositorioInquilino repositorioInquilino;
+
+    private readonly IConfiguration config;
+
     // GET: Contrato
-    public ContratoController(IConfiguration config)
+    public ContratoController(IRepositorioContrato repositorio, IRepositorioPago repositorioPago, IRepositorioInmueble repositorioInmueble, IRepositorioInquilino repositorioInquilino, IConfiguration config)
     {
-      // Sin inyección de dependencias y sin usar el config (quitar el parámetro repo del ctor)
-      this.repositorio = new RepositorioContraro(config);
-      this.repositorioPago = new RepositorioPago(config);
-      this.repositorioInmueble = new RepositorioInmueble(config);
-      this.repositorioInquilino = new RepositorioInquilino(config);
+      this.repositorio = repositorio;
+      this.repositorioPago = repositorioPago;
+      this.repositorioInmueble = repositorioInmueble;
+      this.repositorioInquilino = repositorioInquilino;
+      this.config = config;
     }
     public IActionResult Index()
     {
@@ -91,7 +93,7 @@ namespace Inmobiliaria.Controllers
 
           if (contrato.FechaDesde < DateTime.Now || contrato.FechaHasta < contrato.FechaDesde)
           {
-            TempData["MensajeError"] = "Fachas Invalidas";
+            TempData["MensajeError"] = "Fechas Invalidas";
             TempData["Contrato"] = JsonSerializer.Serialize(contrato);
             return RedirectToAction("Crear");
           }

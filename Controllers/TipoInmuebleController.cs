@@ -7,11 +7,12 @@ namespace Inmobiliaria.Controllers
 {
     public class TipoInmuebleController : Controller
     {
-        private readonly RepositorioTipoInmueble repositorio;
-
-        public TipoInmuebleController(IConfiguration config)
+        private readonly IRepositorioTipoInmueble repositorio;
+        private readonly IConfiguration config;
+        public TipoInmuebleController(IRepositorioTipoInmueble repositorio, IConfiguration config)
         {
-            this.repositorio = new RepositorioTipoInmueble(config);
+            this.repositorio = repositorio;
+            this.config = config;
         }
 
         // GET: TipoInmueble
@@ -61,7 +62,7 @@ namespace Inmobiliaria.Controllers
         {
             try
             {
-                var tipo = repositorio.BuscarPorId(id);
+                var tipo = repositorio.ObtenerPorID(id);
                 if (tipo == null)
                     return RedirectToAction(nameof(Listar));
 
@@ -81,7 +82,7 @@ namespace Inmobiliaria.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var ti = repositorio.BuscarPorId(tipoInmueble.IdTipoInmueble);
+                    var ti = repositorio.ObtenerPorID(tipoInmueble.IdTipoInmueble);
                     if (ti.Nombre == tipoInmueble.Nombre)
                     {
                         TempData["Mensaje"] =

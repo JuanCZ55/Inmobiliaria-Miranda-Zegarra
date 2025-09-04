@@ -5,14 +5,13 @@ namespace Inmobiliaria.Controllers
 {
     public class InquilinoController : Controller
     {
-        // Sin inyección de dependencias (crear dentro del ctor)
-        private readonly RepositorioInquilino repositorio;
-
+        private readonly IRepositorioInquilino repositorio;
+    private readonly IConfiguration config;
         // GET: Propietario
-        public InquilinoController(IConfiguration config)
+        public InquilinoController(IRepositorioInquilino repositorio, IConfiguration config)
         {
-            // Sin inyección de dependencias y sin usar el config (quitar el parámetro repo del ctor)
-            this.repositorio = new RepositorioInquilino(config);
+            this.repositorio = repositorio;
+            this.config = config;
         }
 
         // GET: Inquilino

@@ -6,22 +6,23 @@ namespace Inmobiliaria.Controllers
 
   public class PagoController : Controller
   {
-    // Sin inyección de dependencias (crear dentro del ctor)
-    private readonly RepositorioPago repositorio;
-    private readonly RepositorioPago repositorioPago;
-    private readonly RepositorioInmueble repositorioInmueble;
-    private readonly RepositorioInquilino repositorioInquilino;
-    private readonly RepositorioContraro repositorioContraro;
+    private readonly IRepositorioPago repositorio;
+    private readonly IRepositorioPago repositorioPago;
+    private readonly IRepositorioInmueble repositorioInmueble;
+    private readonly IRepositorioInquilino repositorioInquilino;
+    private readonly IRepositorioContrato repositorioContraro;
+    private readonly IConfiguration config;
 
     // GET: Contrato
-    public PagoController(IConfiguration config)
+    public PagoController(
+      IRepositorioPago repositorio, IRepositorioPago repositorioPago, IRepositorioInmueble repositorioInmueble, IRepositorioInquilino repositorioInquilino, IRepositorioContrato repositorioContraro, IConfiguration config)
     {
-      // Sin inyección de dependencias y sin usar el config (quitar el parámetro repo del ctor)
-      this.repositorio = new RepositorioPago(config);
-      this.repositorioPago = new RepositorioPago(config);
-      this.repositorioInmueble = new RepositorioInmueble(config);
-      this.repositorioInquilino = new RepositorioInquilino(config);
-      this.repositorioContraro = new RepositorioContraro(config);
+      this.repositorio = repositorio;
+      this.repositorioPago = repositorioPago;
+      this.repositorioInmueble = repositorioInmueble;
+      this.repositorioInquilino = repositorioInquilino;
+      this.repositorioContraro = repositorioContraro;
+      this.config = config;
     }
     public IActionResult Index()
     {

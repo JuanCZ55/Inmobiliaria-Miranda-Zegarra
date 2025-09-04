@@ -6,15 +6,16 @@ namespace Inmobiliaria.Controllers
 {
     public class InmuebleController : Controller
     {
-        private readonly RepositorioInmueble repositorio;
-        private readonly RepositorioTipoInmueble repoTipo;
-        private readonly RepositorioPropietario repoPropietario;
-
-        public InmuebleController(IConfiguration config)
+        private readonly IRepositorioInmueble repositorio;
+        private readonly IRepositorioTipoInmueble repoTipo;
+        private readonly IRepositorioPropietario repoPropietario;
+    private readonly IConfiguration config;
+        public InmuebleController(IRepositorioInmueble repositorio, IRepositorioTipoInmueble repoTipo, IRepositorioPropietario repoPropietario, IConfiguration config)
         {
-            this.repositorio = new RepositorioInmueble(config);
-            this.repoTipo = new RepositorioTipoInmueble(config);
-            this.repoPropietario = new RepositorioPropietario(config);
+            this.repositorio = repositorio;
+            this.repoTipo = repoTipo;
+            this.repoPropietario = repoPropietario;
+            this.config = config;
         }
 
         // GET: Inmueble
