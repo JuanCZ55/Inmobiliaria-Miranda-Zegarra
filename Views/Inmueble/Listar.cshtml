@@ -5,58 +5,79 @@
 }
 
 <h2>Listado de Inmuebles</h2>
-
 <div class="container px-0 p-3 row">
   <div class="col-md-3 mb-1">
-    <input type="text" id="direccion" class="form-control" style="max-width: 300px;" placeholder="Ingrese Direccion"
-      oninput="filtrarInmuebles()" />
-  </div>
-  <div class="col-md-3 mb-1">
-    <input type="text" id="dni" class="form-control" style="max-width: 300px;" placeholder="Ingrese DNI propietario"
-      oninput="filtrarInmuebles()" />
-  </div>
-  <div class="col-md-3 mb-1">
-    <select id="tipo" class="form-control" style="max-width: 300px;" onchange="filtrarInmuebles()">
-      <option value="">Seleccione tipo</option>
-      @foreach (var tipo in ViewBag.Tipos ?? new List<Inmobiliaria.Models.TipoInmueble>())
-      {
-        <option value="@tipo.IdTipoInmueble">@tipo.Nombre</option>
-      }
-    </select>
+    <div class="zeg-field">
+      <input type="text" id="direccion" class="zeg-input" placeholder=" " oninput="filtrarInmuebles()" />
+      <label for="direccion">Ingrese Dirección</label>
+    </div>
   </div>
 
-
+  <div class="col-md-3 mb-1">
+    <div class="zeg-field">
+      <input type="text" id="dni" class="zeg-input" placeholder=" " oninput="filtrarInmuebles()" />
+      <label for="dni">Ingrese DNI propietario</label>
+    </div>
+  </div>
 
   <div class="col-md-3 mb-1">
-    <select id="uso" class="form-control" style="max-width: 300px;" onchange="filtrarInmuebles()">
-      <option value="">Seleccione uso</option>
-      <option value="1">Residencial</option>
-      <option value="2">Comercial</option>
-    </select>
+    <div class="zeg-field">
+      <select id="tipo" class="zeg-input" onchange="filtrarInmuebles()">
+        <option value=""></option>
+        @foreach (var tipo in ViewBag.Tipos ?? new List<Inmobiliaria.Models.TipoInmueble>())
+        {
+          <option value="@tipo.IdTipoInmueble">@tipo.Nombre</option>
+        }
+      </select>
+      <label for="tipo">Tipo de inmueble</label>
+    </div>
   </div>
 
+  <div class="col-md-3 mb-1">
+    <div class="zeg-field">
+      <select id="uso" class="zeg-input" onchange="filtrarInmuebles()">
+        <option value=""></option>
+        <option value="1">Residencial</option>
+        <option value="2">Comercial</option>
+      </select>
+      <label for="uso">Uso</label>
+    </div>
+  </div>
 
   <div class="col-md-3 mb-1">
-    <input type="number" id="ambientes" class="form-control" style="max-width: 300px;"
-      placeholder="Min Cantidad de ambientes" oninput="filtrarInmuebles()" />
+    <div class="zeg-field">
+      <input type="number" id="ambientes" class="zeg-input" placeholder=" " oninput="filtrarInmuebles()" />
+      <label for="ambientes">Min Cantidad de ambientes</label>
+    </div>
   </div>
-  <div class="col-md-3">
-    <input type="number" id="precioMin" class="form-control" style="max-width: 300px;" placeholder="Precio mínimo"
-      oninput="filtrarInmuebles()" />
-  </div>
-  <div class="col-md-3">
-    <input type="number" id="precioMax" class="form-control" style="max-width: 300px;" placeholder="Precio máximo"
-      oninput="filtrarInmuebles()" />
-  </div>
+
   <div class="col-md-3 mb-1">
-    <select id="estado" class="form-control" style="max-width: 300px;" onchange="filtrarInmuebles()">
-      <option value="">Seleccione estado</option>
-      <option value="1">Disponible</option>
-      <option value="2">Ocupado</option>
-      <option value="3">Suspendido</option>
-    </select>
+    <div class="zeg-field">
+      <input type="number" id="precioMin" class="zeg-input" placeholder=" " oninput="filtrarInmuebles()" />
+      <label for="precioMin">Precio mínimo</label>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-1">
+    <div class="zeg-field">
+      <input type="number" id="precioMax" class="zeg-input" placeholder=" " oninput="filtrarInmuebles()" />
+      <label for="precioMax">Precio máximo</label>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-1">
+    <div class="zeg-field">
+      <select id="estado" class="zeg-input" onchange="filtrarInmuebles()">
+        <option value=""></option>
+        <option value="1">Disponible</option>
+        <option value="2">Ocupado</option>
+        <option value="3">Suspendido</option>
+      </select>
+      <label for="estado">Estado</label>
+    </div>
   </div>
 </div>
+
 
 <table class="table table-hover table-caption-top">
   <thead class="table-dark">
@@ -189,3 +210,26 @@
     }, 5000);
   </script>
 }
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+
+    document.querySelectorAll('select.zeg-input').forEach(select => {
+      if (select.value !== "") select.classList.add('active');
+
+      select.addEventListener('change', () => {
+        if (select.value !== "") select.classList.add('active');
+        else select.classList.remove('active');
+      });
+    });
+
+    document.querySelectorAll('input.zeg-input, textarea.zeg-input').forEach(input => {
+      if (input.value !== "") input.classList.add('active');
+      input.addEventListener('input', () => {
+        if (input.value !== "") input.classList.add('active');
+        else input.classList.remove('active');
+      });
+    });
+
+  });
+
+</script>
