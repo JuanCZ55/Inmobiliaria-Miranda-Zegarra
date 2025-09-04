@@ -520,20 +520,53 @@ namespace Inmobiliaria.Models
       using (var conn = new MySqlConnection(connectionString))
       {
         var sql = @"
-            SELECT c.id_Contrato, c.fecha_desde, c.fecha_hasta, c.fecha_terminacion_anticipada, 
-                  c.monto_mensual, c.multa, c.estado, c.id_inmueble, c.id_inquilino, 
-                  c.created_at, c.updated_at,
-                  inm.id_Propietario AS inm_id_propietario, inm.direccion AS inm_direccion, 
-                  inm.cantidad_ambientes AS inm_cantidad_ambientes, inm.descripcion AS inm_descripcion,
-                  p.id_propietario AS p_id_propietario, p.dni AS p_dni, p.nombre AS p_nombre, 
-                  p.apellido AS p_apellido, p.telefono AS p_telefono, p.email AS p_email,
-                  inq.id_inquilino AS inq_id_inquilino, inq.dni AS inq_dni, inq.nombre AS inq_nombre, 
-                  inq.apellido AS inq_apellido, inq.telefono AS inq_telefono, inq.email AS inq_email
-            FROM contrato c 
-            JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
-            JOIN propietario p ON inm.id_propietario = p.id_propietario
-            JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino
-            WHERE 1=1
+          SELECT 
+              c.id_Contrato, 
+              c.fecha_desde, 
+              c.fecha_hasta, 
+              c.fecha_terminacion_anticipada, 
+              c.monto_mensual, 
+              c.multa, 
+              c.estado, 
+              c.id_inmueble, 
+              c.id_inquilino, 
+              c.created_at, 
+              c.updated_at, 
+
+              -- inmueble
+              inm.id_Propietario AS inm_id_propietario, 
+              inm.direccion AS inm_direccion, 
+              inm.cantidad_ambientes AS inm_cantidad_ambientes, 
+              inm.descripcion AS inm_descripcion,
+              inm.precio AS inm_precio, 
+
+              -- propietario
+              p.id_propietario AS p_id_propietario, 
+              p.dni AS p_dni, 
+              p.nombre AS p_nombre, 
+              p.apellido AS p_apellido, 
+              p.telefono AS p_telefono, 
+              p.email AS p_email,
+
+              -- tipo inmueble
+              ti.id_tipo_inmueble AS ti_id_tipo_inmueble, 
+              ti.nombre AS ti_nombre,
+
+              -- inquilino
+              inq.id_inquilino AS inq_id_inquilino, 
+              inq.dni AS inq_dni, 
+              inq.nombre AS inq_nombre, 
+              inq.apellido AS inq_apellido, 
+              inq.telefono AS inq_telefono, 
+              inq.email AS inq_email,
+              inq.direccion AS inq_direccion
+
+          FROM contrato c 
+          JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
+          JOIN tipo_inmueble ti ON inm.id_tipo_inmueble = ti.id_tipo_inmueble
+          JOIN propietario p ON inm.id_propietario = p.id_propietario
+          JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino
+          WHERE 1=1 
         ";
 
         // Filtros dinámicos con LIKE
@@ -613,7 +646,13 @@ namespace Inmobiliaria.Models
                   },
                   Direccion = reader.GetString("inm_direccion"),
                   CantidadAmbientes = reader.GetInt32("inm_cantidad_ambientes"),
-                  Descripcion = reader.GetString("inm_descripcion")
+                  Precio = reader.GetDecimal("inm_precio"),
+                  Descripcion = reader.GetString("inm_descripcion"),
+                  IdTipoInmueble = reader.GetInt32("ti_id_tipo_inmueble"),
+                  TipoInmueble = new TipoInmueble
+                  { 
+                    Nombre = reader.GetString("ti_nombre")
+                  }
                 },
                 IdInquilino = reader.GetInt32("id_inquilino"),
                 Inquilino = new Inquilino
@@ -623,7 +662,8 @@ namespace Inmobiliaria.Models
                   Nombre = reader.GetString("inq_nombre"),
                   Apellido = reader.GetString("inq_apellido"),
                   Telefono = reader.GetString("inq_telefono"),
-                  Email = reader.GetString("inq_email")
+                  Email = reader.GetString("inq_email"),
+                  Direccion = reader.GetString("inq_direccion"),
                 },
                 CreatedAt = reader.GetDateTime("created_at"),
                 UpdatedAt = reader.GetDateTime("updated_at")
