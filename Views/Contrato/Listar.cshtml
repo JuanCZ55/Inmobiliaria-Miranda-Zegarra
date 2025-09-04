@@ -33,38 +33,38 @@
         placeholder="Cod. Inmueble" />
     </div>
 
-      <div class="col-md-2">
-        <select class="form-control" name="estado">
-            <option value="">Seleccionar estado</option>
-            @if (estado == "1")
-            {
-                <option value="1" selected>Vigente</option>
-            }
-            else
-            {
-                <option value="1">Vigente</option>
-            }
+    <div class="col-md-2">
+      <select class="form-control" name="estado">
+        <option value="">Seleccionar estado</option>
+        @if (estado == "1")
+        {
+          <option value="1" selected>Vigente</option>
+        }
+        else
+        {
+          <option value="1">Vigente</option>
+        }
 
-            @if (estado == "2")
-            {
-                <option value="2" selected>Finalizado</option>
-            }
-            else
-            {
-                <option value="2">Finalizado</option>
-            }
+        @if (estado == "2")
+        {
+          <option value="2" selected>Finalizado</option>
+        }
+        else
+        {
+          <option value="2">Finalizado</option>
+        }
 
-            @if (estado == "3")
-            {
-                <option value="3" selected>Cancelado</option>
-            }
-            else
-            {
-                <option value="3">Cancelado</option>
-            }
-        </select>
+        @if (estado == "3")
+        {
+          <option value="3" selected>Cancelado</option>
+        }
+        else
+        {
+          <option value="3">Cancelado</option>
+        }
+      </select>
 
-      </div>
+    </div>
 
     <div class="col-md-2">
       <label for="Fecha_desde" class="form-label">Fecha desde</label>
@@ -95,20 +95,30 @@
   <tbody class="text-center">
     @if (Model != null && Model.Any())
     {
-      foreach (var c in Model)
+      @foreach (var i in Model)
       {
         <tr>
-          <td>@c.IdContrato</td>
-          <td>@c.IdInquilino</td>
-          <td>@c.IdInmueble</td>
-          <td>@c.MontoMensual</td>
-          <td>@c.FechaDesde.ToShortDateString() - @c.FechaHasta.ToShortDateString()</td>
-          <td>@(c.Estado == 1 ? "Vigente" : c.Estado == 2 ? "Finalizado" : c.Estado == 3 ? "Cancelado" : "Desconocido")</td>
+          <td>@i.IdContrato</td>
+          <td class="id-inquilino" data-dni="@i.Inquilino?.Dni" data-nombre="@i.Inquilino?.Nombre"
+            data-apellido="@i.Inquilino?.Apellido" data-telefono="@i.Inquilino?.Telefono" data-email="@i.Inquilino?.Email"
+            data-direccion="@i.Inquilino?.Direccion">
+            @i.IdInquilino
+          </td>
+          <td class="id-inmueble" data-tipo="@i.Inmueble?.TipoInmueble?.Nombre" data-direccion="@i.Inmueble?.Direccion"
+            data-dni-propietario="@i.Inmueble?.Propietario?.Dni" data-propietario="@i.Inmueble?.Propietario?.Nombre"
+            data-ambientes="@i.Inmueble?.CantidadAmbientes" data-precio="@i.Inmueble?.Precio">
+            @i.IdInmueble
+          </td>
+          <td>@i.MontoMensual</td>
+          <td>@i.FechaDesde.ToShortDateString() - @i.FechaHasta.ToShortDateString()</td>
+          <td>@(i.Estado == 1 ? "Vigente" : i.Estado == 2 ? "Finalizado" : i.Estado == 3 ? "Cancelado" : "Desconocido")</td>
           <td>
-            <a asp-action="Ver" asp-route-id="@c.IdContrato" class="btn btn-warning btn-sm">Ver</a>
+            <a asp-action="Ver" asp-route-id="@i.IdContrato" class="btn btn-warning btn-sm">Ver</a>
           </td>
         </tr>
       }
+
+
     }
     else
     {
@@ -118,7 +128,10 @@
     }
   </tbody>
 </table>
-
+<!-- Div flotante (uno solo para ambos) -->
+<div id="tooltip-info"
+  style="display:none; width:300px; position:absolute; background:#fff; border:1px solid #ccc; padding:10px; box-shadow:0 4px 6px rgba(0,0,0,0.1); z-index:9999;">
+</div>
 @if (totalPaginas > 1)
 {
   <nav aria-label="Paginación">
@@ -139,3 +152,62 @@
 {
   <div class="alert alert-success">@TempData["Mensaje"]</div>
 }
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const tooltip = document.getElementById("tooltip-info");
+
+    // -------- Inquilino --------
+    document.querySelectorAll(".id-inquilino").forEach(cell => {
+      cell.addEventListener("mouseenter", e => {
+        tooltip.innerHTML = `
+          <strong>Inquilino</strong><br>
+          <strong>DNI:</strong> ${cell.dataset.dni}<br>
+          <strong>Nombre:</strong> ${cell.dataset.nombre}<br>
+          <strong>Apellido:</strong> ${cell.dataset.apellido}<br>
+          <strong>Teléfono:</strong> ${cell.dataset.telefono}<br>
+          <strong>Email:</strong> ${cell.dataset.email}<br>
+          <strong>Dirección:</strong> ${cell.dataset.direccion}
+        `;
+        tooltip.style.display = "block";
+        tooltip.style.top = (e.pageY + 10) + "px";
+        tooltip.style.left = (e.pageX + 10) + "px";
+      });
+
+      cell.addEventListener("mousemove", e => {
+        tooltip.style.top = (e.pageY + 10) + "px";
+        tooltip.style.left = (e.pageX + 10) + "px";
+      });
+
+      cell.addEventListener("mouseleave", () => {
+        tooltip.style.display = "none";
+      });
+    });
+
+    // -------- Inmueble --------
+    document.querySelectorAll(".id-inmueble").forEach(cell => {
+      cell.addEventListener("mouseenter", e => {
+        tooltip.innerHTML = `
+          <strong>Inmueble</strong><br>
+          <strong>Tipo:</strong> ${cell.dataset.tipo}<br>
+          <strong>Dirección:</strong> ${cell.dataset.direccion}<br>
+          <strong>Propietario:</strong> ${cell.dataset.propietario} (DNI: ${cell.dataset.dniPropietario})<br>
+          <strong>Ambientes:</strong> ${cell.dataset.ambientes}<br>
+          <strong>Precio:</strong> $${cell.dataset.precio}
+        `;
+        tooltip.style.display = "block";
+        tooltip.style.top = (e.pageY + 10) + "px";
+        tooltip.style.left = (e.pageX + 10) + "px";
+      });
+
+      cell.addEventListener("mousemove", e => {
+        tooltip.style.top = (e.pageY + 10) + "px";
+        tooltip.style.left = (e.pageX + 10) + "px";
+      });
+
+      cell.addEventListener("mouseleave", () => {
+        tooltip.style.display = "none";
+      });
+    });
+  });
+</script>
