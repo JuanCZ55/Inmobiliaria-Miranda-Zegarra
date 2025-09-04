@@ -1,12 +1,15 @@
-using System.Collections.Generic;
+using Inmobiliaria_.Models;
 
 namespace Inmobiliaria.Models
 {
-    public interface IRepositorioTipoInmueble
+    public interface IRepositorioTipoInmueble : IRepositorio<TipoInmueble>
     {
-        int Crear(TipoInmueble tipoInmueble);
-        int Modificar(TipoInmueble tipoInmueble);
-        int Eliminar(int idInmueble);
         int ExisteTipoInmueble(string nombre);
+        int SeEstaUsando(int IdTipoInmueble);
+        int ContarPorTodos();
+        List<TipoInmueble> ObtenerTodos(int limit, int offset);
+        List<TipoInmueble> TenerTodos();
+        List<TipoInmueble> ListarPorNombre(string nombre, int limite, int offset);
+        int ContarPorNombre(string nombre);
     }
 }

@@ -97,7 +97,7 @@ namespace Inmobiliaria.Models
             return res;
         }
 
-        public TipoInmueble BuscarPorId(int id)
+        public TipoInmueble ObtenerPorID(int id)
         {
             TipoInmueble tipoInmueble = new TipoInmueble(); // objeto por defecto
             using (var conn = new MySqlConnection(connectionString))

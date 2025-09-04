@@ -39,7 +39,6 @@ public int Crear(Pago pago)
     return res;
 }
 
-
     public int Modificar(Pago pago)
     {
       int res = -1;

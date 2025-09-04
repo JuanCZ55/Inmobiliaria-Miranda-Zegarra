@@ -1,15 +1,13 @@
-using System.Collections.Generic;
+using Inmobiliaria_.Models;
 
 namespace Inmobiliaria.Models
 {
-    public interface IRepositorioPago
+    public interface IRepositorioPago : IRepositorio<Pago>
     {
-        int Crear(Pago Pago);
-        int Modificar(Pago Pago);
-        int Eliminar(int IdPago);
         int EliminarPorContrato(int IdContrato);
-        Pago ObtenerPorID(int IdPago);
         List<Pago> BuscarPorContrato(int IdContrato);
         List<Pago> ObtenerTodos();
+        List<Pago> Filtrar(string? idPago, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta, int offset, int limite);
+        int CantidadFiltro(string? idPago, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta);
     }
 }
