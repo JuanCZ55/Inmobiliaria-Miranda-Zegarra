@@ -6,6 +6,9 @@
   width: 50%;
   margin: 0 auto;
 }
+.botone {
+  height: 38px;
+}
 .zeg-field {
   width: 90%;
   max-width: 20em;
