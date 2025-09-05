@@ -14,16 +14,16 @@
   <form method="get" asp-action="Listar" class="d-flex mb-3">
     <div class="zeg-field" style="max-width: 300px;">
       <input type="text" id="dni" name="dni" value="@dniFiltro" class="zeg-input" placeholder=" " />
-      <label for="dni">Ingrese DNI</label>
+      <label for="dni">Filtrar por DNI</label>
     </div>
 
-    <button type="submit" class="btn btn-primary ms-2">Buscar</button>
+    <button type="submit" class="btn btn-primary ms-2 botone">Buscar</button>
   </form>
 </div>
 
 
-<table class="table table-hover table-caption-top">
-  <thead class="table-dark">
+<table class="table table-hover text-center table-light">
+  <thead class="table-dark ">
     <tr>
       <th>@Html.DisplayNameFor(model => model.First().IdInquilino)</th>
       <th>@Html.DisplayNameFor(model => model.First().Dni)</th>

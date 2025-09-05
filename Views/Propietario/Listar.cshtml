@@ -5,58 +5,65 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
   var paginaActual = ViewBag.PaginaActual ?? 1;
   var totalPaginas = ViewBag.TotalPaginas ?? 1;
-  var nombreFiltro = ViewBag.Nombre ?? "";
+  var dniFiltro = ViewBag.Dni ?? "";
 }
 
 <h2>Listado de Propietarios</h2>
+
 <div class="container px-0 p-3">
   <form method="get" asp-action="Listar" class="d-flex mb-3">
     <div class="zeg-field" style="max-width: 300px;">
-      <input type="text" id="nombre" name="nombre" value="@nombreFiltro" class="zeg-input" placeholder=" " />
-      <label for="nombre">Filtrar por nombre</label>
+      <input type="text" id="Dni" name="Dni" value="@dniFiltro" class="zeg-input" placeholder=" " />
+      <label for="Dni">Filtrar por DNI</label>
     </div>
-
-    <button type="submit" class="btn btn-primary ms-2">Buscar</button>
+    <button type="submit" class="btn btn-primary ms-2 botone">Buscar</button>
   </form>
 </div>
 
-
-<table class="table table-hover table-caption-top">
+<table class="table table-hover text-center table-light">
   <thead class="table-dark">
     <tr>
-      <th>@Html.DisplayNameFor(m => m.First().IdPropietario)</th>
-      <th>@Html.DisplayNameFor(m => m.First().Dni)</th>
-      <th>@Html.DisplayNameFor(m => m.First().Nombre)</th>
-      <th>@Html.DisplayNameFor(m => m.First().Apellido)</th>
-      <th>@Html.DisplayNameFor(m => m.First().Telefono)</th>
-      <th>@Html.DisplayNameFor(m => m.First().Email)</th>
-      <th>@Html.DisplayNameFor(m => m.First().Direccion)</th>
+      <th>Id</th>
+      <th>Dni</th>
+      <th>Nombre</th>
+      <th>Apellido</th>
+      <th>Telefono</th>
+      <th>Email</th>
+      <th>Direccion</th>
       <th>Acciones</th>
     </tr>
   </thead>
   <tbody class="text-center">
-    @foreach (var p in Model)
+    @if (Model != null && Model.Any())
+    {
+      foreach (var p in Model)
+      {
+        <tr>
+          <td>@p.IdPropietario</td>
+          <td>@p.Dni</td>
+          <td>@p.Nombre</td>
+          <td>@p.Apellido</td>
+          <td>@p.Telefono</td>
+          <td>@p.Email</td>
+          <td>@p.Direccion</td>
+          <td class="d-flex justify-content-evenly">
+            <a asp-action="Modificar" asp-route-id="@p.IdPropietario" class="btn btn-warning btn-sm">Modificar</a>
+            <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+      }
+    }
+    else
     {
       <tr>
-        <td>@p.IdPropietario</td>
-        <td>@p.Dni</td>
-        <td>@p.Nombre</td>
-        <td>@p.Apellido</td>
-        <td>@p.Telefono</td>
-        <td>@p.Email</td>
-        <td>@p.Direccion</td>
-        <td class="d-flex justify-content-evenly">
-          <a asp-action="Modificar" asp-route-id="@p.IdPropietario" class="btn btn-warning btn-sm">Modificar</a>
-          <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" style="display:inline;">
-            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-          </form>
-        </td>
+        <td colspan="8">No se encontraron propietarios.</td>
       </tr>
     }
   </tbody>
 </table>
 
-<!-- Paginacion -->
 @if (totalPaginas > 1)
 {
   <nav>
@@ -64,7 +71,7 @@
       @for (int i = 1; i <= totalPaginas; i++)
       {
         <li class="page-item @(i == paginaActual ? "active" : "")">
-          <a class="page-link" asp-action="Listar" asp-route-nombre="@nombreFiltro" asp-route-PaginaActual="@i">@i</a>
+          <a class="page-link" asp-action="Listar" asp-route-Dni="@dniFiltro" asp-route-PaginaActual="@i">@i</a>
         </li>
       }
     </ul>
