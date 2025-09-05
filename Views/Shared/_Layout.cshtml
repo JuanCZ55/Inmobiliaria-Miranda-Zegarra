@@ -80,6 +80,18 @@
   </header>
   <div class="container mt-4">
     <main role="main " class="row justify-content-center">
+      @if (TempData["Error"] != null)
+      {
+        <div class="alert alert-danger w-75">@TempData["Error"]</div>
+      }
+      @if (TempData["Warning"] != null)
+      {
+        <div class="alert alert-warning w-75">@TempData["Warning"]</div>
+      }
+      @if (TempData["Success"] != null)
+      {
+        <div class="alert alert-success w-75">@TempData["Success"]</div>
+      }
       @RenderBody()
     </main>
   </div>
@@ -89,6 +101,7 @@
   <script src="~/js/site.js" asp-append-version="true"></script>
   @await RenderSectionAsync("Scripts", required: false)
   <partial name="_ValidationScriptsPartial" />
+  <script></script>
 </body>
 
 </html>
