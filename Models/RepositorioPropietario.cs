@@ -62,40 +62,6 @@ namespace Inmobiliaria.Models
             return res;
         }
 
-        public int Alta(string dni)
-        {
-            int res = -1;
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql = @"UPDATE propietario SET estado=1, updated_at=NOW() WHERE dni=@dni";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@dni", dni);
-                    conn.Open();
-                    res = cmd.ExecuteNonQuery();
-                    conn.Close();
-                }
-            }
-            return res;
-        }
-
-        public int Baja(string dni)
-        {
-            int res = -1;
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql = @"UPDATE propietario SET estado=0, updated_at=NOW() WHERE dni=@dni";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@dni", dni);
-                    conn.Open();
-                    res = cmd.ExecuteNonQuery();
-                    conn.Close();
-                }
-            }
-            return res;
-        }
-
         public int Eliminar(int id)
         {
             int res = -1;
@@ -113,16 +79,16 @@ namespace Inmobiliaria.Models
             return res;
         }
 
-        public Propietario ObtenerPorDni(string dni)
+        public Propietario ObtenerPorID(int id)
         {
             Propietario p = new Propietario();
             using (var conn = new MySqlConnection(connectionString))
             {
                 var sql =
-                    @"SELECT id_propietario, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM propietario WHERE dni = @dni";
+                    @"SELECT id_propietario, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM propietario WHERE id_propietario = @id";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
-                    cmd.Parameters.AddWithValue("@dni", dni);
+                    cmd.Parameters.AddWithValue("@id", id);
                     conn.Open();
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -146,91 +112,16 @@ namespace Inmobiliaria.Models
             return p;
         }
 
-        public List<Propietario> filtrarDNI(string dni)
-        {
-            List<Propietario> lista = new List<Propietario>();
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql =
-                    @"SELECT id_propietario, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM propietario WHERE dni LIKE CONCAT(@dni, '%')";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@dni", dni);
-                    conn.Open();
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            Propietario propietario = new Propietario
-                            {
-                                IdPropietario = reader.GetInt32("id_propietario"),
-                                Dni = reader.GetString("dni"),
-                                Nombre = reader.GetString("nombre"),
-                                Apellido = reader.GetString("apellido"),
-                                Telefono = reader.GetString("telefono"),
-                                Email = reader.GetString("email"),
-                                Direccion = reader.GetString("direccion"),
-                                Estado = reader.GetInt32("estado"),
-                                CreatedAt = reader.GetDateTime("created_at"),
-                                UpdatedAt = reader.GetDateTime("updated_at"),
-                            };
-                            lista.Add(propietario);
-                        }
-                    }
-                    conn.Close();
-                }
-            }
-            return lista;
-        }
-
-        public List<Propietario> BuscarPorNombre(string nombre)
-        {
-            var lista = new List<Propietario>();
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql =
-                    @"SELECT id_propietario, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM propietario WHERE nombre LIKE @nombre";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@nombre", $"%{nombre}%");
-                    conn.Open();
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            lista.Add(
-                                new Propietario
-                                {
-                                    IdPropietario = reader.GetInt32("id_propietario"),
-                                    Dni = reader.GetString("dni"),
-                                    Nombre = reader.GetString("nombre"),
-                                    Apellido = reader.GetString("apellido"),
-                                    Telefono = reader.GetString("telefono"),
-                                    Email = reader.GetString("email"),
-                                    Direccion = reader.GetString("direccion"),
-                                    Estado = reader.GetInt32("estado"),
-                                    CreatedAt = reader.GetDateTime("created_at"),
-                                    UpdatedAt = reader.GetDateTime("updated_at"),
-                                }
-                            );
-                        }
-                    }
-                    conn.Close();
-                }
-            }
-            return lista;
-        }
-
-        public Propietario ObtenerPorID(int id)
+        public Propietario ObtenerPorDni(string dni)
         {
             Propietario p = new Propietario();
             using (var conn = new MySqlConnection(connectionString))
             {
                 var sql =
-                    @"SELECT id_propietario, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM propietario WHERE id_propietario = @id";
+                    @"SELECT id_propietario, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM propietario WHERE dni = @dni";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
-                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@dni", dni);
                     conn.Open();
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -291,109 +182,55 @@ namespace Inmobiliaria.Models
             return lista;
         }
 
-        public int ContarTodos()
+        public int ContarFiltro(string dni)
         {
-            int total = 0;
+            int count = 0;
             using (var conn = new MySqlConnection(connectionString))
             {
-                var sql = "SELECT COUNT(*) FROM propietario";
-                using (var cmd = new MySqlCommand(sql, conn))
+                var sql = @"SELECT COUNT(*) FROM propietario WHERE 1=1 ";
+                if (!string.IsNullOrEmpty(dni))
                 {
-                    conn.Open();
-                    total = Convert.ToInt32(cmd.ExecuteScalar());
-                    conn.Close();
+                    sql += "AND dni LIKE @dni ";
                 }
-            }
-            return total;
-        }
-
-        public List<Propietario> ObtenerTodosPaginado(int offset, int limite)
-        {
-            var lista = new List<Propietario>();
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql =
-                    @"SELECT id_propietario, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at
-                    FROM propietario
-                    ORDER BY nombre ASC
-                    LIMIT @limite OFFSET @offset";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
-                    cmd.Parameters.AddWithValue("@limite", limite);
-                    cmd.Parameters.AddWithValue("@offset", offset);
-                    conn.Open();
-                    using (var reader = cmd.ExecuteReader())
+                    if (!string.IsNullOrEmpty(dni))
                     {
-                        while (reader.Read())
-                        {
-                            lista.Add(
-                                new Propietario
-                                {
-                                    IdPropietario = reader.GetInt32("id_propietario"),
-                                    Dni = reader.GetString("dni"),
-                                    Nombre = reader.GetString("nombre"),
-                                    Apellido = reader.GetString("apellido"),
-                                    Telefono = reader.GetString("telefono"),
-                                    Email = reader.GetString("email"),
-                                    Direccion = reader.GetString("direccion"),
-                                    Estado = reader.GetInt32("estado"),
-                                    CreatedAt = reader.GetDateTime("created_at"),
-                                    UpdatedAt = reader.GetDateTime("updated_at"),
-                                }
-                            );
-                        }
+                        cmd.Parameters.AddWithValue("@dni", dni + "%");
                     }
-                    conn.Close();
-                }
-            }
-            return lista;
-        }
-
-        public int ContarPorNombre(string nombre)
-        {
-            int total = 0;
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql =
-                    @"SELECT COUNT(*) FROM propietario 
-                    WHERE (@nombre IS NULL OR nombre LIKE @nombreFiltro)";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue(
-                        "@nombre",
-                        string.IsNullOrEmpty(nombre) ? DBNull.Value : nombre
-                    );
-                    cmd.Parameters.AddWithValue("@nombreFiltro", $"%{nombre}%");
                     conn.Open();
-                    total = Convert.ToInt32(cmd.ExecuteScalar());
+                    count = Convert.ToInt32(cmd.ExecuteScalar());
                     conn.Close();
                 }
             }
-            return total;
+            return count;
         }
 
-        public List<Propietario> ObtenerPaginado(string nombre, int offset, int limite)
+        public List<Propietario> Filtro(string dni, int limit, int offset)
         {
             var lista = new List<Propietario>();
             using (var conn = new MySqlConnection(connectionString))
             {
                 var sql =
-                    @"SELECT id_propietario, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at
-                    FROM propietario
-                    WHERE (@nombre IS NULL OR nombre LIKE @nombreFiltro)
-                    ORDER BY nombre ASC
-                    LIMIT @limite OFFSET @offset";
-
+                    @"SELECT id_propietario, dni, nombre, apellido, telefono, email, direccion, estado, created_at, updated_at FROM propietario WHERE 1=1 ";
+                if (!string.IsNullOrEmpty(dni))
+                {
+                    sql += "AND dni LIKE @dni ORDER BY dni ";
+                }
+                else
+                {
+                    sql += "ORDER BY id_propietario DESC ";
+                }
+                sql += "LIMIT @limit OFFSET @offset;";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
-                    cmd.Parameters.AddWithValue(
-                        "@nombre",
-                        string.IsNullOrEmpty(nombre) ? DBNull.Value : nombre
-                    );
-                    cmd.Parameters.AddWithValue("@nombreFiltro", $"%{nombre}%");
-                    cmd.Parameters.AddWithValue("@limite", limite);
-                    cmd.Parameters.AddWithValue("@offset", offset);
+                    if (!string.IsNullOrEmpty(dni))
+                    {
+                        cmd.Parameters.AddWithValue("@dni", dni + "%");
+                    }
 
+                    cmd.Parameters.AddWithValue("@limit", limit);
+                    cmd.Parameters.AddWithValue("@offset", offset);
                     conn.Open();
                     using (var reader = cmd.ExecuteReader())
                     {

@@ -7,6 +7,7 @@ namespace Inmobiliaria.Controllers
     {
         private readonly IRepositorioPropietario repositorio;
         private readonly IConfiguration config;
+
         // GET: Propietario
         public PropietarioController(IRepositorioPropietario repositorio, IConfiguration config)
         {
@@ -32,15 +33,24 @@ namespace Inmobiliaria.Controllers
         {
             try
             {
-                if (ModelState.IsValid) // Verifiaca que propietario tenga el formato valido
+                if (ModelState.IsValid)
                 {
+                    var existe = repositorio.ObtenerPorDni(propietario.Dni);
+                    if (existe.IdPropietario > 0)
+                    {
+                        TempData["Error"] = "El DNI ya existe";
+                        return View(propietario);
+                    }
                     repositorio.Crear(propietario);
                     TempData["PropietarioCreado"] =
                         $"Se agrego correctamente el propietario {propietario.Dni} {propietario.Nombre} {propietario.Apellido}";
                     return RedirectToAction(nameof(Listar));
                 }
                 else
+                {
+                    TempData["Error"] = "Error con el modelo";
                     return View(propietario);
+                }
             }
             catch (System.Exception)
             {
@@ -75,6 +85,12 @@ namespace Inmobiliaria.Controllers
             {
                 if (ModelState.IsValid) // Verifiaca que propietario tenga el formato valido
                 {
+                    var existe = repositorio.ObtenerPorDni(propietario.Dni);
+                    if (existe.IdPropietario <= 0)
+                    {
+                        TempData["Error"] = "El DNI ya existe";
+                        return View(propietario);
+                    }
                     repositorio.Modificar(propietario);
                     TempData["PropietarioCreado"] =
                         $"Se modifico correctamente el propietario {propietario.Dni} {propietario.Nombre} {propietario.Apellido}";
@@ -109,47 +125,21 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-        // GET: Propietario/Alta/5
-
-        public IActionResult Alta(int id)
-        {
-            return View();
-        }
-
-        // GET: Propietario/Baja/5
-
-        public IActionResult Baja(int id)
-        {
-            return View();
-        }
-
-        // GET: Propietario
-        public IActionResult Listar(string nombre, int PaginaActual = 1)
+        // GET: Propietario/Lista
+        public IActionResult Listar(string Dni, int PaginaActual = 1)
         {
             int registrosPorPagina = 9;
-            int total = 0;
-            int offset = 0;
-            int limite = 0;
-            List<Propietario> propietarios;
-            offset = (PaginaActual - 1) * registrosPorPagina;
-            if (string.IsNullOrEmpty(nombre))
-            {
-                total = repositorio.ContarTodos();
-                limite = Math.Min(registrosPorPagina, total - offset);
-                propietarios = repositorio.ObtenerTodosPaginado(offset, limite);
-            }
-            else
-            {
-                total = repositorio.ContarPorNombre(nombre);
-                limite = Math.Min(registrosPorPagina, total - offset);
-                propietarios = repositorio.ObtenerPaginado(nombre, offset, limite);
-            }
+            int offset = (PaginaActual - 1) * registrosPorPagina;
+            int total = repositorio.ContarFiltro(Dni);
+            int limit = Math.Max(0, Math.Min(registrosPorPagina, total - offset));
+
+            var propietarios = repositorio.Filtro(Dni, limit, offset);
 
             int totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina);
 
             ViewBag.PaginaActual = PaginaActual;
             ViewBag.TotalPaginas = totalPaginas;
-            ViewBag.Nombre = nombre;
+            ViewBag.Dni = Dni;
 
             return View(propietarios);
         }
