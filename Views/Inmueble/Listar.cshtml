@@ -1,214 +1,212 @@
+@using System.Diagnostics
 @model IEnumerable<Inmobiliaria.Models.Inmueble>
+
 @{
   ViewData["Title"] = "Listado de Inmuebles";
   Layout = "~/Views/Shared/_Layout.cshtml";
+  var paginaActual = ViewBag.PaginaActual ?? 1;
+  var totalPaginas = ViewBag.TotalPaginas ?? 1;
+  var direccionFiltro = ViewBag.Direccion ?? "";
+  var dniFiltro = ViewBag.Dni ?? "";
+  var idTipoFiltro = ViewBag.IdTipoInmueble ?? 0;
+  var usoFiltro = ViewBag.Uso ?? 0;
+  var ambientesFiltro = ViewBag.CantidadAmbientesMin ?? "";
+  var precioMinFiltro = ViewBag.PrecioMin ?? "";
+  var precioMaxFiltro = ViewBag.PrecioMax ?? "";
+  var estadoFiltro = ViewBag.Estado ?? 0;
 }
 
-<h2>Listado de Inmuebles</h2>
-<div class="container px-0 p-3 row">
-  <div class="col-md-3 mb-1">
-    <div class="zeg-field">
-      <input type="text" id="direccion" class="zeg-input" placeholder=" " oninput="filtrarInmuebles()" />
-      <label for="direccion">Ingrese Dirección</label>
-    </div>
-  </div>
+<h2>Listado de Inmuebles <a class="btn btn-primary" asp-controller="Inmueble" asp-action="Crear">+</a></h2>
 
-  <div class="col-md-3 mb-1">
-    <div class="zeg-field">
-      <input type="text" id="dni" class="zeg-input" placeholder=" " oninput="filtrarInmuebles()" />
-      <label for="dni">Ingrese DNI propietario</label>
+<div class="container px-0 p-3">
+  <form method="get" asp-action="Listar" class="row g-2 mb-3">
+    <div class="col-md-3">
+      <div class="zeg-field">
+        <input type="text" id="direccion" name="direccion" value="@direccionFiltro" class="zeg-input" placeholder=" " />
+        <label for="direccion">Dirección</label>
+      </div>
     </div>
-  </div>
 
-  <div class="col-md-3 mb-1">
-    <div class="zeg-field">
-      <select id="tipo" class="zeg-input" onchange="filtrarInmuebles()">
-        <option value=""></option>
-        @foreach (var tipo in ViewBag.Tipos ?? new List<Inmobiliaria.Models.TipoInmueble>())
-        {
-          <option value="@tipo.IdTipoInmueble">@tipo.Nombre</option>
-        }
-      </select>
-      <label for="tipo">Tipo de inmueble</label>
+    <div class="col-md-3">
+      <div class="zeg-field">
+        <input type="text" id="dni" name="dni" value="@dniFiltro" class="zeg-input" placeholder=" " />
+        <label for="dni">DNI Propietario</label>
+      </div>
     </div>
-  </div>
 
-  <div class="col-md-3 mb-1">
-    <div class="zeg-field">
-      <select id="uso" class="zeg-input" onchange="filtrarInmuebles()">
-        <option value=""></option>
-        <option value="1">Residencial</option>
-        <option value="2">Comercial</option>
-      </select>
-      <label for="uso">Uso</label>
+    <div class="col-md-3">
+      <div class="zeg-field">
+        <select id="idTipoInmueble" name="idTipoInmueble" class="zeg-input">
+          <option value=""></option>
+          @foreach (var tipo in ViewBag.Tipos)
+          {@if (tipo.IdTipoInmueble == idTipoFiltro)
+            {
+              <option value="@tipo.IdTipoInmueble" selected>@tipo.Nombre</option>
+            }
+                    else
+            {
+              <option value="@tipo.IdTipoInmueble">@tipo.Nombre</option>
+            }
+          }
+        </select>
+        <label for="idTipoInmueble">Tipo de Inmueble</label>
+      </div>
     </div>
-  </div>
 
-  <div class="col-md-3 mb-1">
-    <div class="zeg-field">
-      <input type="number" id="ambientes" class="zeg-input" placeholder=" " oninput="filtrarInmuebles()" />
-      <label for="ambientes">Min Cantidad de ambientes</label>
+    <div class="col-md-3">
+      <div class="zeg-field">
+        <select id="uso" name="uso" class="zeg-input">
+          <option value=""></option>
+          @if (usoFiltro == 1)
+          {
+            <option value="1" selected>Residencial</option>
+          }
+          else
+          {
+            <option value="1">Residencial</option>
+          }
+          @if (usoFiltro == 2)
+          {
+            <option value="2" selected>Comercial</option>
+          }
+          else
+          {
+            <option value="2">Comercial</option>
+          }
+        </select>
+        <label for="uso">Uso</label>
+      </div>
     </div>
-  </div>
 
-  <div class="col-md-3 mb-1">
-    <div class="zeg-field">
-      <input type="number" id="precioMin" class="zeg-input" placeholder=" " oninput="filtrarInmuebles()" />
-      <label for="precioMin">Precio mínimo</label>
+    <div class="col-md-3">
+      <div class="zeg-field">
+        <input type="number" id="cantidadAmbientesMin" name="cantidadAmbientesMin" value="@ambientesFiltro"
+          class="zeg-input" placeholder=" " />
+        <label for="cantidadAmbientesMin">Mín. ambientes</label>
+      </div>
     </div>
-  </div>
 
-  <div class="col-md-3 mb-1">
-    <div class="zeg-field">
-      <input type="number" id="precioMax" class="zeg-input" placeholder=" " oninput="filtrarInmuebles()" />
-      <label for="precioMax">Precio máximo</label>
+    <div class="col-md-3">
+      <div class="zeg-field">
+        <input type="number" id="precioMin" name="precioMin" value="@precioMinFiltro" class="zeg-input"
+          placeholder=" " />
+        <label for="precioMin">Precio mínimo</label>
+      </div>
     </div>
-  </div>
 
-  <div class="col-md-3 mb-1">
-    <div class="zeg-field">
-      <select id="estado" class="zeg-input" onchange="filtrarInmuebles()">
-        <option value=""></option>
-        <option value="1">Disponible</option>
-        <option value="2">Ocupado</option>
-        <option value="3">Suspendido</option>
-      </select>
-      <label for="estado">Estado</label>
+    <div class="col-md-3">
+      <div class="zeg-field">
+        <input type="number" id="precioMax" name="precioMax" value="@precioMaxFiltro" class="zeg-input"
+          placeholder=" " />
+        <label for="precioMax">Precio máximo</label>
+      </div>
     </div>
-  </div>
+
+    <div class="col-md-3">
+      <div class="zeg-field">
+        <select id="estado" name="estado" class="zeg-input">
+          <option value=""></option>
+          @switch (estadoFiltro)
+          {
+            case 1:
+              <option value="1" selected>Disponible</option>
+              <option value="2">Ocupado</option>
+              <option value="3">Suspendido</option>
+              break;
+            case 2:
+              <option value="1">Disponible</option>
+              <option value="2" selected>Ocupado</option>
+              <option value="3">Suspendido</option>
+              break;
+            case 3:
+              <option value="1">Disponible</option>
+              <option value="2">Ocupado</option>
+              <option value="3" selected>Suspendido</option>
+              break;
+            default:
+              <option value="1">Disponible</option>
+              <option value="2">Ocupado</option>
+              <option value="3">Suspendido</option>
+              break;
+          }
+
+        </select>
+        <label for="estado">Estado</label>
+      </div>
+    </div>
+
+    <div class="col-12 d-flex justify-content-end">
+      <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+  </form>
 </div>
 
-
-<table class="table table-hover table-caption-top">
+<table class="table table-hover text-center table-light">
   <thead class="table-dark">
     <tr>
       <th>@Html.DisplayNameFor(model => model.First().IdInmueble)</th>
       <th>@Html.DisplayNameFor(model => model.First().Direccion)</th>
-      <th>@Html.DisplayNameFor(model => model.First().IdPropietario)</th>
-      <th>Tipo de Inmueble</th>
-      <th>@Html.DisplayNameFor(model => model.First().Uso)</th>
+      <th>Propietario</th>
+      <th>Tipo</th>
+      <th>Uso</th>
       <th>@Html.DisplayNameFor(model => model.First().CantidadAmbientes)</th>
-      <th>@Html.DisplayNameFor(model => model.First().Descripcion)</th>
+      @* <th>@Html.DisplayNameFor(model => model.First().Descripcion)</th> *@
       <th>@Html.DisplayNameFor(model => model.First().Precio)</th>
       <th>@Html.DisplayNameFor(model => model.First().Estado)</th>
-      <th>Acciones</th>
+      <th class="acciones">Acciones</th>
     </tr>
   </thead>
-  <tbody id="tablaInmueble">
+  <tbody>
     @foreach (var i in Model)
     {
       <tr>
         <td>@i.IdInmueble</td>
         <td>@i.Direccion</td>
-        <td>@i.IdPropietario</td>
-        <td>@(ViewBag.TipoDict.ContainsKey(i.IdTipoInmueble) ? ViewBag.TipoDict[i.IdTipoInmueble] : "-")</td>
-        @if (i.Uso == 1)
-        {
-          <td>Residencial</td>
-        }
-        else
-        {
-          <td>Comercial</td>
-        }
-
-      <td>@i.CantidadAmbientes</td>
-      <td>@i.Descripcion</td>
-      <td>@i.Precio</td>
-      <td>
-        @(i.Estado == 1 ? "Disponible" :
-                i.Estado == 2 ? "Ocupado" :
-                i.Estado == 3 ? "Suspendido" :
-                "Error")
+        <td>@i.Propietario?.Nombre @i.Propietario?.Apellido</td>
+        <td>@i.TipoInmueble?.Nombre</td>
+        <td>@(i.Uso == 1 ? "Residencial" : "Comercial")</td>
+        <td>@i.CantidadAmbientes</td>
+        @* <td>@i.Descripcion</td> *@
+        <td>@i.Precio</td>
+        <td>
+          @(i.Estado == 1 ? "Disponible" :
+                  i.Estado == 2 ? "Ocupado" :
+                  i.Estado == 3 ? "Suspendido" :
+                  "Error")
         </td>
-        <td class="d-flex ">
-          <a asp-controller="Contrato" asp-action="Crear" asp-route-idInmueble="@i.IdInmueble"
-            class="btn btn-primary btn-sm">Crear contrato</a>
-          <a asp-action="Modificar" asp-route-id="@i.IdInmueble" class="btn btn-warning btn-sm">Modificar</a>
-          <form asp-action="Eliminar" asp-route-id="@i.IdInmueble" method="post" style="display:inline;">
-            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-          </form>
+        <td>
+          <div class="row acciones">
+
+            <div class="col-md-4"><a asp-controller="Contrato" asp-action="Crear" asp-route-idInmueble="@i.IdInmueble"
+                class="btn btn-primary btn-sm ">Contrato</a></div>
+            <div class="col-md-4"><a asp-action="Modificar" asp-route-id="@i.IdInmueble"
+                class="btn btn-warning btn-sm">Modificar</a></div>
+            <div class="col-md-4">
+              <form asp-action="Eliminar" asp-route-id="@i.IdInmueble" method="post"> <button type="submit"
+                  class="btn btn-danger btn-sm">Eliminar</button> </form>
+            </div>
+          </div>
         </td>
       </tr>
     }
   </tbody>
 </table>
 
-
-<script>
-  function filtrarInmuebles() {
-    const direccion = document.getElementById("direccion").value;
-    const dni = document.getElementById("dni").value;
-    const tipo = document.getElementById("tipo").value;
-    const uso = document.getElementById("uso").value;
-    const ambientes = document.getElementById("ambientes").value;
-    const precioMin = document.getElementById("precioMin").value;
-    const precioMax = document.getElementById("precioMax").value;
-    const estado = document.getElementById("estado").value;
-
-    const params = new URLSearchParams();
-    if (direccion) params.append("direccion", direccion);
-    if (dni) params.append("dni", dni);
-    if (tipo) params.append("tipo", tipo);
-    if (uso) params.append("uso", uso);
-    if (ambientes) params.append("ambientes", ambientes);
-    if (precioMin) params.append("precioMin", precioMin);
-    if (precioMax) params.append("precioMax", precioMax);
-    if (estado) params.append("estado", estado);
-
-    let url = "/Inmueble/SupaFiltro?" + params.toString();
-    // Si no hay ningún filtro, usar ListarTodos
-    if (!direccion && !dni && !tipo && !uso && !ambientes && !precioMin && !precioMax && !estado) {
-      url = "/Inmueble/ListarTodos";
-    }
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        let tbody = document.getElementById("tablaInmueble");
-        tbody.innerHTML = "";
-        if (data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="10" class="text-center">No se encontraron inmuebles</td></tr>`;
-          return;
-        }
-        data.forEach(i => {
-          tbody.innerHTML += `
-            <tr>
-                <td>${i.idInmueble}</td>
-                <td>${i.direccion}</td>
-                <td>${i.idPropietario}</td>
-                <td>${i.idTipoInmueble}</td>
-                <td>${i.uso == 1 ? 'Residencial' : 'Comercial'}</td>
-                <td>${i.cantidadAmbientes}</td>
-                <td>${i.descripcion}</td>
-                <td>${i.precio}</td>
-                <td>${i.estado == 1 ? 'Disponible' : i.estado == 2 ? 'Ocupado' : i.estado == 3 ? 'Suspendido' : 'Error'}</td>
-                <td class="d-flex justify-content-evenly">
-                    <a href="/Contrato/Crear?idInmueble=${i.idInmueble}" class="btn btn-primary btn-sm">Crear contrato</a>
-                    <a href="/Inmueble/Modificar/${i.idInmueble}" class="btn btn-warning btn-sm">Modificar</a>
-                    <form action="/Inmueble/Eliminar/${i.idInmueble}" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
-                </td>
-            </tr>`;
-        });
-      })
-      .catch(err => { console.error(err); alert("Hubo un problema al filtrar"); });
-  }
-
-  // Llamar al cargar la página para mostrar todos
-  window.onload = filtrarInmuebles;
-</script>
-
-@if (TempData["Mensaje"] != null)
+@if (totalPaginas > 1)
 {
-  <div id="mensajeAlerta" class="alert alert-success">
-    @TempData["Mensaje"]
-  </div>
-  <script>
-    setTimeout(function () {
-      var alerta = document.getElementById("mensajeAlerta");
-      if (alerta) { alerta.style.transition = "opacity 0.5s ease"; alerta.style.opacity = "0"; setTimeout(() => alerta.remove(), 500); }
-    }, 5000);
-  </script>
+  <nav>
+    <ul class="pagination">
+      @for (int i = 1; i <= totalPaginas; i++)
+      {
+        <li class="page-item @(i == paginaActual ? "active" : "")">
+          <a class="page-link" asp-action="Listar" asp-route-direccion="@direccionFiltro" asp-route-dni="@dniFiltro"
+            asp-route-idTipoInmueble="@idTipoFiltro" asp-route-uso="@usoFiltro"
+            asp-route-cantidadAmbientesMin="@ambientesFiltro" asp-route-precioMin="@precioMinFiltro"
+            asp-route-precioMax="@precioMaxFiltro" asp-route-estado="@estadoFiltro" asp-route-paginaActual="@i">@i</a>
+        </li>
+      }
+    </ul>
+  </nav>
 }
 <script>
   document.addEventListener("DOMContentLoaded", () => {
