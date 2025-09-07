@@ -9,6 +9,10 @@
 .botone {
   height: 38px;
 }
+.acciones {
+  width: 240px;
+}
+
 .zeg-field {
   width: 90%;
   max-width: 20em;
