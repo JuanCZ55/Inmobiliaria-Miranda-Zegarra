@@ -82,6 +82,24 @@ namespace Inmobiliaria.Models
             return res;
         }
 
+        public int SetEstado(int IdInmueble, int Estado)
+        {
+            int res = -1;
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                var sql = @"UPDATE inmueble SET estado = @Estado WHERE id_inmueble = @IdInmueble";
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@IdInmueble", IdInmueble);
+                    cmd.Parameters.AddWithValue("@Estado", Estado);
+                    conn.Open();
+                    res = cmd.ExecuteNonQuery();
+                    conn.Close();
+                }
+            }
+            return res;
+        }
+
         public Inmueble ObtenerPorID(int IdInmueble)
         {
             var i = new Inmueble();
@@ -122,303 +140,243 @@ namespace Inmobiliaria.Models
             return i;
         }
 
-        public List<Inmueble> ObtenerTodos()
+        public bool SeEstaUsando(int idInmueble)
         {
-            var lista = new List<Inmueble>();
             using (var conn = new MySqlConnection(connectionString))
             {
                 var sql =
-                    @"SELECT * FROM inmueble JOIN tipo_inmueble ON inmueble.id_tipo_inmueble = tipo_inmueble.id_tipo_inmueble";
+                    @"SELECT COUNT(*) FROM inmueble WHERE id_inmueble = @IdInmueble AND estado=2";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
+                    cmd.Parameters.AddWithValue("@IdInmueble", idInmueble);
                     conn.Open();
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var inmueble = new Inmueble
-                            {
-                                IdInmueble = reader.GetInt32("id_inmueble"),
-                                IdPropietario = reader.GetInt32("id_propietario"),
-                                IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
-                                Direccion = reader.GetString("direccion"),
-                                Uso = reader.GetInt32("uso"),
-                                CantidadAmbientes = reader.GetInt32("cantidad_ambientes"),
-                                Longitud = reader.GetString("longitud"),
-                                Latitud = reader.GetString("latitud"),
-                                Precio = reader.GetDecimal("precio"),
-                                Descripcion = reader.GetString("descripcion"),
-                                Estado = reader.GetInt32("estado"),
-                                CreatedAt = reader.GetDateTime("created_at"),
-                                UpdatedAt = reader.GetDateTime("updated_at"),
-                            };
-                            lista.Add(inmueble);
-                        }
-                    }
-                }
-            }
-            return lista;
-        }
-
-        public List<Inmueble> ObtenerPorPropietario(int IdPropietario)
-        {
-            var lista = new List<Inmueble>();
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql = @"SELECT * FROM inmueble WHERE id_propietario = @IdPropietario";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@IdPropietario", IdPropietario);
-                    conn.Open();
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var inmueble = new Inmueble
-                            {
-                                IdInmueble = reader.GetInt32("id_inmueble"),
-                                IdPropietario = reader.GetInt32("id_propietario"),
-                                IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
-                                Direccion = reader.GetString("direccion"),
-                                Uso = reader.GetInt32("uso"),
-                                CantidadAmbientes = reader.GetInt32("cantidad_ambientes"),
-                                Longitud = reader.GetString("longitud"),
-                                Latitud = reader.GetString("latitud"),
-                                Precio = reader.GetDecimal("precio"),
-                                Descripcion = reader.GetString("descripcion"),
-                                Estado = reader.GetInt32("estado"),
-                                CreatedAt = reader.GetDateTime("created_at"),
-                                UpdatedAt = reader.GetDateTime("updated_at"),
-                            };
-                            lista.Add(inmueble);
-                        }
-                    }
+                    var count = Convert.ToInt32(cmd.ExecuteScalar());
                     conn.Close();
+                    return count > 0;
                 }
-                return lista;
             }
         }
 
-        public List<Inmueble> ObtenerPorTipo(int IdTipoInmueble)
-        {
-            var lista = new List<Inmueble>();
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql = @"SELECT * FROM inmueble WHERE id_tipo_inmueble = @IdTipoInmueble";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@IdTipoInmueble", IdTipoInmueble);
-                    conn.Open();
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var inmueble = new Inmueble
-                            {
-                                IdInmueble = reader.GetInt32("id_inmueble"),
-                                IdPropietario = reader.GetInt32("id_propietario"),
-                                IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
-                                Direccion = reader.GetString("direccion"),
-                                Uso = reader.GetInt32("uso"),
-                                CantidadAmbientes = reader.GetInt32("cantidad_ambientes"),
-                                Longitud = reader.GetString("longitud"),
-                                Latitud = reader.GetString("latitud"),
-                                Precio = reader.GetDecimal("precio"),
-                                Descripcion = reader.GetString("descripcion"),
-                                Estado = reader.GetInt32("estado"),
-                                CreatedAt = reader.GetDateTime("created_at"),
-                                UpdatedAt = reader.GetDateTime("updated_at"),
-                            };
-                            lista.Add(inmueble);
-                        }
-                    }
-                    conn.Close();
-                }
-            }
-            return lista;
-        }
-
-        public List<Inmueble> ObtenerPorUso(int Uso)
-        {
-            var lista = new List<Inmueble>();
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql = @"SELECT * FROM inmueble WHERE uso = @Uso";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Uso", Uso);
-                    conn.Open();
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var inmueble = new Inmueble
-                            {
-                                IdInmueble = reader.GetInt32("id_inmueble"),
-                                IdPropietario = reader.GetInt32("id_propietario"),
-                                IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
-                                Direccion = reader.GetString("direccion"),
-                                Uso = reader.GetInt32("uso"),
-                                CantidadAmbientes = reader.GetInt32("cantidad_ambientes"),
-                                Longitud = reader.GetString("longitud"),
-                                Latitud = reader.GetString("latitud"),
-                                Precio = reader.GetDecimal("precio"),
-                                Descripcion = reader.GetString("descripcion"),
-                                Estado = reader.GetInt32("estado"),
-                                CreatedAt = reader.GetDateTime("created_at"),
-                                UpdatedAt = reader.GetDateTime("updated_at"),
-                            };
-                            lista.Add(inmueble);
-                        }
-                    }
-                    conn.Close();
-                }
-            }
-            return lista;
-        }
-
-        public List<Inmueble> ObtenerPorCantidadAmbientes(int CantidadDeAmbientes)
-        {
-            var lista = new List<Inmueble>();
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql =
-                    @"SELECT * FROM inmueble WHERE cantidad_ambientes >= @CantidadDeAmbientes";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@CantidadDeAmbientes", CantidadDeAmbientes);
-                    conn.Open();
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var inmueble = new Inmueble
-                            {
-                                IdInmueble = reader.GetInt32("id_inmueble"),
-                                IdPropietario = reader.GetInt32("id_propietario"),
-                                IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
-                                Direccion = reader.GetString("direccion"),
-                                Uso = reader.GetInt32("uso"),
-                                CantidadAmbientes = reader.GetInt32("cantidad_ambientes"),
-                                Longitud = reader.GetString("longitud"),
-                                Latitud = reader.GetString("latitud"),
-                                Precio = reader.GetDecimal("precio"),
-                                Descripcion = reader.GetString("descripcion"),
-                                Estado = reader.GetInt32("estado"),
-                                CreatedAt = reader.GetDateTime("created_at"),
-                                UpdatedAt = reader.GetDateTime("updated_at"),
-                            };
-                            lista.Add(inmueble);
-                        }
-                    }
-                    conn.Close();
-                }
-            }
-            return lista;
-        }
-
-        public int SeEstaUsando(int IdInmueble)
-        {
-            int res = -1;
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql =
-                    @"SELECT COUNT(*) FROM contrato WHERE id_inmueble = @IdInmueble AND estado = 1";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@IdInmueble", IdInmueble);
-                    conn.Open();
-                    res = Convert.ToInt32(cmd.ExecuteScalar());
-                    conn.Close();
-                }
-            }
-            return res;
-        }
-
-        public List<Inmueble> SupaFiltro(
+        public int ContarFiltro(
             string? direccion,
             string? dni,
             int? idTipoInmueble,
             int? uso,
-            int? cantidadAmbientesMin,
+            int? cantidadAmbientes,
             decimal? precioMin,
             decimal? precioMax,
             int? estado
+        )
+        {
+            int total = 0;
+
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                var sql =
+                    @"
+                      SELECT COUNT(*) 
+                      FROM inmueble i
+                      JOIN propietario pr 
+                          ON i.id_propietario = pr.id_propietario
+                      WHERE 1=1
+                  ";
+
+                if (!string.IsNullOrEmpty(direccion))
+                {
+                    sql += " AND i.direccion LIKE CONCAT('%', @Direccion, '%')";
+                }
+                if (!string.IsNullOrEmpty(dni))
+                {
+                    sql += " AND pr.dni LIKE CONCAT('%', @Dni, '%')";
+                }
+                if (idTipoInmueble > 0)
+                {
+                    sql += " AND i.id_tipo_inmueble = @IdTipoInmueble";
+                }
+                if (uso == 1 || uso == 2)
+                {
+                    sql += " AND i.uso = @Uso";
+                }
+                if (cantidadAmbientes > 0)
+                {
+                    sql += " AND i.cantidad_ambientes >= @CantidadAmbientes";
+                }
+                if (precioMin.HasValue && precioMin.Value > 0)
+                {
+                    sql += " AND i.precio >= @PrecioMin";
+                }
+                if (precioMax.HasValue && precioMax.Value > 0)
+                {
+                    sql += " AND i.precio <= @PrecioMax";
+                }
+                if (estado == 1 || estado == 2 || estado == 3)
+                {
+                    sql += " AND i.estado = @Estado";
+                }
+
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    if (!string.IsNullOrEmpty(direccion))
+                    {
+                        cmd.Parameters.AddWithValue("@Direccion", direccion);
+                    }
+                    if (!string.IsNullOrEmpty(dni))
+                    {
+                        cmd.Parameters.AddWithValue("@Dni", dni);
+                    }
+                    if (idTipoInmueble > 0)
+                    {
+                        cmd.Parameters.AddWithValue("@IdTipoInmueble", idTipoInmueble);
+                    }
+                    if (uso == 1 || uso == 2)
+                    {
+                        cmd.Parameters.AddWithValue("@Uso", uso);
+                    }
+                    if (cantidadAmbientes > 0)
+                    {
+                        cmd.Parameters.AddWithValue("@CantidadAmbientes", cantidadAmbientes);
+                    }
+                    if (precioMin.HasValue && precioMin.Value > 0)
+                    {
+                        cmd.Parameters.AddWithValue("@PrecioMin", precioMin.Value);
+                    }
+                    if (precioMax.HasValue && precioMax.Value > 0)
+                    {
+                        cmd.Parameters.AddWithValue("@PrecioMax", precioMax.Value);
+                    }
+                    if (estado == 1 || estado == 2 || estado == 3)
+                    {
+                        cmd.Parameters.AddWithValue("@Estado", estado);
+                    }
+
+                    conn.Open();
+                    total = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+            }
+
+            return total;
+        }
+
+        public List<Inmueble> Filtro(
+            string? direccion,
+            string? dni,
+            int? idTipoInmueble,
+            int? uso,
+            int? cantidadAmbientes,
+            decimal? precioMin,
+            decimal? precioMax,
+            int? estado,
+            int? limit,
+            int? offset
         )
         {
             var lista = new List<Inmueble>();
 
             using (var conn = new MySqlConnection(connectionString))
             {
-                conn.Open();
-
                 var sql =
                     @"
-            SELECT
-                i.id_inmueble           AS IdInmueble,
-                i.id_propietario        AS Inmueble_IdPropietario,
-                i.direccion             AS Inmueble_Direccion,
-                i.id_tipo_inmueble      AS IdTipoInmueble,
-                i.uso                   AS Uso,
-                i.cantidad_ambientes    AS CantidadAmbientes,
-                i.longitud              AS Inmueble_Longitud,
-                i.latitud               AS Inmueble_Latitud,
-                i.precio                AS Precio,
-                i.descripcion           AS Descripcion,
-                i.estado                AS Inmueble_Estado,
-                i.created_at            AS Inmueble_CreatedAt,
-                i.updated_at            AS Inmueble_UpdatedAt,
-                pr.id_propietario       AS Propietario_IdPropietario,
-                pr.nombre               AS Propietario_Nombre,
-                pr.apellido             AS Propietario_Apellido,
-                pr.dni                  AS Propietario_Dni
-            FROM inmueble i
-            JOIN propietario pr 
-                ON i.id_propietario = pr.id_propietario
-            WHERE 1=1
-        ";
+                    SELECT
+                        i.id_inmueble           AS IdInmueble,
+                        i.id_propietario        AS Inmueble_IdPropietario,
+                        i.direccion             AS Inmueble_Direccion,
+                        i.id_tipo_inmueble      AS IdTipoInmueble,
+                        i.uso                   AS Uso,
+                        i.cantidad_ambientes    AS CantidadAmbientes,
+                        i.longitud              AS Inmueble_Longitud,
+                        i.latitud               AS Inmueble_Latitud,
+                        i.precio                AS Precio,
+                        i.descripcion           AS Descripcion,
+                        i.estado                AS Inmueble_Estado,
+                        i.created_at            AS Inmueble_CreatedAt,
+                        i.updated_at            AS Inmueble_UpdatedAt,
+                        pr.id_propietario       AS Propietario_IdPropietario,
+                        pr.nombre               AS Propietario_Nombre,
+                        pr.apellido             AS Propietario_Apellido,
+                        pr.dni                  AS Propietario_Dni,
+                        ti.id_tipo_inmueble     AS TipoInmueble_IdTipoInmueble,
+                        ti.nombre               AS TipoInmueble_Nombre
 
-                // filtros dinámicos
+                    FROM inmueble i
+                    JOIN propietario pr ON i.id_propietario = pr.id_propietario
+                    JOIN tipo_inmueble ti ON i.id_tipo_inmueble = ti.id_tipo_inmueble
+                    WHERE 1=1
+                ";
+
                 if (!string.IsNullOrEmpty(direccion))
-                    sql += " AND i.direccion LIKE CONCAT(@Direccion, '%')";
+                {
+                    sql += " AND i.direccion LIKE CONCAT('%', @Direccion, '%')";
+                }
                 if (!string.IsNullOrEmpty(dni))
-                    sql += " AND pr.dni LIKE CONCAT(@Dni, '%')";
-                if (idTipoInmueble.HasValue && idTipoInmueble.Value != 0)
+                {
+                    sql += " AND pr.dni LIKE CONCAT('%', @Dni, '%')";
+                }
+                if (idTipoInmueble > 0)
+                {
                     sql += " AND i.id_tipo_inmueble = @IdTipoInmueble";
-                if (uso.HasValue && uso.Value != 0)
+                }
+                if (uso == 1 || uso == 2)
+                {
                     sql += " AND i.uso = @Uso";
-                if (cantidadAmbientesMin.HasValue && cantidadAmbientesMin.Value > 0)
-                    sql += " AND i.cantidad_ambientes >= @CantidadAmbientesMin";
+                }
+                if (cantidadAmbientes > 0)
+                {
+                    sql += " AND i.cantidad_ambientes >= @CantidadAmbientes";
+                }
                 if (precioMin.HasValue && precioMin.Value > 0)
+                {
                     sql += " AND i.precio >= @PrecioMin";
+                }
                 if (precioMax.HasValue && precioMax.Value > 0)
+                {
                     sql += " AND i.precio <= @PrecioMax";
-                if (estado.HasValue && estado.Value != 0)
+                }
+                if (estado == 1 || estado == 2 || estado == 3)
+                {
                     sql += " AND i.estado = @Estado";
+                }
+
+                sql += " LIMIT @Limit OFFSET @Offset";
 
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
-                    // parámetros dinámicos
                     if (!string.IsNullOrEmpty(direccion))
+                    {
                         cmd.Parameters.AddWithValue("@Direccion", direccion);
+                    }
                     if (!string.IsNullOrEmpty(dni))
+                    {
                         cmd.Parameters.AddWithValue("@Dni", dni);
-                    if (idTipoInmueble.HasValue && idTipoInmueble.Value != 0)
-                        cmd.Parameters.AddWithValue("@IdTipoInmueble", idTipoInmueble.Value);
-                    if (uso.HasValue && uso.Value != 0)
-                        cmd.Parameters.AddWithValue("@Uso", uso.Value);
-                    if (cantidadAmbientesMin.HasValue && cantidadAmbientesMin.Value > 0)
-                        cmd.Parameters.AddWithValue(
-                            "@CantidadAmbientesMin",
-                            cantidadAmbientesMin.Value
-                        );
+                    }
+                    if (idTipoInmueble > 0)
+                    {
+                        cmd.Parameters.AddWithValue("@IdTipoInmueble", idTipoInmueble);
+                    }
+                    if (uso == 1 || uso == 2)
+                    {
+                        cmd.Parameters.AddWithValue("@Uso", uso);
+                    }
+                    if (cantidadAmbientes > 0)
+                    {
+                        cmd.Parameters.AddWithValue("@CantidadAmbientes", cantidadAmbientes);
+                    }
                     if (precioMin.HasValue && precioMin.Value > 0)
+                    {
                         cmd.Parameters.AddWithValue("@PrecioMin", precioMin.Value);
+                    }
                     if (precioMax.HasValue && precioMax.Value > 0)
+                    {
                         cmd.Parameters.AddWithValue("@PrecioMax", precioMax.Value);
-                    if (estado.HasValue && estado.Value != 0)
-                        cmd.Parameters.AddWithValue("@Estado", estado.Value);
+                    }
+                    if (estado == 1 || estado == 2 || estado == 3)
+                    {
+                        cmd.Parameters.AddWithValue("@Estado", estado);
+                    }
 
+                    cmd.Parameters.AddWithValue("@Limit", limit);
+                    cmd.Parameters.AddWithValue("@Offset", offset);
+
+                    conn.Open();
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
@@ -446,6 +404,11 @@ namespace Inmobiliaria.Models
                                     Apellido = reader.GetString("Propietario_Apellido"),
                                     Dni = reader.GetString("Propietario_Dni"),
                                 },
+                                TipoInmueble = new TipoInmueble
+                                {
+                                    IdTipoInmueble = reader.GetInt32("IdTipoInmueble"),
+                                    Nombre = reader.GetString("TipoInmueble_Nombre"),
+                                },
                             };
 
                             lista.Add(inmueble);
@@ -455,24 +418,6 @@ namespace Inmobiliaria.Models
             }
 
             return lista;
-        }
-
-        public int SetEstado(int IdInmueble, int Estado)
-        {
-            int res = -1;
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql = @"UPDATE inmueble SET estado = @Estado WHERE id_inmueble = @IdInmueble";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@IdInmueble", IdInmueble);
-                    cmd.Parameters.AddWithValue("@Estado", Estado);
-                    conn.Open();
-                    res = cmd.ExecuteNonQuery();
-                    conn.Close();
-                }
-            }
-            return res;
         }
     }
 }
