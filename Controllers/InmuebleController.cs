@@ -9,8 +9,14 @@ namespace Inmobiliaria.Controllers
         private readonly IRepositorioInmueble repositorio;
         private readonly IRepositorioTipoInmueble repoTipo;
         private readonly IRepositorioPropietario repoPropietario;
-    private readonly IConfiguration config;
-        public InmuebleController(IRepositorioInmueble repositorio, IRepositorioTipoInmueble repoTipo, IRepositorioPropietario repoPropietario, IConfiguration config)
+        private readonly IConfiguration config;
+
+        public InmuebleController(
+            IRepositorioInmueble repositorio,
+            IRepositorioTipoInmueble repoTipo,
+            IRepositorioPropietario repoPropietario,
+            IConfiguration config
+        )
         {
             this.repositorio = repositorio;
             this.repoTipo = repoTipo;
@@ -131,7 +137,7 @@ namespace Inmobiliaria.Controllers
         {
             try
             {
-                if (repositorio.SeEstaUsando(id) > 0)
+                if (repositorio.SeEstaUsando(id))
                 {
                     TempData["Mensaje"] = "No se puede eliminar el inmueble porque está en uso";
                     return RedirectToAction(nameof(Listar));
@@ -151,82 +157,6 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-        // GET: Inmueble/Listar
-        public IActionResult Listar()
-        {
-            var lista = repositorio.ObtenerTodos();
-            var tipos = repoTipo.TenerTodos();
-            ViewBag.Tipos = tipos;
-            // Crear diccionario para acceso rápido en la vista
-            ViewBag.TipoDict = tipos.ToDictionary(t => t.IdTipoInmueble, t => t.Nombre);
-            return View(lista);
-        }
-
-        // GET: Inmueble/ListarTodos
-        [HttpGet]
-        public IActionResult ListarTodos()
-        {
-            var lista = repositorio.ObtenerTodos();
-            return Ok(lista);
-        }
-
-        // GET: Inmueble/BuscarPorPropietario
-        [HttpGet]
-        public IActionResult BuscarPorPropietario(int idPropietario)
-        {
-            var lista = repositorio.ObtenerPorPropietario(idPropietario);
-            return Ok(lista);
-        }
-
-        // GET: Inmueble/BuscarPorTipo
-        [HttpGet]
-        public IActionResult BuscarPorTipo(int idTipo)
-        {
-            var lista = repositorio.ObtenerPorTipo(idTipo);
-            return Ok(lista);
-        }
-
-        // GET: Inmueble/BuscarPorUso
-        [HttpGet]
-        public IActionResult BuscarPorUso(int uso)
-        {
-            var lista = repositorio.ObtenerPorUso(uso);
-            return Ok(lista);
-        }
-
-        // GET: Inmueble/BuscarPorCantidadAmbientes
-        [HttpGet]
-        public IActionResult BuscarPorCantidadAmbientes(int cantidad)
-        {
-            var lista = repositorio.ObtenerPorCantidadAmbientes(cantidad);
-            return Ok(lista);
-        }
-
-        [HttpGet]
-        public IActionResult SupaFiltro(
-            string direccion,
-            string dni,
-            int tipo,
-            int uso,
-            int ambientes,
-            int precioMin,
-            int precioMax,
-            int estado
-        )
-        {
-            var lista = repositorio.SupaFiltro(
-                direccion,
-                dni,
-                tipo,
-                uso,
-                ambientes,
-                precioMin,
-                precioMax,
-                estado
-            );
-            return Ok(lista);
-        }
-
         // POST: Inmueble/SetEstado/5
         [HttpPost]
         public IActionResult SetEstado(int id, int estado)
@@ -244,12 +174,62 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-        // GET: Inquilino/Inquilino
+        // GET: Inmueble/Listar
         [HttpGet]
-        public IActionResult Inmueble(int idInmueble)
+        public IActionResult Listar(
+            string? direccion,
+            string? dni,
+            int? idTipoInmueble,
+            int? uso,
+            int? cantidadAmbientesMin,
+            decimal? precioMin,
+            decimal? precioMax,
+            int? estado,
+            int paginaActual = 1
+        )
         {
-            var inmueble = repositorio.ObtenerPorID(idInmueble);
-            return Ok(inmueble);
+            int registrosPorPagina = 9;
+            int offset = (paginaActual - 1) * registrosPorPagina;
+            int total = repositorio.ContarFiltro(
+                direccion,
+                dni,
+                idTipoInmueble,
+                uso,
+                cantidadAmbientesMin,
+                precioMin,
+                precioMax,
+                estado
+            );
+            int limit = Math.Max(0, Math.Min(registrosPorPagina, total - offset));
+
+            var inmuebles = repositorio.Filtro(
+                direccion,
+                dni,
+                idTipoInmueble,
+                uso,
+                cantidadAmbientesMin,
+                precioMin,
+                precioMax,
+                estado,
+                limit,
+                offset
+            );
+            var tipos = repoTipo.TenerTodos();
+            int totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina);
+            Console.WriteLine("Total paginas: " + inmuebles);
+            ViewBag.PaginaActual = paginaActual;
+            ViewBag.TotalPaginas = totalPaginas;
+            ViewBag.Direccion = direccion;
+            ViewBag.Dni = dni;
+            ViewBag.IdTipoInmueble = idTipoInmueble;
+            ViewBag.Uso = uso;
+            ViewBag.CantidadAmbientesMin = cantidadAmbientesMin;
+            ViewBag.PrecioMin = precioMin;
+            ViewBag.PrecioMax = precioMax;
+            ViewBag.Estado = estado;
+            ViewBag.Tipos = tipos;
+
+            return View(inmuebles);
         }
     }
 }
