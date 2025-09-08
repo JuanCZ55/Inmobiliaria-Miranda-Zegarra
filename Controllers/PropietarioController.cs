@@ -42,7 +42,7 @@ namespace Inmobiliaria.Controllers
                         return View(propietario);
                     }
                     repositorio.Crear(propietario);
-                    TempData["PropietarioCreado"] =
+                    TempData["Success"] =
                         $"Se agrego correctamente el propietario {propietario.Dni} {propietario.Nombre} {propietario.Apellido}";
                     return RedirectToAction(nameof(Listar));
                 }
@@ -83,16 +83,16 @@ namespace Inmobiliaria.Controllers
         {
             try
             {
-                if (ModelState.IsValid) // Verifiaca que propietario tenga el formato valido
+                if (ModelState.IsValid)
                 {
                     var existe = repositorio.ObtenerPorDni(propietario.Dni);
                     if (existe.IdPropietario <= 0)
                     {
-                        TempData["Error"] = "El DNI ya existe";
+                        TempData["Error"] = "No hay propiertario con ese DNI para modificar";
                         return View(propietario);
                     }
                     repositorio.Modificar(propietario);
-                    TempData["PropietarioCreado"] =
+                    TempData["Success"] =
                         $"Se modifico correctamente el propietario {propietario.Dni} {propietario.Nombre} {propietario.Apellido}";
                     return RedirectToAction(nameof(Listar));
                 }
@@ -112,11 +112,11 @@ namespace Inmobiliaria.Controllers
             {
                 if (repositorio.Eliminar(id) > 0)
                 {
-                    TempData["Mensaje"] = $"Se eliminó correctamente el propietario";
+                    TempData["Success"] = $"Se eliminó correctamente el propietario";
                     return RedirectToAction(nameof(Listar));
                 }
 
-                TempData["Mensaje"] = "No se pudo eliminar el propietario";
+                TempData["Error"] = "No se pudo eliminar el propietario";
                 return RedirectToAction(nameof(Listar));
             }
             catch (System.Exception)
