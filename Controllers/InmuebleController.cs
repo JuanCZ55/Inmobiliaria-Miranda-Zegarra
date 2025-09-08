@@ -54,7 +54,7 @@ namespace Inmobiliaria.Controllers
                 if (ModelState.IsValid)
                 {
                     repositorio.Crear(inmueble);
-                    TempData["Mensaje"] =
+                    TempData["Success"] =
                         $"Se agrego correctamente el inmueble en {inmueble.Direccion}";
                     return RedirectToAction(nameof(Listar));
                 }
@@ -108,7 +108,7 @@ namespace Inmobiliaria.Controllers
                 if (ModelState.IsValid)
                 {
                     repositorio.Modificar(inmueble);
-                    TempData["Mensaje"] =
+                    TempData["Success"] =
                         $"Se modifico correctamente el inmueble de {inmueble.Direccion}";
                     return RedirectToAction(nameof(Listar));
                 }
@@ -139,16 +139,16 @@ namespace Inmobiliaria.Controllers
             {
                 if (repositorio.SeEstaUsando(id))
                 {
-                    TempData["Mensaje"] = "No se puede eliminar el inmueble porque está en uso";
+                    TempData["Warning"] = "No se puede eliminar el inmueble porque está en uso";
                     return RedirectToAction(nameof(Listar));
                 }
                 if (repositorio.Eliminar(id) > 0)
                 {
-                    TempData["Mensaje"] = "Se elimino correctamente el inmueble";
+                    TempData["Success"] = "Se elimino correctamente el inmueble";
                     return RedirectToAction(nameof(Listar));
                 }
 
-                TempData["Mensaje"] = "No se pudo eliminar el inmueble";
+                TempData["Error"] = "No se pudo eliminar el inmueble";
                 return RedirectToAction(nameof(Listar));
             }
             catch (System.Exception)
@@ -164,12 +164,12 @@ namespace Inmobiliaria.Controllers
             try
             {
                 repositorio.SetEstado(id, estado);
-                TempData["Mensaje"] = "Se actualizo el estado del inmueble correctamente";
+                TempData["Success"] = "Se actualizo el estado del inmueble correctamente";
                 return RedirectToAction(nameof(Listar));
             }
             catch
             {
-                TempData["Mensaje"] = "No se pudo actualizar el estado";
+                TempData["Success"] = "No se pudo actualizar el estado";
                 return RedirectToAction(nameof(Listar));
             }
         }

@@ -6,7 +6,8 @@ namespace Inmobiliaria.Controllers
     public class InquilinoController : Controller
     {
         private readonly IRepositorioInquilino repositorio;
-    private readonly IConfiguration config;
+        private readonly IConfiguration config;
+
         // GET: Propietario
         public InquilinoController(IRepositorioInquilino repositorio, IConfiguration config)
         {
@@ -35,7 +36,7 @@ namespace Inmobiliaria.Controllers
                 if (ModelState.IsValid) // Verifiaca que inquilino tenga el formato valido
                 {
                     repositorio.Crear(inquilino);
-                    TempData["InquilinoCreado"] =
+                    TempData["Success"] =
                         $"Se agrego correctamente el inquilino {inquilino.Dni} {inquilino.Nombre} {inquilino.Apellido}";
                     return RedirectToAction(nameof(Listar));
                 }
@@ -73,9 +74,15 @@ namespace Inmobiliaria.Controllers
             {
                 if (ModelState.IsValid) // Verifiaca que inquilino tenga el formato valido
                 {
+                    var existe = repositorio.ObtenerPorDni(inquilino.Dni);
+                    if (existe.IdInquilino <= 0)
+                    {
+                        TempData["Error"] = "No hay inquilino con ese DNI para modificar";
+                        return View(inquilino);
+                    }
                     repositorio.Modificar(inquilino);
-                    TempData["InquilinoCreado"] =
-                        $"Se modificado correctamente el inquilino {inquilino.Dni} {inquilino.Nombre} {inquilino.Apellido}";
+                    TempData["Success"] =
+                        $"Se modifico correctamente el inquilino {inquilino.Dni} {inquilino.Nombre} {inquilino.Apellido}";
                     return RedirectToAction(nameof(Listar));
                 }
                 else
@@ -95,11 +102,11 @@ namespace Inmobiliaria.Controllers
             {
                 if (repositorio.Eliminar(id) > 0)
                 {
-                    TempData["Mensaje"] = $"Se eliminó correctamente el propietario";
+                    TempData["Success"] = $"Se eliminó correctamente el inquilino";
                     return RedirectToAction(nameof(Listar));
                 }
 
-                TempData["Mensaje"] = "No se pudo eliminar el propietario";
+                TempData["Success"] = "No se pudo eliminar el inquilino";
                 return RedirectToAction(nameof(Listar));
             }
             catch (System.Exception)
@@ -109,6 +116,7 @@ namespace Inmobiliaria.Controllers
         }
 
         // GET: Inquilino/Lista
+        [HttpGet]
         public IActionResult Listar(string Dni, int PaginaActual = 1)
         {
             int registrosPorPagina = 9;
@@ -125,33 +133,6 @@ namespace Inmobiliaria.Controllers
             ViewBag.Dni = Dni;
 
             return View(inquilinos);
-        }
-
-        [HttpGet]
-        public IActionResult Listartodos()
-        {
-            var lista = repositorio.ObtenerTodos();
-            return Ok(lista);
-        }
-
-        // GET: Inquilino/Buscar
-        [HttpGet]
-        public IActionResult Buscar(string dni)
-        {
-            var lista = repositorio.filtrarDNI(dni);
-            return Ok(lista);
-        }
-
-        // GET: Inquilino/Inquilino
-        [HttpGet]
-        public IActionResult Inquilino(string dni)
-        {
-            var inquilino = repositorio.ObtenerPorDni(dni);
-            if (inquilino.Estado == 1)
-            {
-                return Ok(inquilino);
-            }
-            return Ok(null);
         }
     }
 }
