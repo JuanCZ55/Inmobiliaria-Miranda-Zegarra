@@ -140,3 +140,18 @@ ALTER TABLE `pago`
   ADD FOREIGN KEY (`id_usuario`) 
   REFERENCES `usuario` (`id_usuario`) 
   ON DELETE NO ACTION ON UPDATE CASCADE;
+
+
+
+
+DELIMITER $$
+
+DROP EVENT IF EXISTS `finalizar_contratos`;
+CREATE DEFINER=`root`@`localhost` EVENT `finalizar_contratos` ON SCHEDULE EVERY 1 MINUTE STARTS '2025-09-09 18:50:00' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE inmueble AS im
+  JOIN contrato AS cn ON im.id_inmueble = cn.id_inmueble
+  SET im.estado = 1,
+      cn.estado = 2
+  WHERE DATE(cn.fecha_hasta) <= CURRENT_DATE 
+    AND cn.estado = 1
+
+DELIMITER ;
