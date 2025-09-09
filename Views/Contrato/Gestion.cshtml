@@ -2,12 +2,13 @@
 @{
   ViewData["Title"] = "Crear Contrato";
   Layout = "~/Views/Shared/_Layout.cshtml";
+  var Renovar = ViewBag.Renovar;
 }
 <div class="container">
   <div class="row bg-light rounded shadow-sm">
     <!-- Columna izquierda -->
     <div class="col-6 d-flex align-items-start p-5">
-      <form asp-action="@(Model.IdContrato == 0 ? "Crear" : "Cancelar")" method="post"
+      <form asp-action="@((Model.IdContrato == 0 || Renovar == "Renovar") ? "Crear" : "Cancelar")" method="post"
         class="mx-auto h-100 rounded bg-white shadow p-5">
         <div class="d-flex flex-column justify-content-between align-items-center h-100">
           <div class="row justify-content-center">
@@ -91,6 +92,8 @@
             else if (Model != null && Model.IdContrato > 0 && Model.Estado == 1)
             {
               <button type="submit" class="btn btn-success">Cancelar Contrato</button>
+            } else if(Model != null && Model.IdContrato > 0 && Renovar == "Renovar"){
+              <button type="submit" class="btn btn-success">Renovar Contrato</button>
             }
             <a href="/Contrato/Listar" class="btn btn-secondary">Cancelar</a>
           </div>
@@ -211,7 +214,11 @@
         console.warn("No se encontró el inquilino");
         return;
       }
-      console.warn(data)
+      if (data.estado == 0) {
+        console.warn("El inmueble no está disponible") 
+        return;
+      }
+
       document.getElementById("dni").value = data.dni || "";
       document.getElementById('IdInquilino').value = data.idInquilino || "";
       document.getElementById("nombre").value = data.nombre || "";
