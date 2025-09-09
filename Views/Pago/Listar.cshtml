@@ -96,14 +96,16 @@
       </div>
       <div class="col-md-2">
         <div class="zeg-field">
-          <input class="zeg-input" type="date" id="FechaDesde" name="FechaDesde" value="@Fecha_desde" placeholder=" " />
+          <input class="zeg-input-date" type="date" id="FechaDesde" name="FechaDesde" value="@Fecha_desde"
+            placeholder=" " />
           <label for="FechaDesde">Fecha desde</label>
         </div>
       </div>
       <div class="col-md-2">
         <div class="zeg-field">
-          <input class="zeg-input" type="date" id="FechaHasta" name="FechaHasta" value="@Fecha_hasta" placeholder=" " />
-          <label for="FechaHasta">Fecha hasta</label>
+          <input class="zeg-input-date" type="date" id="FechaHasta" name="FechaHasta" value="@Fecha_hasta"
+            placeholder=" " />
+          <label for="FechaHasta">Fecha hasta &nbsp;</label>
         </div>
       </div>
       <div class="col-md-2 align-items-start d-flex">
@@ -178,44 +180,50 @@
 <script>
   document.addEventListener("DOMContentLoaded", () => {
 
-    // ===== Inputs tipo text, number, textarea =====
-    document.querySelectorAll('input.zeg-input:not([type="date"]), textarea.zeg-input').forEach(input => {
-      const checkActive = () => {
-        if (input.value && input.value.trim() !== "") {
-          input.classList.add('active');
-        } else {
-          input.classList.remove('active');
-        }
-      }
-      checkActive();
-      input.addEventListener('input', checkActive);
+    document.querySelectorAll('select.zeg-input').forEach(select => {
+      if (select.value !== "") select.classList.add('active');
+
+      select.addEventListener('change', () => {
+        if (select.value !== "") select.classList.add('active');
+        else select.classList.remove('active');
+      });
     });
 
-    // ===== Inputs tipo date =====
-    document.querySelectorAll('input.zeg-input[type="date"]').forEach(input => {
+    document.querySelectorAll('input.zeg-input, textarea.zeg-input').forEach(input => {
+      if (input.value !== "") input.classList.add('active');
+      input.addEventListener('input', () => {
+        if (input.value !== "") input.classList.add('active');
+        else input.classList.remove('active');
+      });
+    });
+
+
+    document.querySelectorAll('input.zeg-input-date[type="date"]').forEach(input => {
 
       const checkDateActive = () => {
         const val = input.value;
-        // Verificar si es fecha válida
+
+        // Validar fecha
         const isValidDate = (val) => {
-          // No vacío, no placeholder nativo y es parseable a fecha
-          if (!val || val.trim() === "" || val === "0000-00-00") return false;
+          if (!val || val.trim() === "" || val === "0000-00-00" || val.toLowerCase() === "dd/mm/aaaa") return false;
           const d = new Date(val);
           return !isNaN(d.getTime());
-        }
+        };
 
         if (isValidDate(val)) {
           input.classList.add('active');
         } else {
           input.classList.remove('active');
-          input.classList.add('no-active');
         }
-      }
+      };
 
+      // Inicial
       checkDateActive();
+
+      // Eventos
       input.addEventListener('input', checkDateActive);
       input.addEventListener('change', checkDateActive);
     });
-
   });
+
 </script>
