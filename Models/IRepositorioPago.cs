@@ -7,7 +7,7 @@ namespace Inmobiliaria.Models
         int EliminarPorContrato(int IdContrato);
         List<Pago> BuscarPorContrato(int IdContrato);
         List<Pago> ObtenerTodos();
-        List<Pago> Filtrar(string? idPago, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta, int offset, int limite);
-        int CantidadFiltro(string? idPago, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta);
+        List<Pago> Filtrar(string? idPago, string? idContrato, string? dniInquilino, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta, int offset, int limite);
+        int CantidadFiltro(string? idPago, string? idContrato, string? dniInquilino, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta);
     }
 }

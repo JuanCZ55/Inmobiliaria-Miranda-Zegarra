@@ -6,7 +6,6 @@ namespace Inmobiliaria.Models
     {
         int Finalizar(Contrato contrato);
         int Cancelado(Contrato contrato);
-        Contrato ObtenerPorID(int IdContrato);
 
         public List<Contrato> Filtrar(string? idContrato, string? dniInquilino, string? idInmueble, string? estado, string? Fecha_desde, string? Fecha_hasta, int offset, int limite);
 
