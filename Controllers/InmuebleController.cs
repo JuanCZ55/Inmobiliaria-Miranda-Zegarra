@@ -231,5 +231,15 @@ namespace Inmobiliaria.Controllers
 
             return View(inmuebles);
         }
+
+        public IActionResult Inmueble(int id)
+        {
+            var inmueble = repositorio.ObtenerPorID(id);
+            if (inmueble.Estado == 1)
+            {
+                return Ok(inmueble);
+            }
+            return Ok(null);
+        }
     }
 }
