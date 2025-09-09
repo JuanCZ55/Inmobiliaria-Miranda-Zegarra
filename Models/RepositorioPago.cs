@@ -12,11 +12,11 @@ namespace Inmobiliaria.Models
     {
     }
 
-public int Crear(Pago pago)
-{
-    int res = -1;
-    using (var conn = new MySqlConnection(connectionString))
+    public int Crear(Pago pago)
     {
+      int res = -1;
+      using (var conn = new MySqlConnection(connectionString))
+      {
         var sql = @"
             INSERT INTO pago (id_contrato, numero_pago, fecha_pago, concepto, monto, estado) 
             VALUES (@id_contrato, @numero_pago, @fecha_pago, @concepto, @monto, @estado);
@@ -24,20 +24,20 @@ public int Crear(Pago pago)
 
         using (var cmd = new MySqlCommand(sql, conn))
         {
-            cmd.Parameters.AddWithValue("@id_contrato", pago.IdContrato);
-            cmd.Parameters.AddWithValue("@numero_pago", pago.numeroPago);
-            cmd.Parameters.AddWithValue("@fecha_pago", pago.FechaPago);
-            cmd.Parameters.AddWithValue("@concepto", pago.Concepto);
-            cmd.Parameters.AddWithValue("@monto", pago.Monto);
-            cmd.Parameters.AddWithValue("@estado", pago.Estado);
+          cmd.Parameters.AddWithValue("@id_contrato", pago.IdContrato);
+          cmd.Parameters.AddWithValue("@numero_pago", pago.numeroPago);
+          cmd.Parameters.AddWithValue("@fecha_pago", pago.FechaPago);
+          cmd.Parameters.AddWithValue("@concepto", pago.Concepto);
+          cmd.Parameters.AddWithValue("@monto", pago.Monto);
+          cmd.Parameters.AddWithValue("@estado", pago.Estado);
 
-            conn.Open();
-            res = Convert.ToInt32(cmd.ExecuteScalar());
-            pago.IdPago = res;
+          conn.Open();
+          res = Convert.ToInt32(cmd.ExecuteScalar());
+          pago.IdPago = res;
         }
+      }
+      return res;
     }
-    return res;
-}
 
     public int Modificar(Pago pago)
     {
@@ -199,7 +199,7 @@ public int Crear(Pago pago)
       }
     }
 
-    public List<Pago> Filtrar(string? idPago, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta, int offset, int limite)
+    public List<Pago> Filtrar(string? idPago, string? idContrato, string? dniInquilino, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta, int offset, int limite)
     {
       var lista = new List<Pago>();
       using (var conn = new MySqlConnection(connectionString))
@@ -224,6 +224,13 @@ public int Crear(Pago pago)
         if (!string.IsNullOrEmpty(idPago))
           sql += " AND id_pago LIKE @idPago";
 
+        if (!string.IsNullOrEmpty(idContrato))
+            sql += " AND p.id_contrato LIKE @idContrato";
+
+
+        if (!string.IsNullOrEmpty(dniInquilino))
+          sql += " AND inq.dni LIKE @dniInquilino";
+
         if (!string.IsNullOrEmpty(MontoMenor))
           sql += " AND monto >= @MontoMenor";
 
@@ -246,6 +253,12 @@ public int Crear(Pago pago)
 
           if (!string.IsNullOrEmpty(idPago))
             cmd.Parameters.AddWithValue("@idPago", "%" + idPago + "%");
+
+          if (!string.IsNullOrEmpty(idContrato))
+            cmd.Parameters.AddWithValue("@idContrato", "%" + idContrato + "%");
+
+          if (!string.IsNullOrEmpty(dniInquilino))
+            cmd.Parameters.AddWithValue("@dniInquilino", "%" + dniInquilino + "%");
 
           if (!string.IsNullOrEmpty(MontoMenor))
             cmd.Parameters.AddWithValue("@MontoMenor", MontoMenor);
@@ -276,7 +289,7 @@ public int Crear(Pago pago)
                 FechaPago = reader.GetDateTime("fecha_pago"),
                 Concepto = reader.GetString("concepto"),
                 Monto = reader.GetDecimal("monto"),
-                Estado = reader.GetInt32("estado"),
+                Estado = reader.GetInt32("pago_estado"),
                 IdContrato = reader.GetInt32("id_contrato"),
                 contrato = new Contrato
                 {
@@ -337,39 +350,53 @@ public int Crear(Pago pago)
       return lista;
     }
 
-    public int CantidadFiltro(string? idPago, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta)
+    public int CantidadFiltro(string? idPago, string? idContrato, string? dniInquilino, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta)
     {
       int total = 0;
       using (var conn = new MySqlConnection(connectionString))
       {
         var sql = @"
-          SELECT COUNT(*)
-          FROM pago
-          WHERE 1=1
+            SELECT COUNT(*)
+            FROM pago p
+            JOIN contrato c ON p.id_contrato = c.id_contrato
+            JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino
+            WHERE 1=1
           ";
 
         if (!string.IsNullOrEmpty(idPago))
-          sql += " AND id_pago LIKE @idPago";
+          sql += " AND p.id_pago LIKE @idPago";
+
+        if (!string.IsNullOrEmpty(idContrato))
+          sql += " AND p.id_contrato LIKE @idContrato";
+
+        if (!string.IsNullOrEmpty(dniInquilino))
+          sql += " AND inq.dni LIKE @dniInquilino";
 
         if (!string.IsNullOrEmpty(MontoMenor))
-          sql += " AND monto >= @MontoMenor";
+          sql += " AND p.monto >= @MontoMenor";
 
         if (!string.IsNullOrEmpty(MontoMayor))
-          sql += " AND monto <= @MontoMayor";
+          sql += " AND p.monto <= @MontoMayor";
 
         if (!string.IsNullOrEmpty(Fecha_desde))
-          sql += " AND DATE(fecha_pago) >= @fechaDesde";
+          sql += " AND DATE(p.fecha_pago) >= @fechaDesde";
 
         if (!string.IsNullOrEmpty(Fecha_hasta))
-          sql += " AND DATE(fecha_pago) <= @fechaHasta";
+          sql += " AND DATE(p.fecha_pago) <= @fechaHasta";
 
         if (!string.IsNullOrEmpty(estado))
-          sql += " AND estado = @estado";
+          sql += " AND p.estado = @estado";
         using (var cmd = new MySqlCommand(sql, conn))
         {
 
           if (!string.IsNullOrEmpty(idPago))
             cmd.Parameters.AddWithValue("@idPago", "%" + idPago + "%");
+
+          if (!string.IsNullOrEmpty(idContrato))
+            cmd.Parameters.AddWithValue("@idContrato", "%" + idContrato + "%");
+
+          if (!string.IsNullOrEmpty(dniInquilino))
+            cmd.Parameters.AddWithValue("@dniInquilino", "%" + dniInquilino + "%");
 
           if (!string.IsNullOrEmpty(MontoMenor))
             cmd.Parameters.AddWithValue("@MontoMenor", MontoMenor);
@@ -392,5 +419,6 @@ public int Crear(Pago pago)
       }
       return total;
     }
+
   }
 }
