@@ -115,6 +115,17 @@ namespace Inmobiliaria.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult Inquilino(string dni)
+        {
+            var inquilino = repositorio.ObtenerPorDni(dni);
+            if (inquilino.Estado == 1)
+            {
+                return Ok(inquilino);
+            }
+            return Ok(null);
+        }
+
         // GET: Inquilino/Lista
         [HttpGet]
         public IActionResult Listar(string Dni, int PaginaActual = 1)
