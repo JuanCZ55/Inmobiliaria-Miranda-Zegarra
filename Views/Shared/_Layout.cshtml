@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
   <link rel="stylesheet" href="~/Inmobiliaria.styles.css" asp-append-version="true" />
-</head>
+  </head>
 
 <body>
   <header>
@@ -71,6 +71,15 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" asp-controller="Contrato" asp-action="Crear">Crear</a></li>
                 <li><a class="dropdown-item" asp-controller="Contrato" asp-action="Listar">Lista Gestion</a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle text-primary-emphasis" role="button" data-bs-toggle="dropdown">
+                Pago
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" asp-controller="Pago" asp-action="Crear">Crear</a></li>
+                <li><a class="dropdown-item" asp-controller="Pago" asp-action="Listar">Lista Gestion</a></li>
               </ul>
             </li>
           </ul>
