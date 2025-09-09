@@ -121,7 +121,7 @@ namespace Inmobiliaria.Controllers
 
     // GET: Pago/Listar
     [HttpGet]
-    public IActionResult Listar(string? idPago, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta, int PaginaActual = 1)
+    public IActionResult Listar(string? idPago, string? idContrato, string? dniInquilino, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta, int PaginaActual = 1)
     {
       int registrosPorPagina = 7;
       int total = 0;
@@ -130,20 +130,24 @@ namespace Inmobiliaria.Controllers
       List<Pago> lista;
       try
       {
-        total = repositorio.CantidadFiltro(idPago, MontoMenor, MontoMayor, estado, Fecha_desde, Fecha_hasta);
+        total = repositorio.CantidadFiltro(idPago, idContrato, dniInquilino, MontoMenor, MontoMayor, estado, Fecha_desde, Fecha_hasta);
         limite = Math.Min(registrosPorPagina, total - offset);
-        lista = repositorio.Filtrar(idPago, MontoMenor, MontoMayor, estado, Fecha_desde, Fecha_hasta, offset, limite);
+        lista = repositorio.Filtrar(idPago, idContrato, dniInquilino, MontoMenor, MontoMayor, estado, Fecha_desde, Fecha_hasta, offset, limite);
 
         int totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina);
 
         ViewBag.PaginaActual = PaginaActual;
         ViewBag.TotalPaginas = totalPaginas;
         ViewBag.IdPago = idPago;
+        ViewBag.IdContrato = idContrato;
+        ViewBag.DniInquilino = dniInquilino;
         ViewBag.MontoMenor = MontoMenor;
         ViewBag.MontoMayor = MontoMayor;
         ViewBag.estado = estado;
-        ViewBag.Fecha_desde = Fecha_desde;
-        ViewBag.Fecha_hasta = Fecha_hasta;
+        ViewBag.FechaDesde = Fecha_desde;
+        ViewBag.FechaHasta = Fecha_hasta;
+
+
 
         return View(lista);
       }
