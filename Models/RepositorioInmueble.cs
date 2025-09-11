@@ -336,6 +336,23 @@ namespace Inmobiliaria.Models
                     sql += " AND i.estado = @Estado";
                 }
 
+                // Si todos los filtros están vacíos o nulos, aplicar ORDER BY IdInmueble DESC
+                if (
+                    string.IsNullOrEmpty(direccion)
+                    && string.IsNullOrEmpty(dni)
+                    && (!idTipoInmueble.HasValue || idTipoInmueble.Value <= 0)
+                    && (!uso.HasValue || (uso.Value != 1 && uso.Value != 2))
+                    && (!cantidadAmbientes.HasValue || cantidadAmbientes.Value <= 0)
+                    && (!precioMin.HasValue || precioMin.Value <= 0)
+                    && (!precioMax.HasValue || precioMax.Value <= 0)
+                    && (
+                        !estado.HasValue
+                        || (estado.Value != 1 && estado.Value != 2 && estado.Value != 3)
+                    )
+                )
+                {
+                    sql += " ORDER BY IdInmueble DESC";
+                }
                 sql += " LIMIT @Limit OFFSET @Offset";
 
                 using (var cmd = new MySqlCommand(sql, conn))
