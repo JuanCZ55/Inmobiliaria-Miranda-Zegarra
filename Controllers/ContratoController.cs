@@ -86,9 +86,16 @@ namespace Inmobiliaria.Controllers
           TempData["Contrato"] = JsonSerializer.Serialize(contrato);
           return RedirectToAction("Crear");
         }
-        if (repositorioInmueble.ObtenerPorID(contrato.IdInmueble).Estado != 1)
+        Inmueble inmueble = repositorioInmueble.ObtenerPorID(contrato.IdInmueble);
+        if (inmueble.Estado != 1)
         {
           TempData["MensajeError"] = "Inmueble inactivo";
+          TempData["Contrato"] = JsonSerializer.Serialize(contrato);
+          return RedirectToAction("Crear");
+        }
+        if (inmueble.Precio >= contrato.MontoMensual)
+        { 
+          TempData["MensajeError"] = "El precio ingresado no genera ganacias";
           TempData["Contrato"] = JsonSerializer.Serialize(contrato);
           return RedirectToAction("Crear");
         }
@@ -109,7 +116,7 @@ namespace Inmobiliaria.Controllers
         }
 
         Contrato nuevo = repositorio.ObtenerPorID(repositorio.Crear(contrato));
-        repositorioInmueble.SeEstaUsando(contrato.IdInmueble);
+        repositorioInmueble.SetEstado(contrato.IdInmueble, 2);
         TempData["MensajeError"] = "Contrato Creado";
         return RedirectToAction("Ver", new { id = nuevo.IdContrato });
       }
