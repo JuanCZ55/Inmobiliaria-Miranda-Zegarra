@@ -64,7 +64,7 @@ namespace Inmobiliaria.Controllers
       {
         contrato = repositorio.ObtenerPorID(id);
 
-        ViewBag.Renovar = contrato.Estado != 1 ? "Renovar" : null;
+        ViewBag.Renovar = contrato.Estado == 2 ? "Renovar" : null;
         return View("Gestion", contrato);
       }
       catch (System.Exception)
@@ -189,7 +189,7 @@ namespace Inmobiliaria.Controllers
     [HttpGet]
     public IActionResult Listar(string? idContrato, string? dniInquilino, string? idInmueble, string? estado, string? Fecha_desde, string? Fecha_hasta, int PaginaActual = 1)
     {
-      int registrosPorPagina = 7;
+      int registrosPorPagina = 9;
       int total = 0;
       int offset = (PaginaActual - 1) * registrosPorPagina;
       int limite = registrosPorPagina;
