@@ -232,9 +232,9 @@ namespace Inmobiliaria.Controllers
             return View(inmuebles);
         }
 
-        public IActionResult Inmueble(int id)
+        public IActionResult Inmueble(int idInmueble)
         {
-            var inmueble = repositorio.ObtenerPorID(id);
+            var inmueble = repositorio.ObtenerPorID(idInmueble);
             if (inmueble.Estado == 1)
             {
                 return Ok(inmueble);
