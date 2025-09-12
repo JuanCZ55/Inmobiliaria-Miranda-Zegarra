@@ -183,10 +183,21 @@
               @(i.Estado == 1 ? "Disponible" : i.Estado == 2 ? "Ocupado" : i.Estado == 3 ? "Suspendido" : "Desconocido")
             </td>
             <td class="d-flex justify-content-center">
-              <a asp-controller="Contrato" asp-action="Crear" asp-route-idInmueble="@i.IdInmueble" class="btn btn-link"
-                data-bs-toggle="tooltip" title="Hacer Contrato">
-                <img src="~/images/icon/Contrato.png" alt="Contrato">
-              </a>
+              @if (i.Estado == 2)
+              {
+
+                <a class="btn btn-link " data-bs-toggle="tooltip" title="Inmueble Ocupado">
+                  <img src="~/images/icon/Contrato.png" alt="Contrato">
+                </a>
+              }
+              else
+              {
+                <a asp-controller="Contrato" asp-action="Crear" asp-route-idInmueble="@i.IdInmueble" class="btn btn-link"
+                  data-bs-toggle="tooltip" title="Hacer Contrato">
+                  <img src="~/images/icon/Contrato.png" alt="Contrato">
+                </a>
+
+              }
               <a asp-action="Modificar" asp-route-id="@i.IdInmueble" class="btn btn-link" data-bs-toggle="tooltip"
                 title="Modificar Inmueble">
                 <img src="~/images/icon/Editar.png" alt="Editar">
