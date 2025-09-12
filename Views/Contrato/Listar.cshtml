@@ -2,6 +2,7 @@
 
 @{
   ViewData["Title"] = "Listado de Contratos";
+  ViewData["SubTitle"] = "Contratos";
   Layout = "~/Views/Shared/_Layout.cshtml";
   var PaginaActual = ViewBag.PaginaActual ?? 1;
   var totalPaginas = ViewBag.TotalPaginas ?? 1;
@@ -13,133 +14,172 @@
   var Fecha_hasta = ViewBag.FechaHasta ?? "";
 }
 
-  <div class="d-flex align-items-center mb-3">
-    <h2>Listado de Contratos</h2>
-    <a class="btn btn-primary ms-3" asp-action="Crear">+</a>
-  </div>
 
-<div class="row mb-3">
-  <form action="Listar" method="get" class="row g-2 align-items-end">
-    <div class="col-md-2">
-      <label for="idContrato" class="form-label">Cod. Contrato</label>
-      <input class="form-control" type="text" id="idContrato" name="idContrato" value="@idContrato"
-        placeholder="Cod. Contrato" />
-    </div>
-    <div class="col-md-2">
-      <label for="dniInquilino" class="form-label">DNI Inquilino</label>
-      <input class="form-control" type="text" id="dniInquilino" name="dniInquilino" value="@dniInquilino"
-        placeholder="DNI Inquilino" maxlength="8" />
-    </div>
-    <div class="col-md-2">
-      <label for="idInmueble" class="form-label">Cod. Inmueble</label>
-      <input class="form-control" type="text" id="idInmueble" name="idInmueble" value="@idInmueble"
-        placeholder="Cod. Inmueble" />
-    </div>
+<div class="d-flex align-items-center mb-3">
+  <h2 class="text-center py-4">@ViewData["Title"]</h2>
 
-    <div class="col-md-2">
-      <select class="form-control" name="estado">
-        <option value="">Seleccionar estado</option>
-        @if (estado == "1")
-        {
-          <option value="1" selected>Vigente</option>
-        }
-        else
-        {
-          <option value="1">Vigente</option>
-        }
+  <a class="btn btn-primary ms-3" asp-action="Crear">
+    <img class="invert-color-icon" src="~/images/icon/Agregar.png" alt="">
+  </a>
+</div>
 
-        @if (estado == "2")
-        {
-          <option value="2" selected>Finalizado</option>
-        }
-        else
-        {
-          <option value="2">Finalizado</option>
-        }
+<div class="d-flex flex-column pt-4">
+  <form action="Listar" method="get" class="row g-2 bg-white shadow-sm rounded p-3">
+    <div class="row">
+      <div class="col-md-12 d-flex justify-content-start align-items-center pb-2">
+        <h4 class="ps-2 pe-3 m-0 fw-bold">Filtrar</h4>
+      </div>
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input" type="text" id="idContrato" name="idContrato" value="@idContrato" placeholder=" " />
+          <label for="idContrato">Cod. Contrato</label>
+        </div>
+      </div>
 
-        @if (estado == "3")
-        {
-          <option value="3" selected>Cancelado</option>
-        }
-        else
-        {
-          <option value="3">Cancelado</option>
-        }
-      </select>
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input" type="text" id="dniInquilino" name="dniInquilino" value="@dniInquilino"
+            placeholder=" " maxlength="8" />
+          <label for="dniInquilino">DNI Inquilino</label>
+        </div>
+      </div>
 
-    </div>
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input" type="text" id="idInmueble" name="idInmueble" value="@idInmueble" placeholder=" " />
+          <label for="idInmueble">Cod. Inmueble</label>
+        </div>
+      </div>
 
-    <div class="col-md-2">
-      <label for="Fecha_desde" class="form-label">Fecha desde</label>
-      <input class="form-control" type="date" id="Fecha_desde" name="Fecha_desde" value="@Fecha_desde" />
-    </div>
-    <div class="col-md-2">
-      <label for="Fecha_hasta" class="form-label">Fecha hasta</label>
-      <input class="form-control" type="date" id="Fecha_hasta" name="Fecha_hasta" value="@Fecha_hasta" />
-    </div>
-    <div class="col-md-12 text-end mt-2">
-      <button type="submit" class="btn btn-primary">Filtrar</button>
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <select class="zeg-input" name="estado">
+            <option value="" class="d-none"></option>
+            <option value=" ">Todos</option>
+            @if (estado == "1")
+            {
+              <option value="1" selected>Vigente</option>
+            }
+            else
+            {
+
+              <option value="1">Vigente
+              </option>
+            }
+            @if (estado == "2")
+            {
+              <option value="2" selected>Finalizado</option>
+            }
+            else
+            {
+
+              <option value="2">Finalizado
+              </option>
+            }
+            @if (estado == "3")
+            {
+              <option value="3" selected>Cancelado</option>
+            }
+            else
+            {
+
+              <option value="3">Cancelado
+              </option>
+            }
+          </select>
+          <label for="estado">Estado</label>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input-date" type="date" id="Fecha_desde" name="Fecha_desde" value="@Fecha_desde"
+            placeholder=" " />
+          <label for="Fecha_desde">Fecha desde</label>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input-date" type="date" id="Fecha_hasta" name="Fecha_hasta" value="@Fecha_hasta"
+            placeholder=" " />
+          <label for="Fecha_hasta">Fecha hasta &nbsp;</label>
+        </div>
+      </div>
+      <div class="col-md-12 d-flex justify-content-end align-items-center pb-2">
+        <button type="submit" class="btn btn-outline-primary fw-bold me-4">Filtrar</button>
+      </div>
     </div>
   </form>
 </div>
 
-<table class="table table-hover table-striped table-bordered">
-  <thead class="table-dark text-center">
-    <tr>
-      <th>@Html.DisplayNameFor(model => model.First().IdContrato)</th>
-      <th>@Html.DisplayNameFor(model => model.First().IdInquilino)</th>
-      <th>@Html.DisplayNameFor(model => model.First().IdInmueble)</th>
-      <th>@Html.DisplayNameFor(model => model.First().MontoMensual)</th>
-      <th>Fecha</th>
-      <th>@Html.DisplayNameFor(model => model.First().Estado)</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody class="text-center">
-    @if (Model != null && Model.Any())
-    {
-      @foreach (var i in Model)
+
+<div class="table-responsive shadow-sm rounded mt-4">
+  <table class="table table-hover table-striped align-middle mb-0">
+    <thead class="bg-primary text-white text-center">
+      <tr>
+        <th>@Html.DisplayNameFor(model => model.First().IdContrato)</th>
+        <th>@Html.DisplayNameFor(model => model.First().IdInquilino)</th>
+        <th>@Html.DisplayNameFor(model => model.First().IdInmueble)</th>
+        <th>@Html.DisplayNameFor(model => model.First().MontoMensual)</th>
+        <th>Fecha</th>
+        <th>@Html.DisplayNameFor(model => model.First().Estado)</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      @if (Model != null && Model.Any())
+      {
+        @foreach (var i in Model)
+        {
+          <tr>
+            <td>@i.IdContrato</td>
+            <td class="id-inquilino" data-dni="@i.Inquilino?.Dni" data-nombre="@i.Inquilino?.Nombre"
+              data-apellido="@i.Inquilino?.Apellido" data-telefono="@i.Inquilino?.Telefono" data-email="@i.Inquilino?.Email"
+              data-direccion="@i.Inquilino?.Direccion">
+              @i.IdInquilino
+            </td>
+            <td class="id-inmueble" data-tipo="@i.Inmueble?.TipoInmueble?.Nombre" data-direccion="@i.Inmueble?.Direccion"
+              data-dni-propietario="@i.Inmueble?.Propietario?.Dni" data-propietario="@i.Inmueble?.Propietario?.Nombre"
+              data-ambientes="@i.Inmueble?.CantidadAmbientes" data-precio="@i.Inmueble?.Precio">
+              @i.IdInmueble
+            </td>
+            <td>@i.MontoMensual</td>
+            <td>@i.FechaDesde.ToShortDateString() - @i.FechaHasta.ToShortDateString()</td>
+            <td>@(i.Estado == 1 ? "Vigente" : i.Estado == 2 ? "Finalizado" : i.Estado == 3 ? "Cancelado" : "Desconocido")
+            </td>
+            <td class="d-flex justify-content-evenly">
+              <a href="/Pago/Crear?idContrato=@i.IdContrato" data-bs-toggle="tooltip" title="Hacer un pago">
+                <img src="~/images/icon/Pagar.png" alt="Pagar" />
+              </a>
+              <a asp-action="Ver" asp-route-id="@i.IdContrato" data-bs-toggle="tooltip" title="Ver Contrato">
+                <img src="~/images/icon/Gestionar.png" alt="Gestionar" />
+              </a>
+            </td>
+          </tr>
+        }
+
+
+      }
+      else
       {
         <tr>
-          <td>@i.IdContrato</td>
-          <td class="id-inquilino" data-dni="@i.Inquilino?.Dni" data-nombre="@i.Inquilino?.Nombre"
-            data-apellido="@i.Inquilino?.Apellido" data-telefono="@i.Inquilino?.Telefono" data-email="@i.Inquilino?.Email"
-            data-direccion="@i.Inquilino?.Direccion">
-            @i.IdInquilino
-          </td>
-          <td class="id-inmueble" data-tipo="@i.Inmueble?.TipoInmueble?.Nombre" data-direccion="@i.Inmueble?.Direccion"
-            data-dni-propietario="@i.Inmueble?.Propietario?.Dni" data-propietario="@i.Inmueble?.Propietario?.Nombre"
-            data-ambientes="@i.Inmueble?.CantidadAmbientes" data-precio="@i.Inmueble?.Precio">
-            @i.IdInmueble
-          </td>
-          <td>@i.MontoMensual</td>
-          <td>@i.FechaDesde.ToShortDateString() - @i.FechaHasta.ToShortDateString()</td>
-          <td>@(i.Estado == 1 ? "Vigente" : i.Estado == 2 ? "Finalizado" : i.Estado == 3 ? "Cancelado" : "Desconocido")</td>
-          <td>
-            <a asp-action="Ver" asp-route-id="@i.IdContrato" title="Gestionar">
-              <img src="~/images/icon/Gestionar.png" alt="Gestionar"/>
-            </a>
-          </td>
+          <td colspan="7">No se encontraron Contratos</td>
         </tr>
       }
+    </tbody>
+  </table>
 
 
-    }
-    else
-    {
-      <tr>
-        <td colspan="7">No se encontraron Contratos</td>
-      </tr>
-    }
-  </tbody>
-</table>
+
+</div>
 <!-- Div flotante (uno solo para ambos) -->
-<div id="tooltip-info"
+<div id="tooltip-info" class="rounded"
   style="display:none; width:300px; position:absolute; background:#fff; border:1px solid #ccc; padding:10px; box-shadow:0 4px 6px rgba(0,0,0,0.1); z-index:9999;">
 </div>
 @if (totalPaginas > 1)
 {
-  <nav aria-label="Paginación">
+  <nav aria-label="Paginación" class="mt-3">
     <ul class="pagination justify-content-center">
       @for (int i = 1; i <= totalPaginas; i++)
       {
@@ -153,14 +193,28 @@
   </nav>
 }
 
+
+
 @if (TempData["Mensaje"] != null)
 {
   <div class="alert alert-success">@TempData["Mensaje"]</div>
 }
 
 <script>
+
   document.addEventListener("DOMContentLoaded", () => {
     const tooltip = document.getElementById("tooltip-info");
+
+    function posicionarTooltip(e) {
+      let x = e.pageX + 10;
+      let y = e.pageY + 10;
+      const w = tooltip.offsetWidth;
+      const h = tooltip.offsetHeight;
+      if (x + w > window.innerWidth) x = e.pageX - w - 10;
+      if (y + h > window.innerHeight) y = e.pageY - h - 10;
+      tooltip.style.left = x + "px";
+      tooltip.style.top = y + "px";
+    }
 
     // -------- Inquilino --------
     document.querySelectorAll(".id-inquilino").forEach(cell => {
@@ -175,18 +229,11 @@
           <strong>Dirección:</strong> ${cell.dataset.direccion}
         `;
         tooltip.style.display = "block";
-        tooltip.style.top = (e.pageY + 10) + "px";
-        tooltip.style.left = (e.pageX + 10) + "px";
+        posicionarTooltip(e);
       });
 
-      cell.addEventListener("mousemove", e => {
-        tooltip.style.top = (e.pageY + 10) + "px";
-        tooltip.style.left = (e.pageX + 10) + "px";
-      });
-
-      cell.addEventListener("mouseleave", () => {
-        tooltip.style.display = "none";
-      });
+      cell.addEventListener("mousemove", posicionarTooltip);
+      cell.addEventListener("mouseleave", () => tooltip.style.display = "none");
     });
 
     // -------- Inmueble --------
@@ -201,18 +248,56 @@
           <strong>Precio:</strong> $${cell.dataset.precio}
         `;
         tooltip.style.display = "block";
-        tooltip.style.top = (e.pageY + 10) + "px";
-        tooltip.style.left = (e.pageX + 10) + "px";
+        posicionarTooltip(e);
       });
 
-      cell.addEventListener("mousemove", e => {
-        tooltip.style.top = (e.pageY + 10) + "px";
-        tooltip.style.left = (e.pageX + 10) + "px";
-      });
+      cell.addEventListener("mousemove", posicionarTooltip);
+      cell.addEventListener("mouseleave", () => tooltip.style.display = "none");
+    });
 
-      cell.addEventListener("mouseleave", () => {
-        tooltip.style.display = "none";
+    document.querySelectorAll('select.zeg-input').forEach(select => {
+      if (select.value !== "") select.classList.add('active');
+
+      select.addEventListener('change', () => {
+        if (select.value !== "") select.classList.add('active');
+        else select.classList.remove('active');
       });
+    });
+
+    document.querySelectorAll('input.zeg-input, textarea.zeg-input').forEach(input => {
+      if (input.value !== "") input.classList.add('active');
+      input.addEventListener('input', () => {
+        if (input.value !== "") input.classList.add('active');
+        else input.classList.remove('active');
+      });
+    });
+
+
+    document.querySelectorAll('input.zeg-input-date[type="date"]').forEach(input => {
+
+      const checkDateActive = () => {
+        const val = input.value;
+
+        // Validar fecha
+        const isValidDate = (val) => {
+          if (!val || val.trim() === "" || val === "0000-00-00" || val.toLowerCase() === "dd/mm/aaaa") return false;
+          const d = new Date(val);
+          return !isNaN(d.getTime());
+        };
+
+        if (isValidDate(val)) {
+          input.classList.add('active');
+        } else {
+          input.classList.remove('active');
+        }
+      };
+
+      // Inicial
+      checkDateActive();
+
+      // Eventos
+      input.addEventListener('input', checkDateActive);
+      input.addEventListener('change', checkDateActive);
     });
   });
 </script>

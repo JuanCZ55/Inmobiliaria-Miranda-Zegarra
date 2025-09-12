@@ -1,28 +1,32 @@
 @model Inmobiliaria.Models.Contrato
 @{
   ViewData["Title"] = "Crear Contrato";
+  ViewData["SubTitle"] = "Contratos";
   Layout = "~/Views/Shared/_Layout.cshtml";
   var Renovar = ViewBag.Renovar;
 }
-<div class="container">
-  <div class="row bg-light rounded shadow-sm">
-    <!-- Columna izquierda -->
-    <div class="col-6 d-flex align-items-start p-5">
+
+<div class="row h-100">
+  <!-- COLUMNA IZQUIERDA -->
+  <div class="col-md-6 py-5 d-flex justify-content-center">
+    <!-- esto da el color -->
+    <div class="col-md-10 shadow-lg rounded border bg-light p-5 h-100">
       <form asp-action="@((Model.IdContrato == 0 || Renovar == "Renovar") ? "Crear" : "Cancelar")" method="post"
-        class="mx-auto h-100 rounded bg-white shadow p-5">
-        <div class="d-flex flex-column justify-content-between align-items-center h-100">
-          <div class="row justify-content-center">
+        class="h-100 d-flex flex-column justify-content-center">
+        <div class="h-100 px-5 d-flex flex-column justify-content-between">
+          <div>
             <h2 class="text-center mb-4">Contrato</h2>
+
             @if (Model != null && Model.Inquilino != null)
             {
-              <div class="col-10 mb-3">
+              <div class="mb-3">
                 <label class="form-label">ID del Inquilino</label>
                 <input asp-for="IdInquilino" class="form-control" readonly />
               </div>
             }
             else
             {
-              <div class="col-10 mb-3">
+              <div class="mb-3">
                 <label class="form-label">DNI del Inquilino</label>
                 <input id="DniInquilino" oninput="buscarInquilino()" class="form-control" />
               </div>
@@ -31,60 +35,63 @@
               </div>
             }
 
-            <div class="col-10 mb-3">
+            <div class="mb-3">
               <label asp-for="IdInmueble" class="form-label">Cod. Inmueble</label>
               <input oninput="buscarInmueble()" asp-for="IdInmueble" class="form-control" />
             </div>
-            <div class="col-10 mb-3">
-              <label asp-for="FechaDesde" class="form-label">Fecha Desde</label>
-              <input asp-for="FechaDesde" class="form-control" type="date" />
+
+            <div class="row">
+              <div class="col-6 mb-3">
+                <label asp-for="FechaDesde" class="form-label">Fecha Desde</label>
+                <input asp-for="FechaDesde" class="form-control" type="date" />
+              </div>
+              <div class="col-6 mb-3">
+                <label asp-for="FechaHasta" class="form-label">Fecha Hasta</label>
+                <input asp-for="FechaHasta" class="form-control" type="date" />
+              </div>
             </div>
-            <div class="col-10 mb-3">
-              <label asp-for="FechaHasta" class="form-label">Fecha Hasta</label>
-              <input asp-for="FechaHasta" class="form-control" type="date" />
-            </div>
-            <div class="col-10 mb-3">
+
+            <div class="mb-3">
               <label asp-for="MontoMensual" class="form-label">Monto Mensual</label>
-              <input asp-for="MontoMensual" type="number" class="form-control"/>
+              <input asp-for="MontoMensual" type="number" class="form-control" />
             </div>
 
             @if (Model != null && Model.IdContrato != 0)
             {
-              <div class="col-10 mb-3">
+              <div class="mb-3">
                 <label class="form-label">Estado</label>
                 <input class="form-control" type="text" readonly
-                  value="@(Model.Estado == 1 ? "Vigente" : Model.Estado == 3 ? "Cancelado" : Model.Estado == 2 ? "Finalizado" : "")" readonly/>
+                  value="@(Model.Estado == 1 ? "Vigente" : Model.Estado == 3 ? "Cancelado" : Model.Estado == 2 ? "Finalizado" : "")" />
               </div>
               <div class="d-none">
                 <input asp-for="IdContrato" type="hidden" id="IdContrato" />
               </div>
-              @if(Model.Estado == 1)
+
+              @if (Model.Estado == 1)
               {
                 <div class="d-none">
-                  <input asp-for="FechaFin" type="hidden" value="@DateTime.Now"/>
+                  <input asp-for="FechaFin" type="hidden" value="@DateTime.Now" />
                 </div>
               }
             }
-          @if (Model != null && Model.IdContrato != 0 && Model.Multa != null && Model.FechaFin != null)
-          {
-              <div class="col-5 mb-3">
-                  <label asp-for="FechaFin" class="form-label">Fecha Cancelacion</label>
-                  <input asp-for="FechaFin" 
-                        class="form-control" 
-                        type="date"
-                        value="@(Model.FechaFin?.ToString("yyyy-MM-dd"))" readonly/>
-              </div>
-              <div class="col-5 mb-3">
+
+            @if (Model != null && Model.IdContrato != 0 && Model.Multa != null && Model.FechaFin != null)
+            {
+              <div class="row">
+                <div class="col-6 mb-3">
+                  <label asp-for="FechaFin" class="form-label">Fecha Cancelación</label>
+                  <input asp-for="FechaFin" class="form-control" type="date"
+                    value="@(Model.FechaFin?.ToString("yyyy-MM-dd"))" readonly />
+                </div>
+                <div class="col-6 mb-3">
                   <label asp-for="Multa" class="form-label">Multa</label>
-                  <input asp-for="Multa" class="form-control" readonly/>
+                  <input asp-for="Multa" class="form-control" readonly />
+                </div>
               </div>
-          }
-
-
+            }
           </div>
 
-          <div class="d-flex justify-content-between col-10">
-            <!-- Botones condicionales -->
+          <div class="d-flex justify-content-between mt-3">
             @if (Model != null && Model.IdContrato == 0)
             {
               <button type="submit" class="btn btn-success">Crear</button>
@@ -92,21 +99,25 @@
             else if (Model != null && Model.IdContrato > 0 && Model.Estado == 1)
             {
               <button type="submit" class="btn btn-success">Cancelar Contrato</button>
-            } else if(Model != null && Model.IdContrato > 0 && Renovar == "Renovar"){
+            }
+            else if (Model != null && Model.IdContrato > 0 && Renovar == "Renovar")
+            {
               <button type="submit" class="btn btn-success">Renovar Contrato</button>
             }
             <a href="/Contrato/Listar" class="btn btn-secondary">Volver</a>
           </div>
         </div>
+
       </form>
     </div>
-
-    <!-- Columna derecha -->
-    <div class="col-6 d-flex flex-column justify-content-between p-5" style="min-height: 80vh;">
-      <!-- Formulario derecho superior -->
-      <form id="formInquilino" class="mx-auto mb-4 rounded bg-white shadow p-5">
+  </div>
+  <!-- COLUMNA Derecha -->
+  <div class="col-md-6 py-5 row justify-content-between">
+    <!-- Form superior -->
+    <div class="pe-5 pb-4 h-50">
+      <form id="formInquilino" class="shadow-lg rounded border bg-light h-100 p-5">
         <h2 class="text-center mb-3">Inquilino</h2>
-        <div class="row justify-content-center">
+        <div class="row">
           <div class="col-4 mb-3">
             <label for="dni" class="form-label">DNI</label>
             <input type="text" id="dni" name="dni" class="form-control" value="@Model.Inquilino?.Dni" readonly />
@@ -132,11 +143,12 @@
           </div>
         </div>
       </form>
-
-      <!-- Formulario derecho inferior -->
-      <form id="formInmueble" class="mx-auto rounded bg-white shadow p-5">
+    </div>
+    <!-- Form inferior -->
+    <div class="pe-5 pt-4 h-50 d-flex align-items-end">
+      <form id="formInmueble" class="shadow-lg rounded border bg-light h-100 p-5">
         <h2 class="text-center mb-3">Inmueble</h2>
-        <div class="row justify-content-center">
+        <div class="row">
           <div class="col-4 mb-3">
             <label for="idInmueble" class="form-label">Código</label>
             <input type="text" id="idInmueble" name="idInmueble" class="form-control"
@@ -215,7 +227,7 @@
         return;
       }
       if (data.estado == 0) {
-        console.warn("El inmueble no está disponible") 
+        console.warn("El inmueble no está disponible")
         return;
       }
 
