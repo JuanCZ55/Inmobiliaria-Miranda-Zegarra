@@ -10,7 +10,8 @@ namespace Inmobiliaria.Models
     protected RepositorioBase(IConfiguration configuration)
     {
       this.configuration = configuration;
-      connectionString = configuration["ConnectionStrings:DefaultConnection"];
+      connectionString = configuration["ConnectionStrings:DefaultConnection"]
+                        ?? throw new InvalidOperationException("La cadena de conexión no está configurada.");
     }
   }
 }
