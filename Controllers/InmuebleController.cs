@@ -216,7 +216,6 @@ namespace Inmobiliaria.Controllers
             );
             var tipos = repoTipo.TenerTodos();
             int totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina);
-            Console.WriteLine("Total paginas: " + inmuebles);
             ViewBag.PaginaActual = paginaActual;
             ViewBag.TotalPaginas = totalPaginas;
             ViewBag.Direccion = direccion;

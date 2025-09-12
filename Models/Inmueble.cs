@@ -64,6 +64,7 @@ namespace Inmobiliaria.Models
         [StringLength(255, ErrorMessage = "La descripcion no puede superar los 255 caracteres.")]
         public string? Descripcion { get; set; } = " -";
 
+        [Range(1, 3, ErrorMessage = "El estado debe ser 1, 2 o 3")]
         public int Estado { get; set; } = 1;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;

@@ -9,7 +9,7 @@
     <form asp-action="Modificar" method="post"
       class="row shadow-lg rounded border bg-light p-4 h-100 justify-content-evenly">
       <div class="col-md-12 d-flex justify-content-center align-items-center">
-        <h2 class="text-center">Modificar Inquilino</h2>
+        <h2 class="text-center">Modificar Inmueble</h2>
       </div>
       <input type="hidden" asp-for="IdInmueble" />
       <div class="row">
@@ -37,10 +37,6 @@
           <span asp-validation-for="IdTipoInmueble" class="text-danger"></span>
         </div>
 
-        @if (ViewBag.Error != null)
-        {
-          <div class="alert alert-danger">@ViewBag.Error</div>
-        }
 
         <div class="col-md-6 pb-2">
           <label asp-for="Uso" class="form-label"></label>
@@ -84,10 +80,27 @@
           <input asp-for="Descripcion" class="form-control" />
           <span asp-validation-for="Descripcion" class="text-danger"></span>
         </div>
+        @if (Model.Estado == 2)
+        {
+          <div class="alert alert-warning col-md-12" role="alert">
+            El inmueble está actualmente ocupado. No se puede cambiar su estado.
+          </div>
+        }
+        else
+        {
+          <div class="col-md-12 pb-2">
+            <label asp-for="Estado" class="form-label"></label>
+            <select asp-for="Estado" class="form-select">
+              <option value="">Seleccione un estado</option>
+              <option value="1">Disponible</option>
+              <option value="3">Suspendido</option>
+            </select>
+            <span asp-validation-for="Estado" class="text-danger"></span>
+          </div>
+        }
       </div>
 
-
-      <div class="aling-items-center justify-content-center d-flex">
+      <div class="align-items-center justify-content-center d-flex">
         <div class="d-flex justify-content-end align-items-center">
           <button type="submit" class="btn btn-success">Guardar Cambios</button>
         </div>

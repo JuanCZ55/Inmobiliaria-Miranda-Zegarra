@@ -44,7 +44,7 @@ namespace Inmobiliaria.Models
             using (var conn = new MySqlConnection(connectionString))
             {
                 var sql =
-                    @"UPDATE inmueble SET id_propietario=@IdPropietario, id_tipo_inmueble=@IdTipoInmueble, direccion=@Direccion, uso=@Uso, cantidad_ambientes=@CantidadAmbientes, longitud=@Longitud, latitud=@Latitud, precio=@Precio, descripcion=@Descripcion, updated_at=current_timestamp() WHERE id_inmueble=@IdInmueble";
+                    @"UPDATE inmueble SET id_propietario=@IdPropietario, id_tipo_inmueble=@IdTipoInmueble, direccion=@Direccion, uso=@Uso, cantidad_ambientes=@CantidadAmbientes, longitud=@Longitud, latitud=@Latitud, precio=@Precio, descripcion=@Descripcion,Estado=@Estado, updated_at=current_timestamp() WHERE id_inmueble=@IdInmueble";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@IdInmueble", Inmueble.IdInmueble);
@@ -57,6 +57,7 @@ namespace Inmobiliaria.Models
                     cmd.Parameters.AddWithValue("@Latitud", Inmueble.Latitud);
                     cmd.Parameters.AddWithValue("@Precio", Inmueble.Precio);
                     cmd.Parameters.AddWithValue("@Descripcion", Inmueble.Descripcion);
+                    cmd.Parameters.AddWithValue("@Estado", Inmueble.Estado);
                     conn.Open();
                     res = cmd.ExecuteNonQuery();
                     conn.Close();
