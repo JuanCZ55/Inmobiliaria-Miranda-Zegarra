@@ -4,113 +4,273 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>@ViewData["Title"] - Inmobiliaria</title>
+  <title>@ViewData["Title"]</title>
   <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
   <link rel="stylesheet" href="~/Inmobiliaria.styles.css" asp-append-version="true" />
-  </head>
+  <style>
 
-<body>
-  <header>
-    <nav class="navbar navbar-expand-lg border-bottom box-shadow mb-3 big-navba">
-      <div class="container d-flex justify-content-between align-items-center">
-        <a class="navbar-brand rounded" asp-controller="Home" asp-action="Index">
-          <img src="https://juancz55.github.io/Imagenes/logoInmo.png" alt="logo" width="120" />
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div id="navbarNav" class="collapse navbar-collapse">
-          <ul class="nav nav-underline fs-4 ms-auto">
-            <li class="nav-item">
-              <a class="nav-link text-primary-emphasis" asp-controller="Home" asp-action="Index">Inicio</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-primary-emphasis" role="button" data-bs-toggle="dropdown">
-                Propietarios
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" asp-controller="Propietario" asp-action="Crear">Crear</a></li>
-                <li><a class="dropdown-item" asp-controller="Propietario" asp-action="Listar">Lista Gestion</a></li>
+  </style>
 
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-primary-emphasis" role="button" data-bs-toggle="dropdown">
-                Inquilinos
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" asp-controller="Inquilino" asp-action="Crear">Crear</a></li>
-                <li><a class="dropdown-item" asp-controller="Inquilino" asp-action="Listar">Lista Gestion</a></li>
+</head>
 
+<body class="h-100">
+  <div class="d-flex">
+    <nav id="sidebar" class="d-flex flex-column p-2">
+      <button class="btn btn-sm btn-secondary mb-3" id="toggleSidebar">
+        <i class="bi bi-list"></i>
+      </button>
+
+      <button class="btn btn-sm btn-light mb-2 d-md-none ms-auto" id="mobileClose" aria-label="Cerrar menú">
+        <i class="bi bi-x-lg"> X </i>
+      </button>
+      <div class="sidebar-content">
+        <ul class="nav nav-pills flex-column pt-5">
+          <li class="nav-item mb-1">
+            <a class="nav-link d-flex align-items-center" href="/">Inicio</a>
+          </li>
+
+          <li class="nav-item mb-1">
+            <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse"
+              href="#propietarioMenu">Propietarios</a>
+            <div class="collapse" id="propietarioMenu">
+              <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+                <li><a class="nav-link color-gris py-1" asp-controller="Propietario" asp-action="Crear">Crear</a>
+                </li>
+                <li><a class="nav-link color-gris py-1" asp-controller="Propietario" asp-action="Listar">Lista
+                    Gestion</a></li>
               </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-primary-emphasis" role="button" data-bs-toggle="dropdown">
-                Inmuebles
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" asp-controller="Inmueble" asp-action="Crear">Crear</a></li>
-                <li><a class="dropdown-item" asp-controller="Inmueble" asp-action="Listar">Lista Gestion</a></li>
+            </div>
+          </li>
+
+          <li class="nav-item mb-1">
+            <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#inquilinoMenu">Inquilinos</a>
+            <div class="collapse" id="inquilinoMenu">
+              <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+                <li><a class="nav-link color-gris py-1" asp-controller="Inquilino" asp-action="Crear">Crear</a></li>
+                <li><a class="nav-link color-gris py-1" asp-controller="Inquilino" asp-action="Listar">Lista
+                    Gestion</a></li>
               </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-primary-emphasis" role="button" data-bs-toggle="dropdown">
-                Tipos de Inmueble
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" asp-controller="TipoInmueble" asp-action="Crear">Crear</a></li>
-                <li><a class="dropdown-item" asp-controller="TipoInmueble" asp-action="Listar">Lista Gestion</a></li>
+            </div>
+          </li>
+
+          <li class="nav-item mb-1">
+            <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#inmuebleMenu">Inmuebles</a>
+            <div class="collapse" id="inmuebleMenu">
+              <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+                <li><a class="nav-link color-gris py-1" asp-controller="Inmueble" asp-action="Crear">Crear</a></li>
+                <li><a class="nav-link color-gris py-1" asp-controller="Inmueble" asp-action="Listar">Lista
+                    Gestion</a></li>
               </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-primary-emphasis" role="button" data-bs-toggle="dropdown">
-                Contrato
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" asp-controller="Contrato" asp-action="Crear">Crear</a></li>
-                <li><a class="dropdown-item" asp-controller="Contrato" asp-action="Listar">Lista Gestion</a></li>
+            </div>
+          </li>
+
+          <li class="nav-item mb-1">
+            <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#tipoMenu">Tipos de
+              Inmueble</a>
+            <div class="collapse" id="tipoMenu">
+              <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+                <li><a class="nav-link color-gris py-1" asp-controller="TipoInmueble" asp-action="Crear">Crear</a>
+                </li>
+                <li><a class="nav-link color-gris py-1" asp-controller="TipoInmueble" asp-action="Listar">Lista
+                    Gestion</a></li>
               </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-primary-emphasis" role="button" data-bs-toggle="dropdown">
-                Pago
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" asp-controller="Pago" asp-action="Crear">Crear</a></li>
-                <li><a class="dropdown-item" asp-controller="Pago" asp-action="Listar">Lista Gestion</a></li>
+            </div>
+          </li>
+
+          <li class="nav-item mb-1">
+            <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#contratoMenu">Contrato</a>
+            <div class="collapse" id="contratoMenu">
+              <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+                <li><a class="nav-link color-gris py-1" asp-controller="Contrato" asp-action="Crear">Crear</a></li>
+                <li><a class="nav-link color-gris py-1" asp-controller="Contrato" asp-action="Listar">Lista
+                    Gestion</a></li>
               </ul>
-            </li>
-          </ul>
-        </div>
+            </div>
+          </li>
+
+          <li class="nav-item mb-1">
+            <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#pagoMenu">Pago</a>
+            <div class="collapse" id="pagoMenu">
+              <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+                <li><a class="nav-link color-gris py-1" asp-controller="Pago" asp-action="Crear">Crear</a></li>
+                <li><a class="nav-link color-gris py-1" asp-controller="Pago" asp-action="Listar">Lista Gestion</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+
+        </ul>
       </div>
-    </nav>
-  </header>
-  <div class="container mt-4">
-    <main role="main " class="row justify-content-center">
-      @if (TempData["Error"] != null)
-      {
-        <div class="alert alert-danger w-75">@TempData["Error"]</div>
-      }
-      @if (TempData["Warning"] != null)
-      {
-        <div class="alert alert-warning w-75">@TempData["Warning"]</div>
-      }
-      @if (TempData["Success"] != null)
-      {
-        <div class="alert alert-success w-75">@TempData["Success"]</div>
-      }
-      @RenderBody()
-    </main>
-  </div>
 
+    </nav>
+
+    <div class="flex-grow-1">
+      <header class="d-flex justify-content-between align-items-center shadow-sm py-3 m-0 border-bottom">
+        <div class="d-flex align-items-center">
+          <button class="btn btn-outline-light d-md-none me-2" id="mobileToggle">
+            <i class="bi bi-list"></i>
+          </button>
+          <h4 class="mb-0 fw-bold color-gris">@ViewData["SubTitle"]</h4>
+        </div>
+
+        <div class="d-flex align-items-center">
+          <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="~/images/user.png" alt="Usuario" width="32" height="32" class="rounded-circle me-2">
+              <span class="fw-semibold color-gris">Usuario</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+              <li><a class="dropdown-item" href="#">Perfil</a></li>
+              <li><a class="dropdown-item" href="#">Configuración</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="#">Cerrar sesión</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+
+      <main role="main " class="container-fluid p-4 bg-light">
+        @RenderBody()
+      </main>
+
+    </div>
+  </div>
   <script src="~/lib/jquery/dist/jquery.min.js"></script>
   <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="~/js/site.js" asp-append-version="true"></script>
   @await RenderSectionAsync("Scripts", required: false)
   <partial name="_ValidationScriptsPartial" />
-  <script></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el))
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.getElementById('toggleSidebar');
+      const mobileToggle = document.getElementById('mobileToggle');
+      const mobileClose = document.getElementById('mobileClose');
+      const content = document.querySelector('.flex-grow-1');
+      const sidebarContent = sidebar.querySelector('.sidebar-content');
+
+      let backdrop = document.querySelector('.sidebar-backdrop');
+      function ensureBackdrop() {
+        if (!backdrop) {
+          backdrop = document.createElement('div');
+          backdrop.className = 'sidebar-backdrop';
+          document.body.appendChild(backdrop);
+        }
+      }
+
+      function openMobileSidebar() {
+        sidebar.classList.remove('collapsed');
+
+        ensureBackdrop();
+        sidebar.classList.add('show');
+        sidebar.style.left = '0';
+        backdrop.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+        sidebarContent.classList.remove('d-none');
+      }
+
+      function closeMobileSidebar() {
+        if (!sidebar.classList.contains('show')) return;
+        sidebar.classList.remove('show');
+        if (backdrop) backdrop.classList.remove('visible');
+        document.body.style.overflow = '';
+        sidebar.style.left = '';
+        if (backdrop && !backdrop.classList.contains('visible')) {
+        }
+      }
+
+      document.querySelectorAll('#sidebar .nav-link').forEach(a => {
+        if (a.querySelector('span')) return;
+        const textParts = Array.from(a.childNodes)
+          .filter(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim().length)
+          .map(n => n.textContent.trim());
+        if (textParts.length) {
+          Array.from(a.childNodes)
+            .filter(n => n.nodeType === Node.TEXT_NODE)
+            .forEach(n => n.remove());
+          const span = document.createElement('span');
+          span.textContent = textParts.join(' ');
+          a.appendChild(span);
+        }
+      });
+
+      if (sidebar.classList.contains('collapsed')) {
+        sidebarContent.classList.add('d-none');
+        content.style.marginLeft = '70px';
+      } else {
+        content.style.marginLeft = '220px';
+      }
+
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('collapsed');
+          const isCollapsed = sidebar.classList.contains('collapsed');
+          content.style.marginLeft = isCollapsed ? '70px' : '220px';
+          if (isCollapsed) sidebarContent.classList.add('d-none');
+          else sidebarContent.classList.remove('d-none');
+        });
+      }
+
+      if (mobileToggle) {
+        mobileToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (sidebar.classList.contains('show')) closeMobileSidebar();
+          else openMobileSidebar();
+        });
+      }
+
+      if (mobileClose) {
+        mobileClose.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeMobileSidebar();
+        });
+      }
+
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768 && sidebar.classList.contains('show')) {
+          const clickedInside = sidebar.contains(e.target);
+          const clickedToggle = mobileToggle && mobileToggle.contains(e.target);
+          if (!clickedInside && !clickedToggle) closeMobileSidebar();
+        }
+      }, true);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeMobileSidebar();
+      });
+
+      document.body.addEventListener('click', (e) => {
+        if (backdrop && (e.target === backdrop || backdrop.contains(e.target))) {
+          closeMobileSidebar();
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove('collapsed');
+          content.style.marginLeft = '0';
+        } else {
+          closeMobileSidebar();
+          sidebar.style.left = '';
+          if (sidebar.classList.contains('collapsed')) {
+            sidebarContent.classList.add('d-none');
+            content.style.marginLeft = '70px';
+          } else {
+            sidebarContent.classList.remove('d-none');
+            content.style.marginLeft = '220px';
+          }
+          if (backdrop) backdrop.classList.remove('visible');
+        }
+      });
+    });
+  </script>
+
 </body>
 
 </html>
