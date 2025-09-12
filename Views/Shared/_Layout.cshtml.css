@@ -17,7 +17,8 @@ a {
   border-color: #1861ac;
 }
 
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
   color: #fff;
   background-color: #1b6ec2;
   border-color: #1861ac;
@@ -26,6 +27,7 @@ a {
 .border-top {
   border-top: 1px solid #e5e5e5;
 }
+
 .border-bottom {
   border-bottom: 1px solid #e5e5e5;
 }
@@ -37,4 +39,75 @@ a {
 button.accept-policy {
   font-size: 1rem;
   line-height: inherit;
+}
+
+@media (max-width: 767.98px) {
+  #toggleSidebar {
+    display: none !important;
+  }
+
+  #sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100vh !important;
+    transition: left .28s ease !important;
+    z-index: 9999 !important;
+    /* por encima de todo */
+  }
+
+  #sidebar.show {
+    left: 0 !important;
+  }
+
+  #sidebar.collapsed {
+    left: -100% !important;
+    width: 100% !important;
+    height: 100vh !important;
+  }
+
+  #sidebar .sidebar-content {
+    display: block;
+  }
+
+  #sidebar:not(.show) .sidebar-content {
+    display: none !important;
+  }
+
+  .sidebar-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+    z-index: 9995 !important;
+    opacity: 0;
+    transition: opacity .22s ease;
+    pointer-events: none;
+  }
+
+  .sidebar-backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .flex-grow-1 {
+    margin-left: 0 !important;
+  }
+
+  header {
+    position: relative;
+    z-index: 9990 !important;
+  }
+}
+
+#mobileClose {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+@media (max-width: 767.98px) {
+  #toggleSidebar { display: none !important; }
+
+  #mobileClose { display: inline-flex !important; }
 }
