@@ -2,72 +2,97 @@
 
 @{
   ViewData["Title"] = "Listado de Propietarios";
+  ViewData["SubTitle"] = "Propietario";
   Layout = "~/Views/Shared/_Layout.cshtml";
   var paginaActual = ViewBag.PaginaActual ?? 1;
   var totalPaginas = ViewBag.TotalPaginas ?? 1;
   var dniFiltro = ViewBag.Dni ?? "";
 }
 
-<h2>Listado de Propietarios <a class="btn btn-primary" asp-controller="Propietario" asp-action="Crear">+</a></h2>
+<div class="d-flex align-items-center mb-3">
+  <h2 class="text-center py-4">@ViewData["Title"]</h2>
 
-<div class="container px-0 p-3">
-  <form method="get" asp-action="Listar" class="d-flex mb-3">
-    <div class="zeg-field" style="max-width: 300px;">
-      <input type="text" id="Dni" name="Dni" value="@dniFiltro" class="zeg-input" placeholder=" " />
-      <label for="Dni">Filtrar por DNI</label>
+  <a class="btn btn-primary ms-3" asp-action="Crear">
+    <img class="invert-color-icon" src="~/images/icon/Agregar.png" alt="">
+  </a>
+</div>
+
+
+<div class="d-flex flex-column pt-4">
+  <form method="get" asp-action="Listar" class="row g-2 bg-white shadow-sm rounded p-3">
+    <div class="row">
+      <div class="col-md-12 d-flex justify-content-start align-items-center pb-2">
+        <h4 class="ps-2 pe-3 m-0 fw-bold">Filtrar</h4>
+      </div>
+      <div class="col-md-2">
+        <div class="zeg-field" style="max-width: 300px;">
+          <input type="text" id="Dni" name="Dni" value="@dniFiltro" class="zeg-input" placeholder=" " />
+          <label for="Dni">Filtrar por DNI</label>
+        </div>
+      </div>
+      <div class="col-md-2 d-flex justify-content-start align-items-center pb-3">
+        <button type="submit" class="btn btn-outline-primary fw-bold me-4">Filtrar</button>
+      </div>
     </div>
-    <button type="submit" class="btn btn-primary ms-2 botone">Buscar</button>
   </form>
 </div>
 
-<table class="table table-hover text-center table-light">
-  <thead class="table-dark">
-    <tr>
-      <th>Id</th>
-      <th>Dni</th>
-      <th>Nombre</th>
-      <th>Apellido</th>
-      <th>Telefono</th>
-      <th>Email</th>
-      <th>Direccion</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody class="text-center">
-    @if (Model != null && Model.Any())
-    {
-      foreach (var p in Model)
+<div class="table-responsive shadow-sm rounded mt-4">
+  <table class="table table-hover table-striped align-middle mb-0">
+    <thead class="bg-primary text-white text-center">
+      <tr>
+        <th>Id</th>
+        <th>Dni</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Telefono</th>
+        <th>Email</th>
+        <th>Direccion</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      @if (Model != null && Model.Any())
+      {
+        foreach (var p in Model)
+        {
+          <tr>
+            <td>@p.IdPropietario</td>
+            <td>@p.Dni</td>
+            <td>@p.Nombre</td>
+            <td>@p.Apellido</td>
+            <td>@p.Telefono</td>
+            <td>@p.Email</td>
+            <td>@p.Direccion</td>
+            <td class="d-flex justify-content-center">
+              <a href="/Inmueble/Listar?dni=@p.Dni" class="btn btn-link" data-bs-toggle="tooltip" title="Ver Inmueble">
+                <img src="~/images/icon/Inmueble.png" alt="Inmuebles">
+              </a>
+              <a asp-action="Modificar" asp-route-id="@p.IdPropietario" class="btn btn-link" data-bs-toggle="tooltip" title="Modificar Propietario">
+                <img src="~/images/icon/Editar.png" alt="Editar">
+              </a>
+              <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-link" data-bs-toggle="tooltip" title="Eliminar Propietario">
+                  <img src="~/images/icon/Eliminar.png" alt="Eliminar" />
+                </button>
+              </form>
+            </td>
+          </tr>
+        }
+      }
+      else
       {
         <tr>
-          <td>@p.IdPropietario</td>
-          <td>@p.Dni</td>
-          <td>@p.Nombre</td>
-          <td>@p.Apellido</td>
-          <td>@p.Telefono</td>
-          <td>@p.Email</td>
-          <td>@p.Direccion</td>
-          <td class="d-flex justify-content-evenly">
-            <a asp-action="Modificar" asp-route-id="@p.IdPropietario" class="btn btn-warning btn-sm">Modificar</a>
-            <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" style="display:inline;">
-              <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-            </form>
-          </td>
+          <td colspan="8">No se encontraron propietarios.</td>
         </tr>
       }
-    }
-    else
-    {
-      <tr>
-        <td colspan="8">No se encontraron propietarios.</td>
-      </tr>
-    }
-  </tbody>
-</table>
-
+    </tbody>
+  </table>
+</div>
 @if (totalPaginas > 1)
 {
-  <nav>
-    <ul class="pagination">
+  <nav aria-label="Paginación" class="mt-3">
+    <ul class="pagination justify-content-center">
       @for (int i = 1; i <= totalPaginas; i++)
       {
         <li class="page-item @(i == paginaActual ? "active" : "")">

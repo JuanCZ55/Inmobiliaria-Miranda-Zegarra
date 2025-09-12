@@ -1,52 +1,65 @@
 @model Inmobiliaria.Models.Propietario
 @{
   ViewData["Title"] = "Modificar Propietario";
+  ViewData["SubTitle"] = "Propietario";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<h2>Modificar Propietario</h2>
 
-<form asp-action="Modificar" method="post">
-  <input type="hidden" asp-for="IdPropietario" />
+<div class="px-3 py-1 row justify-content-center h-100">
+  <div class="col-md-8 p-3">
+    <form asp-action="Modificar" method="post"
+      class="row shadow-lg rounded border bg-light p-4 h-100 justify-content-evenly">
+      <input type="hidden" asp-for="IdPropietario" />
+      <div class="col-md-12 d-flex justify-content-center align-items-center">
+        <h2 class="text-center">Modificar Propietario</h2>
+      </div>
+      <div class="row">
 
-  <div class="mb-3">
-    <label asp-for="Dni" class="form-label"></label>
-    <input asp-for="Dni" class="form-control" />
-    <span asp-validation-for="Dni" class="text-danger"></span>
+        <div class="mb-3">
+          <label asp-for="Dni" class="form-label"></label>
+          <input asp-for="Dni" class="form-control" />
+          <span asp-validation-for="Dni" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+          <label asp-for="Nombre" class="form-label"></label>
+          <input asp-for="Nombre" class="form-control" />
+          <span asp-validation-for="Nombre" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+          <label asp-for="Apellido" class="form-label"></label>
+          <input asp-for="Apellido" class="form-control" />
+          <span asp-validation-for="Apellido" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+          <label asp-for="Telefono" class="form-label"></label>
+          <input asp-for="Telefono" class="form-control" />
+          <span asp-validation-for="Telefono" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+          <label asp-for="Email" class="form-label"></label>
+          <input asp-for="Email" class="form-control" />
+          <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+          <label asp-for="Direccion" class="form-label"></label>
+          <input asp-for="Direccion" class="form-control" />
+          <span asp-validation-for="Direccion" class="text-danger"></span>
+        </div>
+      </div>
+
+      <div class="aling-items-center justify-content-center d-flex">
+        <div class="d-flex justify-content-end align-items-center">
+          <button type="submit" class="btn btn-success">Guardar Cambios</button>
+        </div>
+      </div>
+    </form>
   </div>
-
-  <div class="mb-3">
-    <label asp-for="Nombre" class="form-label"></label>
-    <input asp-for="Nombre" class="form-control" />
-    <span asp-validation-for="Nombre" class="text-danger"></span>
-  </div>
-
-  <div class="mb-3">
-    <label asp-for="Apellido" class="form-label"></label>
-    <input asp-for="Apellido" class="form-control" />
-    <span asp-validation-for="Apellido" class="text-danger"></span>
-  </div>
-
-  <div class="mb-3">
-    <label asp-for="Telefono" class="form-label"></label>
-    <input asp-for="Telefono" class="form-control" />
-    <span asp-validation-for="Telefono" class="text-danger"></span>
-  </div>
-
-  <div class="mb-3">
-    <label asp-for="Email" class="form-label"></label>
-    <input asp-for="Email" class="form-control" />
-    <span asp-validation-for="Email" class="text-danger"></span>
-  </div>
-
-  <div class="mb-3">
-    <label asp-for="Direccion" class="form-label"></label>
-    <input asp-for="Direccion" class="form-control" />
-    <span asp-validation-for="Direccion" class="text-danger"></span>
-  </div>
-
-  <button type="submit" class="btn btn-success">Guardar Cambios</button>
-</form>
-
+</div>
 @section Scripts {
   @{
     await Html.RenderPartialAsync("_ValidationScriptsPartial");
