@@ -12,6 +12,9 @@
 .acciones {
   width: 240px;
 }
+.invert-color-icon {
+  filter: invert(1);
+}
 
 .zeg-field {
   width: 90%;
@@ -95,6 +98,185 @@
   top: -0.5em;
   font-size: 0.75rem;
 }
+.zeg-field .zeg-input-date {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: #ffffff;
+  border: 2px solid #aaa8a8;
+  border-radius: 0.5em;
+  outline: none;
+  color: #000000;
+  padding-left: 1em;
+  font-size: 1rem;
+  box-sizing: border-box;
+  appearance: none;
+  transition: border 0.2s, box-shadow 0.15s;
+}
+
+.zeg-field .zeg-input-date:hover {
+  border: 2px solid #bbb;
+}
+
+.zeg-field .zeg-input-date.active {
+  border: 2px solid #00ffff;
+  box-shadow: 0 0 6px rgba(0, 255, 255, 0.08);
+}
+
+.zeg-field input.zeg-input-date:focus ~ label,
+.zeg-field input.zeg-input-date.active ~ label {
+  top: -0.5em;
+  font-size: 0.75rem;
+}
+
 .table .btn {
   margin-left: 0.25rem;
 }
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 220px;
+      color: #fff;
+      transition: width 0.25s ease;
+      background-image: url('/images/Siderbar.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1000;
+    }
+
+    #sidebar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(16, 31, 71, 0.534);
+      z-index: 0;
+      pointer-events: none;
+      backdrop-filter: blur(1px) saturate(60%);
+    }
+
+
+    #sidebar .sidebar-content {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 1rem;
+    }
+
+    #sidebar .nav-link {
+      position: relative;
+      z-index: 1;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.75rem;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    #sidebar .nav-link i {
+      flex: 0 0 30px;
+      width: 30px;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+
+    #sidebar .nav-link span {
+      display: inline-block;
+      vertical-align: middle;
+      max-width: 100%;
+      transition: opacity .2s, max-width .2s, margin .2s;
+    }
+
+    #sidebar.collapsed {
+      width: 70px;
+    }
+
+    #sidebar.collapsed .nav-link {
+      justify-content: center;
+      padding-left: 0.3rem;
+      padding-right: 0.3rem;
+    }
+
+    #sidebar.collapsed .nav-link span {
+      opacity: 0;
+      max-width: 0;
+      width: 0;
+      margin: 0;
+      padding: 0;
+      display: inline-block;
+    }
+
+    #sidebar.collapsed .collapse {
+      display: none !important;
+    }
+
+
+    .flex-grow-1 {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: margin-left .25s ease;
+      margin-left: 220px;
+    }
+
+    .flex-grow-1>main {
+      flex: 1;
+      overflow-y: auto;
+      background: linear-gradient(to right, #e9ecef, #dee2e6);
+    }
+
+    header {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #dee2e6;
+      z-index: 1;
+      background: rgba(13, 24, 54, 0.877);
+
+    }
+
+    .flex-grow-1 {
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(to right, #b8b8b8, #dee2e6);
+      color: #343a40;
+    }
+
+    #sidebar.collapsed~.flex-grow-1 {
+      margin-left: 70px;
+    }
+
+    .color-gris {
+      color: #afafaf !important;
+    }
+
+    .nav-link {
+      border-left-width: 3px;
+      border-right-width: 3px;
+      border-color: transparent;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .nav-link:hover {
+      border-color: #0d1853;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-link.active {
+      border-color: #0d1853;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
