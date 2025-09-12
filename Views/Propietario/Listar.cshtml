@@ -9,7 +9,7 @@
   var dniFiltro = ViewBag.Dni ?? "";
 }
 
-<div class="d-flex align-items-center mb-3">
+<div class="d-flex align-items-center ">
   <h2 class="text-center py-4">@ViewData["Title"]</h2>
 
   <a class="btn btn-primary ms-3" asp-action="Crear">
@@ -18,7 +18,7 @@
 </div>
 
 
-<div class="d-flex flex-column pt-4">
+<div class="d-flex flex-column ">
   <form method="get" asp-action="Listar" class="row g-2 bg-white shadow-sm rounded p-3">
     <div class="row">
       <div class="col-md-12 d-flex justify-content-start align-items-center pb-2">
@@ -68,7 +68,8 @@
               <a href="/Inmueble/Listar?dni=@p.Dni" class="btn btn-link" data-bs-toggle="tooltip" title="Ver Inmueble">
                 <img src="~/images/icon/Inmueble.png" alt="Inmuebles">
               </a>
-              <a asp-action="Modificar" asp-route-id="@p.IdPropietario" class="btn btn-link" data-bs-toggle="tooltip" title="Modificar Propietario">
+              <a asp-action="Modificar" asp-route-id="@p.IdPropietario" class="btn btn-link" data-bs-toggle="tooltip"
+                title="Modificar Propietario">
                 <img src="~/images/icon/Editar.png" alt="Editar">
               </a>
               <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" style="display:inline;">

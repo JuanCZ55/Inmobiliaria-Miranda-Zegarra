@@ -17,14 +17,14 @@
   var estadoFiltro = ViewBag.Estado ?? 0;
 }
 
-<div class="d-flex align-items-center mb-3">
+<div class="d-flex align-items-center ">
   <h2 class="text-center py-4">@ViewData["Title"]</h2>
 
   <a class="btn btn-primary ms-3" asp-action="Crear">
     <img class="invert-color-icon" src="~/images/icon/Agregar.png" alt="">
   </a>
 </div>
-<div class="d-flex flex-column pt-4">
+<div class="d-flex flex-column ">
   <form method="get" asp-action="Listar" class="row g-2 bg-white shadow-sm rounded p-3">
     <div class="row">
       <div class="col-md-12 d-flex justify-content-start align-items-center pb-2">
@@ -183,10 +183,12 @@
               @(i.Estado == 1 ? "Disponible" : i.Estado == 2 ? "Ocupado" : i.Estado == 3 ? "Suspendido" : "Desconocido")
             </td>
             <td class="d-flex justify-content-center">
-              <a asp-controller="Contrato" asp-action="Crear" asp-route-idInmueble="@i.IdInmueble" class="btn btn-link" data-bs-toggle="tooltip" title="Hacer Contrato">
+              <a asp-controller="Contrato" asp-action="Crear" asp-route-idInmueble="@i.IdInmueble" class="btn btn-link"
+                data-bs-toggle="tooltip" title="Hacer Contrato">
                 <img src="~/images/icon/Contrato.png" alt="Contrato">
               </a>
-              <a asp-action="Modificar" asp-route-id="@i.IdInmueble" class="btn btn-link" data-bs-toggle="tooltip" title="Modificar Inmueble">
+              <a asp-action="Modificar" asp-route-id="@i.IdInmueble" class="btn btn-link" data-bs-toggle="tooltip"
+                title="Modificar Inmueble">
                 <img src="~/images/icon/Editar.png" alt="Editar">
               </a>
               <form asp-action="Eliminar" asp-route-id="@i.IdInmueble" method="post">
