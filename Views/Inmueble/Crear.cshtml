@@ -1,90 +1,108 @@
 @model Inmobiliaria.Models.Inmueble
 @{
   ViewData["Title"] = "Crear Inmueble";
+  ViewData["SubTitle"] = "Inmuebles";
   Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
 
-<div class="col-7">
-  <form asp-action="Crear" method="post">
-    <div class="col-12">
-      <h2 class="text-center">Crear Inmueble</h2>
-    </div>
+<div class="px-3 py-1 row justify-content-center h-100">
+  <div class="col-md-8 p-3">
 
-    <div class="mb-3">
-      <label asp-for="Direccion" class="form-label"></label>
-      <input asp-for="Direccion" class="form-control" />
-      <span asp-validation-for="Direccion" class="text-danger"></span>
-    </div>
+    <form asp-action="Crear" method="post" class="row shadow-lg rounded border bg-light p-4 h-100 justify-content-evenly">
+      <div class="col-md-12 d-flex justify-content-center align-items-center">
+        <h2 class="text-center">Crear Inmueble</h2>
+      </div>
+      <div class="row">
+        <div class="col-md-12 pb-2">
+          <label asp-for="IdPropietario" class="form-label">Propietario</label>
+          <select asp-for="IdPropietario" class="form-select"
+            asp-items="@(ViewBag.Propietarios != null ? new SelectList(ViewBag.Propietarios, "IdPropietario", "NombreCompleto") : new SelectList(new List<string>()))">
+            <option value="">Seleccione un propietario...</option>
+          </select>
+          <span asp-validation-for="IdPropietario" class="text-danger"></span>
+        </div>
 
-    <div class="mb-3">
-      <label asp-for="IdPropietario" class="form-label">Propietario</label>
-      <select asp-for="IdPropietario" class="form-select"
-        asp-items="@(ViewBag.Propietarios != null ? new SelectList(ViewBag.Propietarios, "IdPropietario", "NombreCompleto") : new SelectList(new List<string>()))">
-        <option value="">Seleccione un propietario...</option>
-      </select>
-      <span asp-validation-for="IdPropietario" class="text-danger"></span>
-    </div>
+        <div class="col-md-12 pb-2">
+          <label asp-for="Direccion" class="form-label"></label>
+          <input asp-for="Direccion" class="form-control" />
+          <span asp-validation-for="Direccion" class="text-danger"></span>
+        </div>
 
-    <div class="mb-3">
-      <label asp-for="IdTipoInmueble" class="form-label">Tipo de Inmueble</label>
-      <select asp-for="IdTipoInmueble" class="form-select"
-        asp-items="@(ViewBag.Tipos != null ? new SelectList(ViewBag.Tipos, "IdTipoInmueble", "Nombre") : new SelectList(new List<string>()))">
-        <option value="">Seleccione un tipo...</option>
-      </select>
-      <span asp-validation-for="IdTipoInmueble" class="text-danger"></span>
-    </div>
-    @if (ViewBag.Error != null)
-    {
-      <div class="alert alert-danger">@ViewBag.Error</div>
-    }
 
-    <div class="mb-3">
-      <label asp-for="Uso" class="form-label"></label>
-      <select asp-for="Uso" class="form-select">
-        <option value="">Seleccione un uso...</option>
-        <option value="1">Residencial</option>
-        <option value="2">Comercial</option>
-      </select>
-      <span asp-validation-for="Uso" class="text-danger"></span>
-    </div>
 
-    <div class="mb-3">
-      <label asp-for="CantidadAmbientes" class="form-label"></label>
-      <select asp-for="CantidadAmbientes" class="form-select" asp-items="@(new SelectList(Enumerable.Range(1, 20)))">
-        <option value="a">Seleccione una cantidad...</option>
-      </select>
-      <span asp-validation-for="CantidadAmbientes" class="text-danger"></span>
-    </div>
+        <div class="col-md-6 pb-2">
+          <label asp-for="IdTipoInmueble" class="form-label">Tipo de Inmueble</label>
+          <select asp-for="IdTipoInmueble" class="form-select"
+            asp-items="@(ViewBag.Tipos != null ? new SelectList(ViewBag.Tipos, "IdTipoInmueble", "Nombre") : new SelectList(new List<string>()))">
+            <option value="">Seleccione un tipo...</option>
+          </select>
+          <span asp-validation-for="IdTipoInmueble" class="text-danger"></span>
+        </div>
+        @if (ViewBag.Error != null)
+        {
+          <div class="alert alert-danger">@ViewBag.Error</div>
+        }
 
-    <div class="mb-3">
-      <label asp-for="Longitud" class="form-label"></label>
-      <input asp-for="Longitud" class="form-control" />
-      <span asp-validation-for="Longitud" class="text-danger"></span>
-    </div>
+        <div class="col-md-6 pb-2">
+          <label asp-for="Uso" class="form-label"></label>
+          <select asp-for="Uso" class="form-select">
+            <option value="">Seleccione un uso...</option>
+            <option value="1">Residencial</option>
+            <option value="2">Comercial</option>
+          </select>
+          <span asp-validation-for="Uso" class="text-danger"></span>
+        </div>
 
-    <div class="mb-3">
-      <label asp-for="Latitud" class="form-label"></label>
-      <input asp-for="Latitud" class="form-control" />
-      <span asp-validation-for="Latitud" class="text-danger"></span>
-    </div>
+        <div class="col-md-6 pb-2">
+          <label asp-for="CantidadAmbientes" class="form-label"></label>
+          <select asp-for="CantidadAmbientes" class="form-select"
+            asp-items="@(new SelectList(Enumerable.Range(1, 20)))">
+            <option value="a">Seleccione una cantidad...</option>
+          </select>
+          <span asp-validation-for="CantidadAmbientes" class="text-danger"></span>
+        </div>
 
-    <div class="mb-3">
-      <label asp-for="Precio" class="form-label"></label>
-      <input asp-for="Precio" class="form-control" />
-      <span asp-validation-for="Precio" class="text-danger"></span>
-    </div>
+        <div class="col-md-6 pb-2">
+          <label asp-for="Longitud" class="form-label"></label>
+          <input asp-for="Longitud" class="form-control" />
+          <span asp-validation-for="Longitud" class="text-danger"></span>
+        </div>
 
-    <div class="mb-3">
-      <label asp-for="Descripcion" class="form-label"></label>
-      <input asp-for="Descripcion" class="form-control" />
-      <span asp-validation-for="Descripcion" class="text-danger"></span>
-    </div>
+        <div class="col-md-6 pb-2">
+          <label asp-for="Latitud" class="form-label"></label>
+          <input asp-for="Latitud" class="form-control" />
+          <span asp-validation-for="Latitud" class="text-danger"></span>
+        </div>
 
-    <div class="d-flex justify-content-center col-12">
-      <button type="submit" class="btn btn-success">Crear Inmueble</button>
-    </div>
-  </form>
+        <div class="col-md-6 pb-2">
+          <label asp-for="Precio" class="form-label"></label>
+          <input asp-for="Precio" class="form-control" />
+          <span asp-validation-for="Precio" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-12 pb-2">
+          <label asp-for="Descripcion" class="form-label" type="text-area"></label>
+          <input asp-for="Descripcion" class="form-control"/>
+          <span asp-validation-for="Descripcion" class="text-danger"></span>
+        </div>
+      </div>
+
+      <div class="aling-items-center justify-content-center d-flex">
+        <div class="d-flex justify-content-end align-items-center">
+          <button type="submit" class="btn btn-success">Crear Inmueble</button>
+        </div>
+      </div>
+
+
+    </form>
+
+
+  </div>
 </div>
+
+
+
 
 @section Scripts {
   @await Html.PartialAsync("_ValidationScriptsPartial")
