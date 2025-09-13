@@ -11,13 +11,13 @@
   <div class="col-md-6 py-5 d-flex justify-content-center">
     <!-- esto da el color -->
     <div class="col-md-10 shadow-lg rounded border bg-light p-5 h-100">
-      <form asp-action="@((Model.IdContrato == 0 || Renovar == "Renovar") ? "Crear" : "Cancelar")" method="post"
+      <form asp-action="@((Model.IdContrato == 0 || Renovar == "Renovar") ? "CrearContrato" : "Cancelar")" method="post"
         class="h-100 d-flex flex-column justify-content-center">
         <div class="h-100 px-5 d-flex flex-column justify-content-between">
           <div>
             <h2 class="text-center mb-4">Contrato</h2>
 
-            @if (Model != null && Model.Inquilino != null)
+            @if (Model != null && Model.Inquilino?.IdInquilino != 0)
             {
               <div class="mb-3">
                 <label class="form-label">ID del Inquilino</label>
@@ -28,7 +28,7 @@
             {
               <div class="mb-3">
                 <label class="form-label">DNI del Inquilino</label>
-                <input id="DniInquilino" oninput="buscarInquilino()" class="form-control" />
+                <input id="DniInquilino" oninput="buscarInquilino()" name="DniInquilino" class="form-control" />
               </div>
               <div class="d-none">
                 <input asp-for="IdInquilino" type="hidden" id="IdInquilino" />
@@ -179,24 +179,6 @@
     </div>
   </div>
 </div>
-
-@if (TempData["MensajeError"] != null)
-{
-  <div id="mensajeAlerta" class="alert alert-success">
-    @TempData["MensajeError"]
-  </div>
-
-  <script>
-    setTimeout(function () {
-      var alerta = document.getElementById("mensajeAlerta");
-      if (alerta) {
-        alerta.style.transition = "opacity 0.5s ease";
-        alerta.style.opacity = "0";
-        setTimeout(() => alerta.remove(), 500);
-      }
-    }, 5000); // 5000 ms = 5 segundos
-  </script>
-}
 
 <script>
   async function buscarInquilino() {
