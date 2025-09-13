@@ -50,8 +50,33 @@ namespace Inmobiliaria.Controllers
           pago = new Pago
           {
             IdContrato = idContrato.Value,
-            contrato = repositorioContraro.ObtenerPorID(idContrato.Value)
+            contrato = repositorioContraro.ObtenerPorID(idContrato.Value),
+
+            FechaPago = DateTime.Today,
           };
+          if (pago.contrato.Estado == 2) { 
+            ViewBag.MultaPagada = "Contrato Finalizado";
+            return View("Gestion", pago);
+          }
+          if (pago.contrato.Estado == 3)
+          {
+            if (!repositorio.MultaPagada(idContrato))
+            {
+              pago.Concepto = "Multa";
+              pago.Monto = pago.contrato?.Multa ?? 0;
+              pago.numeroPago = repositorio.CantidadPago(idContrato) + 1;
+            }
+            else
+            {
+              ViewBag.MultaPagada = "Multa Pagada";
+            }
+          }
+          else
+          {
+            ViewBag.MultaPagada = "Sin Multa";
+            pago.Monto = pago.contrato?.MontoMensual ?? 0;
+            pago.numeroPago = repositorio.CantidadPago(idContrato) + 1;
+          }
           return View("Gestion", pago);
         }
         catch (System.Exception)
@@ -92,9 +117,9 @@ namespace Inmobiliaria.Controllers
       }
       try
       {
-        if (repositorioContraro.ObtenerPorID(pago.IdContrato).Estado != 1)
+        if (repositorioContraro.ObtenerPorID(pago.IdContrato).Estado == 2)
         {
-          TempData["MensajeError"] = "Contrato inactivo";
+          TempData["MensajeError"] = "Contrato Finalizado";
           TempData["Pago"] = JsonSerializer.Serialize(pago);
           return RedirectToAction("Crear");
         }
