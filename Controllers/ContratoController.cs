@@ -30,30 +30,39 @@ namespace Inmobiliaria.Controllers
     [HttpGet]
     public IActionResult Crear(int? idInmueble)
     {
-      Contrato contrato = new Contrato();
-      if (idInmueble == null)
+      Contrato contrato = new Contrato
       {
-        string? contratoJson = TempData["Contrato"] as string;
-        if (!string.IsNullOrEmpty(contratoJson))
-        {
-          contrato = JsonSerializer.Deserialize<Contrato>(contratoJson) ?? new Contrato();
-        }
-        contrato.FechaDesde = DateTime.Today;
-        contrato.FechaHasta = DateTime.Today.AddMonths(6);
-        return View("Gestion", contrato);
-      }
-      else
+        Inquilino = new Inquilino(),
+        Inmueble = new Inmueble(),
+        FechaDesde = DateTime.Today,
+        FechaHasta = DateTime.Today.AddMonths(6)
+      };
+
+      string? contratoJson = TempData["Contrato"] as string;
+      if (!string.IsNullOrEmpty(contratoJson))
       {
-        contrato = new Contrato
-        {
-          IdInmueble = idInmueble.Value,
-          Inmueble = repositorioInmueble.ObtenerPorID(idInmueble.Value),
-          FechaDesde = DateTime.Today,
-          FechaHasta = DateTime.Today.AddMonths(6)
-        };
-        return View("Gestion", contrato);
+        contrato = JsonSerializer.Deserialize<Contrato>(contratoJson) ?? contrato;
+        contrato.Inquilino ??= new Inquilino();
+        contrato.Inmueble ??= new Inmueble();
       }
+
+      string? dni = TempData["Dni"] as string;
+      if (!string.IsNullOrEmpty(dni))
+      {
+        ViewBag.Dni = dni;
+        contrato.Inquilino.Dni = dni;
+      }
+
+      if (idInmueble != null)
+      {
+        contrato.IdInmueble = idInmueble.Value;
+        contrato.Inmueble = repositorioInmueble.ObtenerPorID(idInmueble.Value) ?? new Inmueble();
+        contrato.MontoMensual = contrato.Inmueble.Precio + (contrato.Inmueble.Precio * 0.2m);
+      }
+
+      return View("Gestion", contrato);
     }
+
 
 
     [HttpGet]
@@ -76,55 +85,48 @@ namespace Inmobiliaria.Controllers
 
     //POST: Contrato/Crear
     [HttpPost]
-    public IActionResult Crear(Contrato contrato)
+    public IActionResult CrearContrato(Contrato contrato, string DniInquilino)
     {
       try
       {
-        if (!ModelState.IsValid)
-        {
-          TempData["MensajeError"] = "Modelo invalido";
-          TempData["Contrato"] = JsonSerializer.Serialize(contrato);
-          return RedirectToAction("Crear");
-        }
-        Inmueble inmueble = repositorioInmueble.ObtenerPorID(contrato.IdInmueble);
-        if (inmueble.Estado != 1)
-        {
-          TempData["MensajeError"] = "Inmueble inactivo";
-          TempData["Contrato"] = JsonSerializer.Serialize(contrato);
-          return RedirectToAction("Crear");
-        }
-        if (inmueble.Precio >= contrato.MontoMensual)
-        { 
-          TempData["MensajeError"] = "El precio ingresado no genera ganacias";
-          TempData["Contrato"] = JsonSerializer.Serialize(contrato);
-          return RedirectToAction("Crear");
-        }
+        var errores = new List<string>();
 
-        Inquilino inqui = repositorioInquilino.ObtenerPorID(contrato.IdInquilino);
-        if (inqui.IdInquilino == 0)
-        {
-          TempData["MensajeError"] = "Inquilino inactivo";
-          TempData["Contrato"] = JsonSerializer.Serialize(contrato);
-          return RedirectToAction("Crear");
-        }
+        if (!ModelState.IsValid)
+          errores.Add("Modelo inválido");
+
+        contrato.Inmueble  = repositorioInmueble.ObtenerPorID(contrato.IdInmueble);
+        if (contrato.Inmueble.Estado != 1)
+          errores.Add("Inmueble inactivo");
+
+        if (contrato.Inmueble.Precio >= contrato.MontoMensual)
+          errores.Add("El precio ingresado no genera ganancias");
+
+        contrato.Inquilino = repositorioInquilino.ObtenerPorID(contrato.IdInquilino);
+        if (contrato.Inquilino.IdInquilino == 0)
+          errores.Add("Inquilino inactivo");
 
         if (contrato.FechaDesde < DateTime.Today || contrato.FechaHasta < contrato.FechaDesde.AddMonths(6))
+          errores.Add("Fechas inválidas");
+
+        if (errores.Any())
         {
-          TempData["MensajeError"] = "Fechas Invalidas";
+          TempData["MensajeError"] = string.Join(" | ", errores);
           TempData["Contrato"] = JsonSerializer.Serialize(contrato);
+          TempData["DniInquilino"] = DniInquilino;
           return RedirectToAction("Crear");
         }
 
         Contrato nuevo = repositorio.ObtenerPorID(repositorio.Crear(contrato));
         repositorioInmueble.SetEstado(contrato.IdInmueble, 2);
-        TempData["MensajeError"] = "Contrato Creado";
+
+        TempData["MensajeSuccess"] = "Contrato Creado";
         return RedirectToAction("Ver", new { id = nuevo.IdContrato });
       }
-
-      catch (System.Exception)
+      catch (Exception)
       {
-        TempData["MensajeError"] = "Modelo invalido";
+        TempData["MensajeError"] = "Ocurrió un error inesperado";
         TempData["Contrato"] = JsonSerializer.Serialize(contrato);
+        TempData["DniInquilino"] = DniInquilino;
         return RedirectToAction("Crear");
       }
     }
@@ -162,7 +164,8 @@ namespace Inmobiliaria.Controllers
           return RedirectToAction("Ver", new { id = nuevo.IdContrato });
         }
         else
-          return View("Gestion", contrato);
+          TempData["MensajeError"] = "Modelo invalido";
+        return View("Gestion", contrato);
       }
       catch (System.Exception)
       {
