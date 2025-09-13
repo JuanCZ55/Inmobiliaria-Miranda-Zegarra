@@ -4,7 +4,7 @@
   ViewData["SubTitle"] = "Pagos";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div  class="px-3 py-1">
+<div class="px-3 py-1">
   <div class="row shadow-lg rounded border bg-light p-3">
     <div class="col-md-6 border-end">
       <form asp-action="@(Model.IdPago == 0 ? "Crear" : "Cancelar")" method="post">
@@ -12,17 +12,37 @@
         <div class="row g-3">
           <div class="col-md-6">
             <label asp-for="numeroPago" class="form-label">Número de pago</label>
-            <input asp-for="numeroPago" type="number" class="form-control" />
+            <input asp-for="numeroPago" type="number" class="form-control" readonly />
           </div>
           <div class="col-md-6">
             <label asp-for="FechaPago" class="form-label">Fecha de Pago</label>
-            <input asp-for="FechaPago" type="date" class="form-control" />
+            <input asp-for="FechaPago" type="date" class="form-control" readonly />
 
           </div>
-          <div class="col-md-6">
-            <label asp-for="Concepto" class="form-label">Concepto</label>
-            <input asp-for="Concepto" type="text" class="form-control" />
-          </div>
+
+          @if (Model.IdContrato > 0 && Model.Concepto == "Multa" && Model.Monto > 0)
+          {
+            <div class="col-md-6">
+              <label asp-for="Concepto" class="form-label">Concepto</label>
+              <input asp-for="Concepto" type="text" class="form-control" />
+            </div>
+          }
+          else
+          {
+            <div class="col-md-6">
+              <label asp-for="Concepto" class="form-label">Concepto</label>
+              <select asp-for="Concepto" class="form-select">
+                <option value="">-- Seleccione un concepto --</option>
+                <option value="Alquiler mensual">Alquiler (mensual)</option>
+                <option value="Alquiler adelantado">Alquiler (adelantado)</option>
+                <option value="Alquiler proporcional">Alquiler (proporcional)</option>
+                <option value="Expensas ordinarias">Expensas (ordinarias)</option>
+                <option value="Expensas extraordinarias">Expensas (extraordinarias)</option>
+                <option value="Depósito en garantía">Depósito en garantía</option>
+              </select>
+            </div>
+          }
+
           <div class="col-md-6">
             <label asp-for="Monto" class="form-label">Monto a pagar</label>
             <input asp-for="Monto" type="number" class="form-control" />
@@ -44,7 +64,7 @@
           }
         </div>
         <div class="d-flex justify-content-between pt-4 mt-4 gap-2">
-          @if (Model != null && Model.IdPago == 0)
+          @if (Model != null && Model.IdPago == 0 && ViewBag.MultaPagada != "Contrato Finalizado" && ViewBag.MultaPagada != "Multa Pagada")
           {
             <button type="submit" class="btn btn-success">Crear</button>
           }
