@@ -137,12 +137,12 @@
             <td class="id-inquilino" data-dni="@i.Inquilino?.Dni" data-nombre="@i.Inquilino?.Nombre"
               data-apellido="@i.Inquilino?.Apellido" data-telefono="@i.Inquilino?.Telefono" data-email="@i.Inquilino?.Email"
               data-direccion="@i.Inquilino?.Direccion">
-              @i.IdInquilino
+              @i.Inquilino?.Nombre @i.Inquilino?.Apellido
             </td>
             <td class="id-inmueble" data-tipo="@i.Inmueble?.TipoInmueble?.Nombre" data-direccion="@i.Inmueble?.Direccion"
               data-dni-propietario="@i.Inmueble?.Propietario?.Dni" data-propietario="@i.Inmueble?.Propietario?.Nombre"
               data-ambientes="@i.Inmueble?.CantidadAmbientes" data-precio="@i.Inmueble?.Precio">
-              @i.IdInmueble
+              @i.Inmueble?.Direccion
             </td>
             <td>@i.MontoMensual</td>
             <td>@i.FechaDesde.ToShortDateString() - @i.FechaHasta.ToShortDateString()</td>
@@ -244,9 +244,9 @@
       cell.addEventListener("mouseenter", e => {
         tooltip.innerHTML = `
           <strong>Inmueble</strong><br>
-          <strong>Tipo:</strong> ${cell.dataset.tipo}<br>
           <strong>Dirección:</strong> ${cell.dataset.direccion}<br>
           <strong>Propietario:</strong> ${cell.dataset.propietario} (DNI: ${cell.dataset.dniPropietario})<br>
+          <strong>Tipo:</strong> ${cell.dataset.tipo}<br>
           <strong>Ambientes:</strong> ${cell.dataset.ambientes}<br>
           <strong>Precio:</strong> $${cell.dataset.precio}
         `;
