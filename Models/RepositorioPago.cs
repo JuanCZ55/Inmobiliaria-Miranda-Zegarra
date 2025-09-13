@@ -225,7 +225,7 @@ namespace Inmobiliaria.Models
           sql += " AND id_pago LIKE @idPago";
 
         if (!string.IsNullOrEmpty(idContrato))
-            sql += " AND p.id_contrato LIKE @idContrato";
+          sql += " AND p.id_contrato LIKE @idContrato";
 
 
         if (!string.IsNullOrEmpty(dniInquilino))
@@ -418,6 +418,52 @@ namespace Inmobiliaria.Models
         }
       }
       return total;
+    }
+    public int CantidadPago(int? idContrato)
+    {
+      int total = 0;
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"
+            SELECT COUNT(*)
+            FROM pago p
+            JOIN contrato c ON p.id_contrato = c.id_contrato
+            JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino
+            WHERE p.id_contrato = @idContrato
+          ";
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          cmd.Parameters.AddWithValue("@idContrato", idContrato);
+          conn.Open();
+          total = Convert.ToInt32(cmd.ExecuteScalar());
+          conn.Close();
+        }
+      }
+      return total;
+    }
+
+    public bool MultaPagada(int? idContrato)
+    {
+      int total = 0;
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"
+            SELECT COUNT(*)
+            FROM pago p
+            JOIN contrato c ON p.id_contrato = c.id_contrato
+            WHERE p.id_contrato = @idContrato 
+            AND p.concepto = 'Multa' 
+            And p.estado = 1
+          ";
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          cmd.Parameters.AddWithValue("@idContrato", idContrato);
+          conn.Open();
+          total = Convert.ToInt32(cmd.ExecuteScalar());
+          conn.Close();
+        }
+      }
+      return total > 0;
     }
 
   }

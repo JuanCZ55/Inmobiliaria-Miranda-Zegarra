@@ -9,5 +9,7 @@ namespace Inmobiliaria.Models
         List<Pago> ObtenerTodos();
         List<Pago> Filtrar(string? idPago, string? idContrato, string? dniInquilino, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta, int offset, int limite);
         int CantidadFiltro(string? idPago, string? idContrato, string? dniInquilino, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta);
+        int CantidadPago(int? idContrato);
+        bool MultaPagada(int? idContrato);
     }
 }
