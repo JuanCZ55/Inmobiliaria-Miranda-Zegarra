@@ -183,10 +183,10 @@
               @(i.Estado == 1 ? "Disponible" : i.Estado == 2 ? "Ocupado" : i.Estado == 3 ? "Suspendido" : "Desconocido")
             </td>
             <td class="d-flex justify-content-center">
-              @if (i.Estado == 2)
+              @if (i.Estado != 1)
               {
 
-                <a class="btn btn-link " data-bs-toggle="tooltip" title="Inmueble Ocupado">
+                <a class="btn btn-link fake-disabled" data-bs-toggle="tooltip" title="Inmueble No Disponible">
                   <img src="~/images/icon/Contrato.png" alt="Contrato">
                 </a>
               }
