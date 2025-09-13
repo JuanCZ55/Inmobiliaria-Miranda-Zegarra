@@ -149,8 +149,11 @@
             <td>@(i.Estado == 1 ? "Vigente" : i.Estado == 2 ? "Finalizado" : i.Estado == 3 ? "Cancelado" : "Desconocido")
             </td>
             <td class="d-flex justify-content-evenly">
+              <a href="/Pago/Listar?idContrato=@i.IdContrato" data-bs-toggle="tooltip" title="Todos los pagos">
+                <img src="~/images/icon/ListaPagos.png" alt="Todos los pagos" />
+              </a>
               <a href="/Pago/Crear?idContrato=@i.IdContrato" data-bs-toggle="tooltip" title="Hacer un pago">
-                <img src="~/images/icon/Pagar.png" alt="Pagar" />
+                <img src="~/images/icon/Pagar.png" alt="Hacer un pago" />
               </a>
               <a asp-action="Ver" asp-route-id="@i.IdContrato" data-bs-toggle="tooltip" title="Ver Contrato">
                 <img src="~/images/icon/Gestionar.png" alt="Gestionar" />
