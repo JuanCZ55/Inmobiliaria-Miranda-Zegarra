@@ -143,5 +143,12 @@ namespace Inmobiliaria.Controllers
 
             return View(propietarios);
         }
+
+        public IActionResult ListarPropietarios(string nombre, string dni)
+        {
+            var propietarios = repositorio.ListarPropietarios(nombre, dni);
+
+            return Ok(propietarios);
+        }
     }
 }

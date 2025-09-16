@@ -258,5 +258,65 @@ namespace Inmobiliaria.Models
             }
             return lista;
         }
+
+        public List<Propietario> ListarPropietarios(string nombre, string dni)
+        {
+            var lista = new List<Propietario>();
+
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                string sql =
+                    @"
+            SELECT
+                id_propietario,
+                nombre,
+                apellido,
+                dni
+            FROM propietario
+            WHERE 1=1
+        ";
+
+                if (!string.IsNullOrWhiteSpace(nombre))
+                {
+                    sql += " AND CONCAT(nombre, ' ', apellido) LIKE CONCAT('%', @Nombre, '%')";
+                }
+
+                if (!string.IsNullOrWhiteSpace(dni))
+                {
+                    sql += " AND dni LIKE CONCAT(@Dni, '%')";
+                }
+
+                sql += " LIMIT 10";
+
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    if (!string.IsNullOrWhiteSpace(nombre))
+                        cmd.Parameters.AddWithValue("@Nombre", nombre);
+
+                    if (!string.IsNullOrWhiteSpace(dni))
+                        cmd.Parameters.AddWithValue("@Dni", dni);
+
+                    conn.Open();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(
+                                new Propietario
+                                {
+                                    IdPropietario = reader.GetInt32("id_propietario"),
+                                    Nombre = reader.GetString("nombre"),
+                                    Apellido = reader.GetString("apellido"),
+                                    Dni = reader.GetString("dni"),
+                                }
+                            );
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+
+            return lista;
+        }
     }
 }
