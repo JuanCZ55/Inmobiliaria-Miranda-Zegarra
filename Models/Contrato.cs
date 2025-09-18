@@ -12,17 +12,19 @@ namespace Inmobiliaria.Models
         public int IdContrato { get; set; }
 
         [Required(ErrorMessage = "La fecha de inicio es obligatorio")]
-        public DateTime FechaDesde { get; set; }
+        public DateTime FechaInicio { get; set; }
 
         [Required(ErrorMessage = "La fecha de fin es obligatorio")]
-        public DateTime FechaHasta { get; set; }
+        public DateTime FechaFinalizacion { get; set; }
 
-        public DateTime? FechaFin { get; set; }
+        public DateTime? FechaCancelacion { get; set; }
 
         [Required(ErrorMessage = "El monto es obligatorio")]
-        public decimal MontoMensual { get; set; }
+        public decimal Monto { get; set; }
 
         public decimal? Multa { get; set; }
+        [Required(ErrorMessage = "La el tipo de contrato es obligatorio")]
+        public int Tipo { get; set; } = 0; 
 
         public int Estado { get; set; } = 1;
 
