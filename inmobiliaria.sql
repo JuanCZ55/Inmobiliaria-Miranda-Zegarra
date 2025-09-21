@@ -84,7 +84,7 @@ CREATE TABLE `inmueble` (
   `longitud` varchar(100) NOT NULL,
   `latitud` varchar(100) NOT NULL,
   `precio` decimal(12,2) NOT NULL,
-  `estado` tinyint NOT NULL DEFAULT '1' COMMENT '1=disponible, 2=suspendido',
+  `estado` tinyint NOT NULL DEFAULT '1' COMMENT '1=activo, 2=suspendido',
   `descripcion` varchar(255) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT (now()),
   `updated_at` datetime NOT NULL DEFAULT (now()),
