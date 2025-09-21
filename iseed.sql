@@ -1,3 +1,16 @@
+-- 1. Usuarios (10 registros)
+INSERT INTO usuario (email, contrasena, rol, nombre, apellido, url, estado) VALUES
+('admin1@inmob.com', '123456', 1, 'Juan', 'Perez', 'url1.jpg', 1),
+('empleado1@inmob.com', '123456', 2, 'Maria', 'Gomez', 'url2.jpg', 1),
+('empleado2@inmob.com', '123456', 2, 'Carlos', 'Lopez', 'url3.jpg', 1),
+('empleado3@inmob.com', '123456', 2, 'Ana', 'Martinez', 'url4.jpg', 1),
+('empleado4@inmob.com', '123456', 2, 'Pedro', 'Rodriguez', 'url5.jpg', 1),
+('empleado5@inmob.com', '123456', 2, 'Laura', 'Sanchez', 'url6.jpg', 1),
+('empleado6@inmob.com', '123456', 2, 'Diego', 'Fernandez', 'url7.jpg', 1),
+('empleado7@inmob.com', '123456', 2, 'Sofia', 'Garcia', 'url8.jpg', 1),
+('empleado8@inmob.com', '123456', 2, 'Miguel', 'Diaz', 'url9.jpg', 1),
+('empleado9@inmob.com', '123456', 2, 'Elena', 'Ruiz', 'url10.jpg', 1);
+
 -- 2. Tipo Inmueble (10 registros)
 INSERT INTO tipo_inmueble (nombre) VALUES
 ('Casa'),
@@ -63,9 +76,20 @@ INSERT INTO contrato (id_inquilino, id_inmueble, id_usuario_creador, fecha_desde
 (9, 9, 10, '2024-09-01', '2024-04-30', 35000.00, 1, 2),
 (10, 10, 2, '2024-10-01', '2024-03-31', 40000.00, 1, 2);
 
+-- 7. Imágenes (10 registros)
+INSERT INTO imagen (id_inmueble, url, tipo) VALUES
+(1, 'http://inmob.com/img1.jpg', 1),
+(2, 'http://inmob.com/img2.jpg', 1),
+(3, 'http://inmob.com/img3.jpg', 1),
+(4, 'http://inmob.com/img4.jpg', 1),
+(5, 'http://inmob.com/img5.jpg', 1),
+(6, 'http://inmob.com/img6.jpg', 1),
+(7, 'http://inmob.com/img7.jpg', 1),
+(8, 'http://inmob.com/img8.jpg', 1),
+(9, 'http://inmob.com/img9.jpg', 1),
+(10, 'http://inmob.com/img10.jpg', 1);
 
-
--- 7. Pagos (10 registros)
+-- 8. Pagos (10 registros)
 INSERT INTO pago (id_contrato, id_usuario, numero_pago, fecha_pago, concepto, monto) VALUES
 (1, 2, 1, '2024-01-05', 'Alquiler Enero', 80000.00),
 (2, 3, 1, '2024-02-05', 'Alquiler Febrero', 65000.00),
