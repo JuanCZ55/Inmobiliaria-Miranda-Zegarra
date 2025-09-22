@@ -431,7 +431,13 @@
   </script>
   <script>
     var contratosExistentes = [];
-    var pickers = {};
+    @if (ViewBag.ListFechas != null)
+      {
+        <text>
+          contratosExistentes = JSON.parse('@Html.Raw(ViewBag.ListFechas)');
+        </text>
+    }
+            var pickers = {};
 
     function buildDisabledRanges(contratos) {
       if (!Array.isArray(contratos)) return [];
@@ -532,8 +538,12 @@
       const startInput = document.querySelector('#fechaInicio');
       const endInput = document.querySelector('#fechaFin');
 
-      if (startInput.dataset.new === 'true') {
-        let firstAvailable = new Date();
+      // Definimos la fecha mínima como hoy menos un mes
+      const today = new Date();
+      const minStartDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+
+      if (startInput.dataset.new === 'true' && !startInput.value) {
+        let firstAvailable = new Date(minStartDate); // partimos del mínimo permitido
         for (let r of disabledRanges) {
           const from = new Date(r.from), to = new Date(r.to);
           if (firstAvailable >= from && firstAvailable <= to) {
@@ -546,7 +556,12 @@
 
       createPicker('#fechaInicio', '#fechaFin', disabledRanges, true);
       createPicker('#fechaInicioModal', '#fechaFinModal', disabledRanges, false);
+
+      // Ajustamos minDate de Flatpickr
+      if (pickers['start_fechaInicio']) pickers['start_fechaInicio'].set('minDate', minStartDate);
+      if (pickers['start_fechaInicioModal']) pickers['start_fechaInicioModal'].set('minDate', minStartDate);
     }
+
 
     document.addEventListener('DOMContentLoaded', initAllCalendars);
 
