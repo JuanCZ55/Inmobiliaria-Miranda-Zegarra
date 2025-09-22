@@ -5,6 +5,8 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
 <div class="px-3 py-1 row justify-content-center h-100">
   <div class="col-md-8 p-3">
 
@@ -16,20 +18,14 @@
       </div>
 
       <div class="row">
+        <!-- Select2 Propietario -->
         <div class="col-md-12 pb-2">
           <label for="select-propietario" class="form-label">Propietario</label>
-          <select asp-for="IdPropietario" class=" " id="select-propietario" style="width: 100%">
-            <option value="">Busque un propietario...</option>
-          </select>
+          <select asp-for="IdPropietario" id="select-propietario" class="form-select"></select>
           <span asp-validation-for="IdPropietario" class="text-danger"></span>
         </div>
 
-        <div class="col-md-12 pb-2">
-          <label asp-for="Direccion" class="form-label"></label>
-          <input asp-for="Direccion" class="form-control" />
-          <span asp-validation-for="Direccion" class="text-danger"></span>
-        </div>
-
+        <!-- Tipo de inmueble -->
         <div class="col-md-6 pb-2">
           <label asp-for="IdTipoInmueble" class="form-label">Tipo de Inmueble</label>
           <select asp-for="IdTipoInmueble" class="form-select"
@@ -39,11 +35,7 @@
           <span asp-validation-for="IdTipoInmueble" class="text-danger"></span>
         </div>
 
-        @if (ViewBag.Error != null)
-        {
-          <div class="alert alert-danger">@ViewBag.Error</div>
-        }
-
+        <!-- Uso -->
         <div class="col-md-6 pb-2">
           <label asp-for="Uso" class="form-label"></label>
           <select asp-for="Uso" class="form-select">
@@ -54,6 +46,7 @@
           <span asp-validation-for="Uso" class="text-danger"></span>
         </div>
 
+        <!-- Cantidad de ambientes -->
         <div class="col-md-6 pb-2">
           <label asp-for="CantidadAmbientes" class="form-label"></label>
           <select asp-for="CantidadAmbientes" class="form-select"
@@ -63,24 +56,40 @@
           <span asp-validation-for="CantidadAmbientes" class="text-danger"></span>
         </div>
 
-        <div class="col-md-6 pb-2">
-          <label asp-for="Longitud" class="form-label"></label>
-          <input asp-for="Longitud" class="form-control" />
-          <span asp-validation-for="Longitud" class="text-danger"></span>
-        </div>
-
-        <div class="col-md-6 pb-2">
-          <label asp-for="Latitud" class="form-label"></label>
-          <input asp-for="Latitud" class="form-control" />
-          <span asp-validation-for="Latitud" class="text-danger"></span>
-        </div>
-
+        <!-- Precio -->
         <div class="col-md-6 pb-2">
           <label asp-for="Precio" class="form-label"></label>
           <input asp-for="Precio" class="form-control" />
           <span asp-validation-for="Precio" class="text-danger"></span>
         </div>
 
+        <!-- Direccion con autocomplete -->
+        <div class="col-md-12 pb-2 position-relative">
+          <label asp-for="Direccion" class="form-label"></label>
+          <input asp-for="Direccion" id="direccion" class="form-control" autocomplete="off" />
+          <ul id="addrList" class="list-group autocomplete-list"></ul>
+          <span asp-validation-for="Direccion" class="text-danger"></span>
+        </div>
+
+        <!-- Mapa -->
+        <div class="col-12 pb-2">
+          <label class="form-label">Ubicacion (mapa)</label>
+          <div id="mapa" style="height:320px;border:1px solid #ddd;border-radius:4px"></div>
+        </div>
+
+        <!-- Longitud y Latitud solo lectura -->
+        <div class="col-md-6 pb-2">
+          <label asp-for="Longitud" class="form-label"></label>
+          <input asp-for="Longitud" id="longitud" class="form-control" readonly />
+          <span asp-validation-for="Longitud" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 pb-2">
+          <label asp-for="Latitud" class="form-label"></label>
+          <input asp-for="Latitud" id="latitud" class="form-control" readonly />
+          <span asp-validation-for="Latitud" class="text-danger"></span>
+        </div>
+
+        <!-- Descripcion -->
         <div class="col-md-12 pb-2">
           <label asp-for="Descripcion" class="form-label"></label>
           <input asp-for="Descripcion" class="form-control" />
@@ -88,87 +97,165 @@
         </div>
       </div>
 
-      <div class="aling-items-center justify-content-center d-flex">
-        <div class="d-flex justify-content-end align-items-center">
-          <button type="submit" class="btn btn-success">Crear Inmueble</button>
-        </div>
+      <div class="d-flex justify-content-end align-items-center">
+        <button type="submit" class="btn btn-success">Crear Inmueble</button>
       </div>
 
     </form>
-
   </div>
 </div>
 
+<style>
+  .autocomplete-list {
+    position: absolute;
+    z-index: 19999;
+    width: 99%;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .autocomplete-list li {
+    padding: 8px 12px;
+    cursor: pointer;
+    background-color: white;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .autocomplete-list li:hover {
+    background-color: #0971da;
+    color: white;
+  }
+
+  .autocomplete-list li:last-child {
+    border-bottom: none;
+  }
+</style>
+
 @section Scripts {
   @await Html.PartialAsync("_ValidationScriptsPartial")
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-  <style>
-    .select2-container--bootstrap-5 .select2-selection--single {
-      display: flex;
-      align-items: flex-start !important;
-      min-height: 38px;
-      padding-top: 0.25rem;
-    }
 
-    .select2-container--bootstrap-5 .select2-selection__rendered {
-      display: block;
-      line-height: 1.2;
-      padding-top: 0 !important;
-    }
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <script>
     $(document).ready(function () {
+      // === Select2 Propietario ===
       $('#select-propietario').select2({
         theme: 'bootstrap-5',
         placeholder: 'Busque un propietario...',
-        allowClear: false,
+        minimumInputLength: 3,
         ajax: {
-          url: 'http://localhost:5227/Propietario/ListarPropietarios',
+          url: '@Url.Action("ListarPropietarios", "Propietario")',
           dataType: 'json',
           delay: 250,
-          data: function (params) {
-            var nombre = params.term || '';
-            var dni = '';
-            if (/^\d+$/.test(nombre)) {
-              dni = nombre;
-              nombre = '';
-            }
-            return { nombre: nombre, dni: dni };
-          },
-          processResults: function (data) {
-            return {
-              results: $.map(data, function (item) {
-                return {
-                  id: item.idPropietario,
-                  text: item.nombre + ' ' + item.apellido + ' (' + item.dni + ')',
-                  nombre: item.nombre,
-                  apellido: item.apellido,
-                  dni: item.dni
-                };
-              })
-            };
-          }
-        },
-        minimumInputLength: 3,
-        templateSelection: function (data) {
-          if (!data.id) return data.text;
-          // Si los datos vienen del select inicial (sin AJAX), usar text
-          if (!data.nombre || !data.apellido || !data.dni) return data.text;
-          return data.nombre + ' ' + data.apellido + ' (' + data.dni + ')';
-        },
-        templateResult: function (data) {
-          if (!data.id) return data.text;
-          return $('<div><b>' + data.nombre + ' ' + data.apellido + '</b><br><small>DNI: ' + data.dni + '</small></div>');
-        },
-        escapeMarkup: function (m) { return m; },
-        language: {
-          inputTooShort: () => 'Ingrese al menos 3 caracteres',
-          noResults: () => 'No se encontraron resultados',
-          searching: () => 'Buscando...'
+          data: params => ({ q: params.term }),
+          processResults: data => ({
+            results: $.map(data, item => ({
+              id: item.idPropietario,
+              text: item.nombre + ' ' + item.apellido + ' (' + item.dni + ')'
+            }))
+          })
         }
+      });
+
+      // === MAPA + DIRECCIÓN ===
+      const $dir = $('#direccion');
+      const $lat = $('#latitud');
+      const $lng = $('#longitud');
+      const $list = $('#addrList');
+
+      const DEF_LAT = -33.302160, DEF_LNG = -66.336993;
+      const initLat = parseFloat($lat.val()) || DEF_LAT;
+      const initLng = parseFloat($lng.val()) || DEF_LNG;
+
+      const map = L.map('mapa').setView([initLat, initLng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+      const marker = L.marker([initLat, initLng], { draggable: true }).addTo(map);
+
+      // actualizar inputs readonly
+      function setInputs(lat, lng) {
+        $lat.val(lat.toFixed(6));
+        $lng.val(lng.toFixed(6));
+      }
+      setInputs(initLat, initLng);
+
+      // reverse geocoding
+      async function reverseGeo(lat, lon) {
+        try {
+          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`, {
+            headers: { 'Accept-Language': 'es' }
+          });
+          const j = await r.json();
+          return j.display_name || '';
+        } catch { return ''; }
+      }
+
+      // búsqueda de direcciones
+      async function searchAddr(q) {
+        try {
+          const r = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q=${encodeURIComponent(q)}`, {
+            headers: { 'Accept-Language': 'es' }
+          });
+          return await r.json();
+        } catch { return []; }
+      }
+
+      function showList(items) {
+        $list.empty();
+        if (!items.length) { $list.hide(); return; }
+
+        items.forEach(it => {
+          const $li = $('<li>').text(it.display_name).data({ lat: it.lat, lon: it.lon });
+          $li.on('click', function () {
+            const lat = parseFloat($(this).data('lat')),
+              lon = parseFloat($(this).data('lon'));
+            $dir.val(it.display_name);
+            marker.setLatLng([lat, lon]);
+            map.setView([lat, lon], 15);
+            setInputs(lat, lon);
+            $list.hide();
+          });
+          $list.append($li);
+        });
+        $list.show();
+      }
+
+      const debounce = (fn, ms = 300) => {
+        let t;
+        return (...a) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...a), ms);
+        };
+      };
+
+      const doSuggest = debounce(async q => {
+        if (q.trim().length < 2) { $list.hide(); return; }
+        showList(await searchAddr(q));
+      }, 300);
+
+      $dir.on('input', () => doSuggest($dir.val()));
+
+      $(document).on('click', e => {
+        if (!$(e.target).closest('.position-relative').length) $list.hide();
+      });
+
+      // mover marcador
+      marker.on('dragend', async e => {
+        const p = e.target.getLatLng();
+        setInputs(p.lat, p.lng);
+        $dir.val(await reverseGeo(p.lat, p.lng));
+      });
+
+      map.on('click', async e => {
+        marker.setLatLng(e.latlng);
+        map.panTo(e.latlng);
+        setInputs(e.latlng.lat, e.latlng.lng);
+        $dir.val(await reverseGeo(e.latlng.lat, e.latlng.lng));
       });
     });
   </script>
-
 }
