@@ -121,7 +121,7 @@
         <th>@Html.DisplayNameFor(model => model.First().IdContrato)</th>
         <th>@Html.DisplayNameFor(model => model.First().IdInquilino)</th>
         <th>@Html.DisplayNameFor(model => model.First().IdInmueble)</th>
-        <th>@Html.DisplayNameFor(model => model.First().MontoMensual)</th>
+        <th>@Html.DisplayNameFor(model => model.First().Monto)</th>
         <th>Fecha</th>
         <th>@Html.DisplayNameFor(model => model.First().Estado)</th>
         <th>Acciones</th>
@@ -144,8 +144,8 @@
               data-ambientes="@i.Inmueble?.CantidadAmbientes" data-precio="@i.Inmueble?.Precio">
               @i.Inmueble?.Direccion
             </td>
-            <td>@i.MontoMensual</td>
-            <td>@i.FechaDesde.ToShortDateString() - @i.FechaHasta.ToShortDateString()</td>
+            <td>@i.Monto</td>
+            <td>@i.FechaInicio.ToShortDateString() - @i.FechaFinalizacion.ToShortDateString()</td>
             <td>@(i.Estado == 1 ? "Vigente" : i.Estado == 2 ? "Finalizado" : i.Estado == 3 ? "Cancelado" : "Desconocido")
             </td>
             <td class="d-flex justify-content-evenly">
@@ -155,7 +155,7 @@
               <a href="/Pago/Crear?idContrato=@i.IdContrato" data-bs-toggle="tooltip" title="Hacer un pago">
                 <img src="~/images/icon/Pagar.png" alt="Hacer un pago" />
               </a>
-              <a asp-action="Ver" asp-route-id="@i.IdContrato" data-bs-toggle="tooltip" title="Ver Contrato">
+              <a asp-action="Ver" asp-route-id="@i.IdContrato" asp-route-returnUrl="@Url.Action("Listar")" data-bs-toggle="tooltip" title="Ver Contrato">
                 <img src="~/images/icon/Gestionar.png" alt="Gestionar" />
               </a>
             </td>
