@@ -1,6 +1,6 @@
 @model Inmobiliaria.Models.Contrato
 @{
-  ViewData["Title"] = "Crear Contrato";
+  ViewData["Title"] = Model.IdContrato == 0 ? "Crear Contrato" : "Gestionar Contrato";
   ViewData["SubTitle"] = "Contratos";
   Layout = "~/Views/Shared/_Layout.cshtml";
   var Renovar = ViewBag.Renovar;
@@ -9,182 +9,221 @@
 <div class="row h-100">
   <!-- COLUMNA IZQUIERDA -->
   <div class="col-md-6 py-5 d-flex justify-content-center">
-    <!-- esto da el color -->
     <div class="col-md-10 shadow-lg rounded border bg-light p-5 h-100">
-      <form asp-action="@((Model.IdContrato == 0 || Renovar == "Renovar") ? "CrearContrato" : "Cancelar")" method="post"
+      <form asp-action="@(Model.IdContrato == 0 ? "CrearContrato" : null)" method="post"
         class="h-100 d-flex flex-column justify-content-center">
         <div class="h-100 px-5 d-flex flex-column justify-content-between">
           <div>
             <h2 class="text-center mb-4">Contrato</h2>
 
-            @if (Model != null && Model.Inquilino?.IdInquilino != 0)
+            <div class="row">
+              @if (Model.IdContrato > 0)
+              {
+                <div class="col-6 mb-3">
+                  <label class="form-label">ID del Inquilino</label>
+                  <input asp-for="IdInquilino" class="form-control" readonly />
+                </div>
+              }
+              else
+              {
+                <div class="col-6 mb-3">
+                  <label class="form-label">DNI del Inquilino</label>
+                  <input id="DniInquilino" oninput="buscarInquilino()" name="DniInquilino" class="form-control"
+                    value="@(Model.Inquilino?.Dni ?? ViewBag.Dni)" />
+                </div>
+                <div class="d-none">
+                  <input asp-for="IdInquilino" type="hidden" id="IdInquilino" />
+                </div>
+              }
+
+              <div class="col-6 mb-3">
+                <label asp-for="IdInmueble" class="form-label">Cod. Inmueble</label>
+                <input oninput="buscarInmueble()" asp-for="IdInmueble" class="form-control" readonly=@(Model.IdContrato
+                                                                                                              > 0) />
+                <span asp-validation-for="IdInmueble" class="text-danger"></span>
+              </div>
+            </div>
+
+            <div class="row">
+              @if (Model.IdContrato == 0)
+              {
+                <div class="col-12 mb-3">
+                  <label class="form-label">Tipo de Pago</label>
+                  <select asp-for="Tipo" class="form-select">
+                    <option value="0"> Selecciona una opción </option>
+                    <option value="1">Pago Total</option>
+                    <option value="2">Pagos Mensuales</option>
+                  </select>
+                  <span asp-validation-for="Tipo" class="text-danger"></span>
+                </div>
+              }
+              else
+              {
+                <div class="col-12 mb-3">
+                  <label class="form-label">Tipo de Pago</label>
+                  <input class="form-control" type="text" readonly
+                    value="@(Model.Tipo == 1 ? "Pago Total" : Model.Tipo == 2 ? "Pagos Mensuales" : "")" />
+                </div>
+              }
+
+              <div class="row">
+                <div class="col-6 mb-3">
+                  <label asp-for="FechaInicio" class="form-label">Fecha Desde</label>
+                  <input asp-for="FechaInicio" class="form-control bg-white" type="date" id="fechaInicio"
+                    data-new="true" disabled=@(Model.IdContrato > 0)
+                    value="@(Model.IdContrato == 0 ? "" : Model.FechaInicio.ToString("yyyy-MM-dd"))" />
+
+                  <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                </div>
+                <div class="col-6 mb-3">
+                  <label asp-for="FechaFinalizacion" class="form-label">Fecha Hasta</label>
+                  <input asp-for="FechaFinalizacion" class="form-control bg-white" type="date" id="fechaFin"
+                    data-new="true" disabled=@(Model.IdContrato > 0)
+                    value="@(Model.IdContrato == 0 ? "" : Model.FechaFinalizacion.ToString("yyyy-MM-dd"))" />
+
+                  <span asp-validation-for="FechaFinalizacion" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 mb-3">
+                  <label asp-for="Monto" class="form-label">Monto</label>
+                  <input asp-for="Monto" type="number" class="form-control" readonly=@(Model.IdContrato > 0) />
+                  <span asp-validation-for="Monto" class="text-danger"></span>
+                </div>
+              </div>
+
+            </div>
+
+            @if (Model.IdContrato > 0)
             {
-              <div class="mb-3">
-                <label class="form-label">ID del Inquilino</label>
-                <input asp-for="IdInquilino" class="form-control" readonly />
+              <div class="row">
+                <div class="col-12 mb-3">
+                  <label class="form-label">Estado</label>
+                  <input class="form-control" type="text" readonly
+                    value="@(Model.Estado == 1 ? "Vigente" : Model.Estado == 2 ? "Finalizado" : Model.Estado == 3 ? "Cancelado" : "")" />
+                </div>
+                <div class="d-none">
+                  <input asp-for="IdContrato" type="hidden" id="IdContrato" />
+                </div>
+
+                @if (Model.Multa != null && Model.FechaCancelacion != null)
+                {
+                  <div class="col-6 mb-3">
+                    <label asp-for="FechaCancelacion" class="form-label">Fecha Cancelación</label>
+                    <input asp-for="FechaCancelacion" class="form-control" type="date"
+                      value="@(Model.FechaCancelacion?.ToString("yyyy-MM-dd"))" readonly />
+                  </div>
+                  <div class="col-6 mb-3">
+                    <label asp-for="Multa" class="form-label">Multa</label>
+                    <input asp-for="Multa" class="form-control" readonly />
+                    <span asp-validation-for="Multa" class="text-danger"></span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="d-flex justify-content-between">
+            @if (Model.IdContrato <= 0)
+            {
+              <div class="col-2">
+                <button type="submit" class="btn btn-success">Crear</button>
               </div>
             }
             else
             {
-              <div class="mb-3">
-                <label class="form-label">DNI del Inquilino</label>
-                <input id="DniInquilino" oninput="buscarInquilino()" name="DniInquilino" class="form-control" />
-              </div>
-              <div class="d-none">
-                <input asp-for="IdInquilino" type="hidden" id="IdInquilino" />
-              </div>
-            }
-
-            <div class="mb-3">
-              <label asp-for="IdInmueble" class="form-label">Cod. Inmueble</label>
-              <input oninput="buscarInmueble()" asp-for="IdInmueble" class="form-control" />
-            </div>
-
-            <div class="row">
-              <div class="col-6 mb-3">
-                <label asp-for="FechaDesde" class="form-label">Fecha Desde</label>
-                <input asp-for="FechaDesde" class="form-control" type="date" />
-              </div>
-              <div class="col-6 mb-3">
-                <label asp-for="FechaHasta" class="form-label">Fecha Hasta</label>
-                <input asp-for="FechaHasta" class="form-control" type="date" />
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label asp-for="MontoMensual" class="form-label">Monto Mensual</label>
-              <input asp-for="MontoMensual" type="number" class="form-control" />
-            </div>
-
-            @if (Model != null && Model.IdContrato != 0)
-            {
-              <div class="mb-3">
-                <label class="form-label">Estado</label>
-                <input class="form-control" type="text" readonly
-                  value="@(Model.Estado == 1 ? "Vigente" : Model.Estado == 3 ? "Cancelado" : Model.Estado == 2 ? "Finalizado" : "")" />
-              </div>
-              <div class="d-none">
-                <input asp-for="IdContrato" type="hidden" id="IdContrato" />
-              </div>
-
               @if (Model.Estado == 1)
               {
-                <div class="d-none">
-                  <input asp-for="FechaFin" type="hidden" value="@DateTime.Now" />
+                <div class="col-2">
+                  <button type="submit" class="btn btn-outline-warning">Cancelar</button>
                 </div>
               }
-            }
-
-            @if (Model != null && Model.IdContrato != 0 && Model.Multa != null && Model.FechaFin != null)
-            {
-              <div class="row">
-                <div class="col-6 mb-3">
-                  <label asp-for="FechaFin" class="form-label">Fecha Cancelación</label>
-                  <input asp-for="FechaFin" class="form-control" type="date"
-                    value="@(Model.FechaFin?.ToString("yyyy-MM-dd"))" readonly />
+              @if (Model.Estado == 2 && ViewBag.PagarMulta)
+              {
+                <div class="col-2">
+                  <button type="submit" class="btn btn-warning">Pagar Multa</button>
                 </div>
-                <div class="col-6 mb-3">
-                  <label asp-for="Multa" class="form-label">Multa</label>
-                  <input asp-for="Multa" class="form-control" readonly />
+              }
+              @if (Model.Estado == 1 && Model.CreatedAt.Date == DateTime.Today && ViewBag.Pagos)
+              {
+                <div class="col-2">
+                  <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal"
+                    data-bs-target="#editContratoModal" id="btnOpenEditModal"
+                    onclick="traerFechas(@Model.IdInmueble, @Model.IdContrato)">Editar</button>
                 </div>
+                <div class="col-2">
+                  <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal"
+                    data-bs-target="#deleteContratoModal" id="btnOpenDeleteModal">Eliminar</button>
+                </div>
+              }
+              <div class="col-2">
+                <a href="@ViewBag.ReturnUrl" class="btn btn-secondary">Volver</a>
               </div>
             }
           </div>
-
-          <div class="d-flex justify-content-between mt-3">
-            @if (Model != null && Model.IdContrato == 0)
-            {
-              <button type="submit" class="btn btn-success">Crear</button>
-            }
-            else if (Model != null && Model.IdContrato > 0 && Model.Estado == 1)
-            {
-              <button type="submit" class="btn btn-success">Cancelar Contrato</button>
-            }
-            else if (Model != null && Model.IdContrato > 0 && Renovar == "Renovar")
-            {
-              <button type="submit" class="btn btn-success">Renovar Contrato</button>
-            }
-            @if (Model != null && Model.IdContrato > 0 && Model.Estado == 1 && Model.CreatedAt.Date == DateTime.Today)
-            {
-
-              <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal"
-                data-bs-target="#editContratoModal" id="btnOpenEditModal">
-                <i class="bi bi-pencil-square me-1"></i> Editar contrato
-              </button>
-
-            }
-            <a href="/Contrato/Listar" class="btn btn-secondary">Volver</a>
-          </div>
         </div>
-
       </form>
     </div>
   </div>
   <!-- COLUMNA Derecha -->
   <div class="col-md-6 py-5 row justify-content-between">
-    <!-- Form superior -->
+    <!-- Bloque superior -->
     <div class="pe-5 pb-4 h-50">
-      <form id="formInquilino" class="shadow-lg rounded border bg-light h-100 p-5">
+      <div id="formInquilino" class="shadow-lg rounded border bg-light h-100 p-5">
         <h2 class="text-center mb-3">Inquilino</h2>
         <div class="row">
           <div class="col-4 mb-3">
             <label for="dni" class="form-label">DNI</label>
-            <input type="text" id="dni" name="dni" class="form-control" value="@Model.Inquilino?.Dni" readonly />
+            <input type="text" id="dni" class="form-control" value="@Model.Inquilino?.Dni" readonly />
           </div>
           <div class="col-4 mb-3">
             <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" id="nombre" name="nombre" class="form-control" value="@Model.Inquilino?.Nombre"
-              readonly />
+            <input type="text" id="nombre" class="form-control" value="@Model.Inquilino?.Nombre" readonly />
           </div>
           <div class="col-4 mb-3">
             <label for="apellido" class="form-label">Apellido</label>
-            <input type="text" id="apellido" name="apellido" class="form-control" value="@Model.Inquilino?.Apellido"
-              readonly />
+            <input type="text" id="apellido" class="form-control" value="@Model.Inquilino?.Apellido" readonly />
           </div>
           <div class="col-6 mb-3">
             <label for="telefono" class="form-label">Teléfono</label>
-            <input type="text" id="telefono" name="telefono" class="form-control" value="@Model.Inquilino?.Telefono"
-              readonly />
+            <input type="text" id="telefono" class="form-control" value="@Model.Inquilino?.Telefono" readonly />
           </div>
           <div class="col-6 mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" name="email" class="form-control" value="@Model.Inquilino?.Email" readonly />
+            <input type="email" id="email" class="form-control" value="@Model.Inquilino?.Email" readonly />
           </div>
         </div>
-      </form>
+      </div>
     </div>
-    <!-- Form inferior -->
+
+    <!-- Bloque inferior -->
     <div class="pe-5 pt-4 h-50 d-flex align-items-end">
-      <form id="formInmueble" class="shadow-lg rounded border bg-light h-100 p-5">
+      <div id="formInmueble" class="shadow-lg rounded border bg-light h-100 p-5">
         <h2 class="text-center mb-3">Inmueble</h2>
         <div class="row">
           <div class="col-4 mb-3">
             <label for="idInmueble" class="form-label">Código</label>
-            <input type="text" id="idInmueble" name="idInmueble" class="form-control"
-              value="@Model.Inmueble?.IdInmueble" readonly />
+            <input type="text" id="idInmueble" class="form-control" value="@Model.Inmueble?.IdInmueble" readonly />
           </div>
           <div class="col-4 mb-3">
             <label for="tipoInmueble" class="form-label">Tipo de Inmueble</label>
-            <input type="text" id="tipoInmueble" name="tipoInmueble" class="form-control"
-              value="@Model.Inmueble?.TipoInmueble?.Nombre" readonly />
+            <input type="text" id="tipoInmueble" class="form-control" value="@Model.Inmueble?.TipoInmueble?.Nombre"
+              readonly />
           </div>
           <div class="col-4 mb-3">
             <label for="precio" class="form-label">Precio</label>
-            <input type="text" id="precio" name="precio" class="form-control" value="@Model.Inmueble?.Precio"
-              readonly />
+            <input type="text" id="precio" class="form-control" value="@Model.Inmueble?.Precio" readonly />
           </div>
           <div class="col-6 mb-3">
             <label for="direccion" class="form-label">Dirección</label>
-            <input type="text" id="direccion" name="direccion" class="form-control" value="@Model.Inmueble?.Direccion"
-              readonly />
+            <input type="text" id="direccion" class="form-control" value="@Model.Inmueble?.Direccion" readonly />
           </div>
           <div class="col-6 mb-3">
             <label for="cantidad_ambientes" class="form-label">Descripción</label>
-            <input type="text" id="cantidad_ambientes" name="cantidad_ambientes" class="form-control"
-              value="@Model.Inmueble?.Descripcion" readonly />
+            <input type="text" id="cantidad_ambientes" class="form-control" value="@Model.Inmueble?.Descripcion"
+              readonly />
           </div>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 </div>
@@ -200,26 +239,39 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          <form>
+          <form asp-action="ModificarContrato" method="post">
             <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
             <input type="hidden" name="IdInmueble" value="@Model.IdInmueble" />
             <input type="hidden" name="IdInquilino" value="@Model.IdInquilino" />
 
             <div class="row">
               <div class="col-12 mb-3">
-                <label class="form-label">Fecha Desde</label>
-                <input name="FechaDesde" type="date" class="form-control"
-                  value="@(Model.FechaDesde.ToString("yyyy-MM-dd"))" required />
+                <label class="form-label">Tipo de Pago</label>
+                <select name="Tipo" class="form-select" id="TipoModal">
+                  <option value="1" selected=@(Model.Tipo == 1 ? "selected" : null)>Pago Total</option>
+                  <option value="2" selected=@(Model.Tipo == 2 ? "selected" : null)>Pagos Mensuales</option>
+                </select>
               </div>
+
+              <div class="col-12 mb-3">
+                <label class="form-label">Fecha Desde</label>
+                <input name="FechaInicio" type="date" class="form-control" id="fechaInicioModal"
+                  value="@(Model.FechaInicio.ToString("yyyy-MM-dd"))" data-new="false" required />
+                <span asp-validation-for="FechaInicio" class="text-danger"></span>
+              </div>
+
               <div class="col-12 mb-3">
                 <label class="form-label">Fecha Hasta</label>
-                <input name="FechaHasta" type="date" class="form-control"
-                  value="@(Model.FechaHasta.ToString("yyyy-MM-dd"))" required />
+                <input name="FechaFinalizacion" type="date" class="form-control" id="fechaFinModal"
+                  value="@(Model.FechaFinalizacion.ToString("yyyy-MM-dd"))" data-new="false" required />
+                <span asp-validation-for="FechaFinalizacion" class="text-danger"></span>
               </div>
+
               <div class="col-12 mb-3">
-                <label class="form-label">Monto Mensual</label>
-                <input name="MontoMensual" type="text" class="form-control"
-                  value="@(Model.MontoMensual.ToString(System.Globalization.CultureInfo.InvariantCulture))" required />
+                <label class="form-label">Monto</label>
+                <input name="Monto" type="text" class="form-control"
+                  value="@(Model.Monto.ToString(System.Globalization.CultureInfo.InvariantCulture))" required />
+                <span asp-validation-for="Monto" class="text-danger"></span>
               </div>
             </div>
 
@@ -232,93 +284,271 @@
       </div>
     </div>
   </div>
+  @if (ViewBag.Pagos)
+  {
+    <div class="modal fade" id="deleteContratoModal" tabindex="-1" aria-labelledby="deleteContratoModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="deleteContratoModalLabel">Eliminar Contrato</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p>¿Estás seguro de que deseas eliminar este contrato?</p>
+            <p>Al confirmar, también se eliminarán <strong>todos los pagos</strong> asociados a este contrato.</p>
+            <p class="small text-muted">Esta acción no se puede deshacer.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+            <form asp-action="EliminarContrato" method="post" class="d-inline">
+              <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  }
 
 }
-
-<script>
-  async function buscarInquilino() {
-    const dniInput = document.getElementById("DniInquilino");
-    const dni = dniInput.value.trim();
-    document.getElementById("dni").value = "";
-    document.getElementById("IdInquilino").value = "";
-    document.getElementById("nombre").value = "";
-    document.getElementById("apellido").value = "";
-    document.getElementById("telefono").value = "";
-    document.getElementById("email").value = "";
-    try {
-      if (!/^[0-9]+$/.test(dni) || (dni.length !== 7 && dni.length !== 8)) {
-        return;
+@if (Model?.IdContrato == 0 || (Model?.Estado == 1 && Model?.CreatedAt.Date == DateTime.Today && ViewBag.Pagos))
+{
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  @if (Model?.IdContrato == 0)
+  {
+    @section Scripts {
+      @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
       }
-      const response = await fetch(`/Inquilino/Inquilino?dni=${dni}`)
-      if (!response.ok) {
-        return;
-      }
-      const text = await response.text();
-      if (!text) {
-        console.warn("El servidor devolvió vacío");
-        return;
-      }
-      const data = JSON.parse(text);
-      if (!data) {
-        console.warn("No se encontró el inquilino");
-        return;
-      }
-      if (data.estado == 0) {
-        console.warn("El inmueble no está disponible")
-        return;
-      }
-
-      document.getElementById("dni").value = data.dni || "";
-      document.getElementById('IdInquilino').value = data.idInquilino || "";
-      document.getElementById("nombre").value = data.nombre || "";
-      document.getElementById("apellido").value = data.apellido || "";
-      document.getElementById("telefono").value = data.telefono || "";
-      document.getElementById("email").value = data.email || "";
-
-      console.warn("Datos cargados en el formulario");
-    } catch (error) {
-      alert("Hubo un problema al buscar");
-      console.error(error);
     }
+    <script>
+      async function buscarInquilino() {
+        const dniInput = document.getElementById("DniInquilino");
+        const dni = dniInput.value.trim();
+        document.getElementById("dni").value = "";
+        document.getElementById("IdInquilino").value = "";
+        document.getElementById("nombre").value = "";
+        document.getElementById("apellido").value = "";
+        document.getElementById("telefono").value = "";
+        document.getElementById("email").value = "";
+        try {
+          if (!/^[0-9]+$/.test(dni) || (dni.length !== 7 && dni.length !== 8)) {
+            return;
+          }
+          const response = await fetch(`/Inquilino/Inquilino?dni=${dni}`)
+          if (!response.ok) {
+            return;
+          }
+          const text = await response.text();
+          if (!text) {
+            console.warn("El servidor devolvió vacío");
+            return;
+          }
+          const data = JSON.parse(text);
+          if (!data) {
+            console.warn("No se encontró el inquilino");
+            return;
+          }
+          if (data.estado == 0) {
+            console.warn("El inmueble no está disponible")
+            return;
+          }
+
+          document.getElementById("dni").value = data.dni || "";
+          document.getElementById('IdInquilino').value = data.idInquilino || "";
+          document.getElementById("nombre").value = data.nombre || "";
+          document.getElementById("apellido").value = data.apellido || "";
+          document.getElementById("telefono").value = data.telefono || "";
+          document.getElementById("email").value = data.email || "";
+
+          console.warn("Datos cargados en el formulario");
+        } catch (error) {
+          alert("Hubo un problema al buscar");
+          console.error(error);
+        }
+      }
+
+      async function buscarInmueble() {
+        const idInput = document.getElementById("IdInmueble");
+        const idInmueble = idInput.value.trim();
+        document.getElementById("idInmueble").value = "";
+        document.getElementById("tipoInmueble").value = "";
+        document.getElementById("precio").value = "";
+        document.getElementById("direccion").value = "";
+        document.getElementById("cantidad_ambientes").value = "";
+        try {
+          if (!/^[0-9]+$/.test(idInmueble)) {
+            return;
+          }
+          const response = await fetch(`/Inmueble/Inmueble?idInmueble=${idInmueble}`);
+
+          if (!response.ok) {
+            console.error("Error en la respuesta:", response.status);
+            return;
+          }
+          const text = await response.text();
+          if (!text) {
+            console.warn("El servidor devolvió vacío");
+            return;
+          }
+          const data = JSON.parse(text);
+          if (!data) {
+            console.warn("No se encontró el inquilino");
+            return;
+          }
+
+          document.getElementById("idInmueble").value = data.idInmueble || "";
+          document.getElementById("tipoInmueble").value = data.idTipoInmueble || "";
+          document.getElementById("precio").value = data.precio || "";
+          document.getElementById("direccion").value = data.direccion || "";
+          document.getElementById("cantidad_ambientes").value = data.cantidadAmbientes || "";
+          if (data.idInmueble) {
+            traerFechas(data.idInmueble, '');
+          }
+        } catch (error) {
+          alert("Hubo un problema al buscar");
+          console.error(error);
+        }
+      }
+    </script>
   }
-
-  async function buscarInmueble() {
-    const idInput = document.getElementById("IdInmueble");
-    const idInmueble = idInput.value.trim();
-    document.getElementById("idInmueble").value = "";
-    document.getElementById("tipoInmueble").value = "";
-    document.getElementById("precio").value = "";
-    document.getElementById("direccion").value = "";
-    document.getElementById("cantidad_ambientes").value = "";
-    try {
-      if (!/^[0-9]+$/.test(idInmueble)) {
-        return;
+  <script>
+    async function traerFechas(idInmueble, idContrato = '') {
+      if (!idInmueble) return; // nada que consultar
+      try {
+        const url = `/Contrato/Fechas?idInmueble=${encodeURIComponent(idInmueble)}&idContrato=${encodeURIComponent(idContrato || '')}`;
+        const resp = await fetch(url);
+        if (!resp.ok) { console.error("Error fetch fechas:", resp.status); return; }
+        contratosExistentes = await resp.json(); // [{ inicio:'YYYY-MM-DD', fin:'YYYY-MM-DD' }, ...]
+        initAllCalendars(); // re-crea/actualiza calendarios con los datos nuevos
+      } catch (err) {
+        console.error("traerFechas error", err);
       }
-      const response = await fetch(`/Inmueble/Inmueble?idInmueble=${idInmueble}`);
-
-      if (!response.ok) {
-        console.error("Error en la respuesta:", response.status);
-        return;
-      }
-      const text = await response.text();
-      if (!text) {
-        console.warn("El servidor devolvió vacío");
-        return;
-      }
-      const data = JSON.parse(text);
-      if (!data) {
-        console.warn("No se encontró el inquilino");
-        return;
-      }
-
-      document.getElementById("idInmueble").value = data.idInmueble || "";
-      document.getElementById("tipoInmueble").value = data.idTipoInmueble || "";
-      document.getElementById("precio").value = data.precio || "";
-      document.getElementById("direccion").value = data.direccion || "";
-      document.getElementById("cantidad_ambientes").value = data.cantidadAmbientes || "";
-    } catch (error) {
-      alert("Hubo un problema al buscar");
-      console.error(error);
     }
-  }
-</script>
+  </script>
+  <script>
+    var contratosExistentes = [];
+    var pickers = {};
+
+    function buildDisabledRanges(contratos) {
+      if (!Array.isArray(contratos)) return [];
+      return contratos
+        .filter(c => c && c.inicio && c.fin)
+        .map(c => ({ from: c.inicio, to: c.fin }));
+    }
+
+    function nextBlockedRangeStartAfter(date, disabledRanges) {
+      const d = (date instanceof Date) ? date : new Date(date);
+      const next = disabledRanges
+        .map(r => new Date(r.from))
+        .filter(r => r > d)
+        .sort((a, b) => a - b);
+      return next.length ? next[0].toISOString().split('T')[0] : null;
+    }
+
+    function dayBeforeIso(isoDate) {
+      const d = new Date(isoDate);
+      d.setDate(d.getDate() - 1);
+      return d.toISOString().split('T')[0];
+    }
+
+    function destroyPickers() {
+      Object.values(pickers).forEach(p => p?.destroy?.());
+      pickers = {};
+    }
+
+    function createPicker(startSelector, endSelector, disabledRanges, isNew) {
+      const startInput = document.querySelector(startSelector);
+      const endInput = document.querySelector(endSelector);
+      if (!startInput || !endInput) return;
+
+      const key = startSelector.replace(/[^a-zA-Z0-9]/g, '');
+
+      const parseISO = (str) => str ? new Date(str.split('-')[0], str.split('-')[1] - 1, str.split('-')[2]) : null;
+
+      const markDayClasses = (dayElem) => {
+        const day = dayElem.dateObj;
+        const dayTs = new Date(day.getFullYear(), day.getMonth(), day.getDate()).getTime();
+        const startDate = parseISO(startInput.value);
+        const endDate = parseISO(endInput.value);
+
+        dayElem.classList.remove('fecha-seleccionada-inicio', 'fecha-seleccionada-fin', 'fecha-en-rango');
+
+        if (startDate && dayTs === startDate.getTime()) dayElem.classList.add("fecha-seleccionada-inicio");
+        if (endDate && dayTs === endDate.getTime()) dayElem.classList.add("fecha-seleccionada-fin");
+        if (startDate && endDate && dayTs > startDate.getTime() && dayTs < endDate.getTime()) dayElem.classList.add("fecha-en-rango");
+      };
+
+      const onDayCreate = function (dObj, dStr, fp, dayElem) {
+        markDayClasses(dayElem);
+      };
+
+      const onChangeStart = function (selectedDates) {
+        const sel = selectedDates[0];
+        if (!sel) return;
+        const endPicker = pickers['end_' + key];
+        if (!endPicker) return;
+
+        endPicker.set('minDate', sel);
+
+        const nextBlocked = nextBlockedRangeStartAfter(sel, disabledRanges);
+        endPicker.set('maxDate', nextBlocked ? dayBeforeIso(nextBlocked) : null);
+
+        pickers['start_' + key].redraw();
+        endPicker.redraw();
+      };
+
+      pickers['start_' + key] = flatpickr(startInput, {
+        dateFormat: 'Y-m-d',
+        disable: disabledRanges,
+        allowInput: true,
+        onChange: onChangeStart,
+        onValueUpdate: function () {
+          const endPicker = pickers['end_' + key];
+          if (endPicker) endPicker.redraw();
+        },
+        onDayCreate
+      });
+
+      pickers['end_' + key] = flatpickr(endInput, {
+        dateFormat: 'Y-m-d',
+        disable: disabledRanges,
+        allowInput: true,
+        onValueUpdate: function () {
+          const startPicker = pickers['start_' + key];
+          if (startPicker) startPicker.redraw();
+        },
+        onDayCreate
+      });
+    }
+
+    function initAllCalendars() {
+      const disabledRanges = buildDisabledRanges(contratosExistentes);
+      destroyPickers();
+
+      const startInput = document.querySelector('#fechaInicio');
+      const endInput = document.querySelector('#fechaFin');
+
+      if (startInput.dataset.new === 'true') {
+        let firstAvailable = new Date();
+        for (let r of disabledRanges) {
+          const from = new Date(r.from), to = new Date(r.to);
+          if (firstAvailable >= from && firstAvailable <= to) {
+            firstAvailable = new Date(to);
+            firstAvailable.setDate(firstAvailable.getDate() + 1);
+          }
+        }
+        startInput.value = firstAvailable.toISOString().split('T')[0];
+      }
+
+      createPicker('#fechaInicio', '#fechaFin', disabledRanges, true);
+      createPicker('#fechaInicioModal', '#fechaFinModal', disabledRanges, false);
+    }
+
+    document.addEventListener('DOMContentLoaded', initAllCalendars);
+
+  </script>
+}
