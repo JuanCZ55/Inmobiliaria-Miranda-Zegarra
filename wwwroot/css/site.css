@@ -304,3 +304,38 @@ header {
 .bg-azul-oscuro {
   background: rgba(13, 24, 54, 0.877);
 }
+/* Días deshabilitados */
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover,
+.flatpickr-day.notAllowed {
+  background-color: #ffcccc !important;
+  color: #990000 !important;
+  border-radius: 50% !important;
+  cursor: not-allowed;
+}
+
+/* Día de hoy que no está seleccionado */
+.flatpickr-day.today:not(.fecha-seleccionada-inicio):not(.fecha-seleccionada-fin):not(.fecha-en-rango) {
+  background: none !important;
+  color: inherit !important;
+}
+
+/* Día de inicio */
+.flatpickr-day.fecha-seleccionada-inicio {
+  background: #0d6efd !important;
+  color: #fff !important;
+  border-radius: 50%;
+}
+
+/* Día de fin */
+.flatpickr-day.fecha-seleccionada-fin {
+  background: #0d6efd !important;
+  color: #fff !important;
+  border-radius: 50%;
+}
+
+/* Días intermedios */
+.flatpickr-day.fecha-en-rango {
+  background: #b6d4fe !important;
+  color: #000 !important;
+}
