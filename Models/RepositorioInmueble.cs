@@ -107,7 +107,32 @@ namespace Inmobiliaria.Models
             using (var conn = new MySqlConnection(connectionString))
             {
                 var sql =
-                    @"SELECT * FROM inmueble JOIN tipo_inmueble ON inmueble.id_tipo_inmueble = tipo_inmueble.id_tipo_inmueble JOIN propietario ON inmueble.id_propietario = propietario.id_propietario WHERE id_inmueble=@IdInmueble";
+                    @"
+            SELECT 
+                inm.id_inmueble,
+                inm.id_propietario,
+                inm.id_tipo_inmueble,
+                inm.direccion,
+                inm.uso,
+                inm.cantidad_ambientes,
+                inm.longitud,
+                inm.latitud,
+                inm.precio,
+                inm.descripcion,
+                inm.estado,
+                inm.created_at,
+                inm.updated_at,
+                ti.id_tipo_inmueble AS tipo_id,
+                ti.nombre AS tipo_nombre,
+                p.id_propietario AS propietario_id,
+                p.nombre AS propietario_nombre,
+                p.apellido AS propietario_apellido,
+                p.dni AS propietario_dni
+            FROM inmueble inm
+            JOIN tipo_inmueble ti ON inm.id_tipo_inmueble = ti.id_tipo_inmueble
+            JOIN propietario p ON inm.id_propietario = p.id_propietario
+            WHERE inm.id_inmueble=@IdInmueble";
+
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@IdInmueble", IdInmueble);
@@ -129,17 +154,19 @@ namespace Inmobiliaria.Models
                             i.Estado = reader.GetInt32("estado");
                             i.CreatedAt = reader.GetDateTime("created_at");
                             i.UpdatedAt = reader.GetDateTime("updated_at");
+
                             i.TipoInmueble = new TipoInmueble
                             {
-                                IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
-                                Nombre = reader.GetString("nombre"),
+                                IdTipoInmueble = reader.GetInt32("tipo_id"),
+                                Nombre = reader.GetString("tipo_nombre"),
                             };
+
                             i.Propietario = new Propietario
                             {
-                                IdPropietario = reader.GetInt32("id_propietario"),
-                                Nombre = reader.GetString("nombre"),
-                                Apellido = reader.GetString("apellido"),
-                                Dni = reader.GetString("dni"),
+                                IdPropietario = reader.GetInt32("propietario_id"),
+                                Nombre = reader.GetString("propietario_nombre"),
+                                Apellido = reader.GetString("propietario_apellido"),
+                                Dni = reader.GetString("propietario_dni"),
                             };
                         }
                     }
