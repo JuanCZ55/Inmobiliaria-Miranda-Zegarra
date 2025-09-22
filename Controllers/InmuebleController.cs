@@ -34,14 +34,6 @@ namespace Inmobiliaria.Controllers
         public IActionResult Crear()
         {
             ViewBag.Tipos = repoTipo.TenerTodos();
-            ViewBag.Propietarios = repoPropietario
-                .ObtenerTodos()
-                .Select(p => new
-                {
-                    p.IdPropietario,
-                    NombreCompleto = p.Nombre + " " + p.Apellido + " - " + p.Dni,
-                })
-                .ToList();
             return View();
         }
 
@@ -80,14 +72,7 @@ namespace Inmobiliaria.Controllers
                 {
                     return RedirectToAction(nameof(Listar));
                 }
-                ViewBag.Propietarios = repoPropietario
-                    .ObtenerTodos()
-                    .Select(p => new
-                    {
-                        p.IdPropietario,
-                        NombreCompleto = p.Nombre + " " + p.Apellido + " - " + p.Dni,
-                    })
-                    .ToList();
+
                 ViewBag.Tipos = repoTipo.TenerTodos();
                 return View(i);
             }
@@ -112,14 +97,7 @@ namespace Inmobiliaria.Controllers
                         $"Se modifico correctamente el inmueble de {inmueble.Direccion}";
                     return RedirectToAction(nameof(Listar));
                 }
-                ViewBag.Propietarios = repoPropietario
-                    .ObtenerTodos()
-                    .Select(p => new
-                    {
-                        p.IdPropietario,
-                        NombreCompleto = p.Nombre + " " + p.Apellido + " - " + p.Dni,
-                    })
-                    .ToList();
+
                 ViewBag.Tipos = repoTipo.TenerTodos();
                 return View(inmueble);
             }
