@@ -19,12 +19,14 @@ namespace Inmobiliaria.Models
 
         public DateTime? FechaCancelacion { get; set; }
 
-        [Required(ErrorMessage = "El monto es obligatorio")]
+        [Required(ErrorMessage = "El monto es obligatorio.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "El monto debe ser un valor positivo.")]
         public decimal Monto { get; set; }
 
         public decimal? Multa { get; set; }
-        [Required(ErrorMessage = "La el tipo de contrato es obligatorio")]
-        public int Tipo { get; set; } = 0; 
+        [Required(ErrorMessage = "El tipo de contrato es obligatorio")]
+        [Range(1, 2, ErrorMessage = "Seleccione Pago Total o Pagos Mensuales.")]
+        public int Tipo { get; set; }
 
         public int Estado { get; set; } = 1;
 
@@ -60,5 +62,21 @@ namespace Inmobiliaria.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
+        // Validación personalizada
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (FechaInicio >= FechaFinalizacion)
+            {
+                yield return new ValidationResult(
+                    "La fecha de inicio debe ser menor que la fecha de finalización",
+                    new[] { nameof(FechaInicio), nameof(FechaFinalizacion) }
+                );
+            }
+        }
+        public bool Validate()
+        {
+            return FechaInicio >= FechaFinalizacion;
+        }
     }
 }

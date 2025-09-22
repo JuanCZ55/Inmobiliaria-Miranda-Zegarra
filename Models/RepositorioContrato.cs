@@ -16,16 +16,20 @@ namespace Inmobiliaria.Models
       int res = -1;
       using (var conn = new MySqlConnection(connectionString))
       {
-        var sql = @"INSERT INTO contrato (id_inquilino, id_inmueble, fecha_desde, fecha_hasta, monto_mensual, estado) VALUES (@id_inquilino, @id_inmueble, @fecha_desde, @fecha_hasta, @monto_mensual, @estado); SELECT LAST_INSERT_ID();";
+        var sql = @"
+        INSERT INTO contrato (id_inquilino, id_inmueble, fecha_desde, fecha_hasta, monto_mensual, tipo, estado, created_at, updated_at) 
+        VALUES (@id_inquilino, @id_inmueble, @fecha_desde, @fecha_hasta, @monto_mensual, @tipo, @estado, current_timestamp(), current_timestamp()); 
+        SELECT LAST_INSERT_ID();";
 
         using (var cmd = new MySqlCommand(sql, conn))
         {
           cmd.Parameters.AddWithValue("@id_inquilino", contrato.IdInquilino);
           cmd.Parameters.AddWithValue("@id_inmueble", contrato.IdInmueble);
-          cmd.Parameters.AddWithValue("@fecha_desde", contrato.FechaDesde);
-          cmd.Parameters.AddWithValue("@fecha_hasta", contrato.FechaHasta);
-          cmd.Parameters.AddWithValue("@monto_mensual", contrato.MontoMensual);
-          cmd.Parameters.AddWithValue("@estado", contrato.Estado);
+          cmd.Parameters.AddWithValue("@fecha_desde", contrato.FechaInicio);
+          cmd.Parameters.AddWithValue("@fecha_hasta", contrato.FechaFinalizacion);
+          cmd.Parameters.AddWithValue("@monto_mensual", contrato.Monto);
+          cmd.Parameters.AddWithValue("@tipo", contrato.Tipo);
+          cmd.Parameters.AddWithValue("@estado", 1);
           conn.Open();
           res = System.Convert.ToInt32(cmd.ExecuteScalar());
           contrato.IdContrato = res;
@@ -48,7 +52,6 @@ namespace Inmobiliaria.Models
           conn.Open();
           res = cmd.ExecuteNonQuery();
           conn.Close();
-
         }
       }
       return res;
@@ -63,7 +66,7 @@ namespace Inmobiliaria.Models
         using (var cmd = new MySqlCommand(sql, conn))
         {
 
-          cmd.Parameters.AddWithValue("@fecha_fin", contrato.FechaFin ?? (object)DBNull.Value);
+          cmd.Parameters.AddWithValue("@fecha_fin", contrato.FechaCancelacion ?? (object)DBNull.Value);
           cmd.Parameters.AddWithValue("@multa", contrato.Multa);
           cmd.Parameters.AddWithValue("@id_contrato", contrato.IdContrato);
           conn.Open();
@@ -77,8 +80,31 @@ namespace Inmobiliaria.Models
 
     public int Modificar(Contrato contrato)
     {
-      return -1;
+      int res = -1;
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"UPDATE contrato 
+                    SET fecha_desde = @fecha_desde,
+                        fecha_hasta = @fecha_hasta,
+                        monto_mensual = @monto_mensual,
+                        tipo = @tipo,
+                        updated_at = NOW()
+                    WHERE id_contrato = @id_contrato;";
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          cmd.Parameters.AddWithValue("@fecha_desde", contrato.FechaInicio);
+          cmd.Parameters.AddWithValue("@fecha_hasta", contrato.FechaFinalizacion);
+          cmd.Parameters.AddWithValue("@monto_mensual", contrato.Monto);
+          cmd.Parameters.AddWithValue("@tipo", contrato.Tipo);
+          cmd.Parameters.AddWithValue("@id_contrato", contrato.IdContrato);
+          conn.Open();
+          res = cmd.ExecuteNonQuery();
+          conn.Close();
+        }
+      }
+      return res;
     }
+
 
     public int Eliminar(int id)
     {
@@ -110,6 +136,7 @@ namespace Inmobiliaria.Models
             c.fecha_terminacion_anticipada, 
             c.monto_mensual, 
             c.multa, 
+            c.tipo,
             c.estado, 
             c.id_inmueble, 
             c.id_inquilino, 
@@ -158,15 +185,16 @@ namespace Inmobiliaria.Models
               Contrato = new Contrato
               {
                 IdContrato = reader.GetInt32("id_Contrato"),
-                FechaDesde = reader.GetDateTime("fecha_desde"),
-                FechaHasta = reader.GetDateTime("fecha_hasta"),
-                FechaFin = reader.IsDBNull(reader.GetOrdinal("fecha_terminacion_anticipada"))
+                FechaInicio = reader.GetDateTime("fecha_desde"),
+                FechaFinalizacion = reader.GetDateTime("fecha_hasta"),
+                FechaCancelacion = reader.IsDBNull(reader.GetOrdinal("fecha_terminacion_anticipada"))
                                   ? (DateTime?)null
                                   : reader.GetDateTime("fecha_terminacion_anticipada"),
-                MontoMensual = reader.GetDecimal("monto_mensual"),
+                Monto = reader.GetDecimal("monto_mensual"),
                 Multa = reader.IsDBNull(reader.GetOrdinal("multa"))
                                   ? (decimal?)null
                                   : reader.GetDecimal(reader.GetOrdinal("multa")),
+                Tipo = reader.GetInt32("tipo"),
                 Estado = reader.GetInt32("estado"),
                 IdInmueble = reader.GetInt32("id_inmueble"),
                 Inmueble = new Inmueble
@@ -269,8 +297,6 @@ namespace Inmobiliaria.Models
           JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino
           WHERE 1=1 
         ";
-
-        // Filtros dinámicos con LIKE
         if (!string.IsNullOrEmpty(idContrato))
           sql += " AND c.id_contrato LIKE @idContrato";
 
@@ -289,7 +315,7 @@ namespace Inmobiliaria.Models
         if (!string.IsNullOrEmpty(Fecha_hasta))
           sql += " AND c.fecha_hasta <= @fechaHasta";
 
-        sql += " LIMIT @limite OFFSET @offset";
+        sql += " ORDER BY c.id_contrato DESC LIMIT @limite OFFSET @offset";
 
         using (var cmd = new MySqlCommand(sql, conn))
         {
@@ -321,12 +347,12 @@ namespace Inmobiliaria.Models
               lista.Add(new Contrato
               {
                 IdContrato = reader.GetInt32("id_Contrato"),
-                FechaDesde = reader.GetDateTime("fecha_desde"),
-                FechaHasta = reader.GetDateTime("fecha_hasta"),
-                FechaFin = reader.IsDBNull("fecha_terminacion_anticipada")
+                FechaInicio = reader.GetDateTime("fecha_desde"),
+                FechaFinalizacion = reader.GetDateTime("fecha_hasta"),
+                FechaCancelacion = reader.IsDBNull("fecha_terminacion_anticipada")
                                     ? (DateTime?)null
                                     : reader.GetDateTime("fecha_terminacion_anticipada"),
-                MontoMensual = reader.GetDecimal("monto_mensual"),
+                Monto = reader.GetDecimal("monto_mensual"),
                 Multa = reader.IsDBNull(reader.GetOrdinal("multa"))
                                     ? (decimal?)null
                                     : reader.GetDecimal(reader.GetOrdinal("multa")),
@@ -351,7 +377,7 @@ namespace Inmobiliaria.Models
                   Descripcion = reader.GetString("inm_descripcion"),
                   IdTipoInmueble = reader.GetInt32("ti_id_tipo_inmueble"),
                   TipoInmueble = new TipoInmueble
-                  { 
+                  {
                     Nombre = reader.GetString("ti_nombre")
                   }
                 },
@@ -376,30 +402,6 @@ namespace Inmobiliaria.Models
       return lista;
     }
 
-    public int ExisteSolapamiento(int idInmueble, DateTime fechaDesde, DateTime fechaHasta)
-    {
-      int cont = 0;
-      using (var conn = new MySqlConnection(connectionString))
-      {
-        var sql = @"
-              SELECT COUNT(1)
-              FROM contrato c JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
-              WHERE c.id_inmueble = @idInmueble 
-              AND c.estado = 1
-              AND NOT (@fechaHasta < c.fecha_desde OR @fechaDesde > c.fecha_hasta)";
-
-        using (var cmd = new MySqlCommand(sql, conn))
-        {
-          cmd.Parameters.AddWithValue("@idInmueble", idInmueble);
-          cmd.Parameters.AddWithValue("@fechaDesde", fechaDesde);
-          cmd.Parameters.AddWithValue("@fechaHasta", fechaHasta);
-          conn.Open();
-          cont = Convert.ToInt32(cmd.ExecuteScalar());
-          conn.Close();
-          return cont;
-        }
-      }
-    }
 
     public int validarContratoCancelar(int idContrato, DateTime? fechaCancelar)
     {
@@ -506,6 +508,159 @@ namespace Inmobiliaria.Models
       }
       return total;
     }
-  }
 
+    public int ValidarSolapamiento(Contrato contrato)
+    {
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"
+            SELECT COUNT(1)
+            FROM contrato c
+            JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
+            WHERE c.id_inmueble = @idInmueble
+              AND inm.estado = 1
+              AND c.estado <> 1 
+              AND c.id_contrato <> @idContrato
+              AND NOT (@fechaFin < c.fecha_desde OR @fechaInicio > c.fecha_hasta)";
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          cmd.Parameters.AddWithValue("@idInmueble", contrato.IdInmueble);
+          cmd.Parameters.AddWithValue("@fechaInicio", contrato.FechaInicio);
+          cmd.Parameters.AddWithValue("@fechaFin", contrato.FechaFinalizacion);
+          cmd.Parameters.AddWithValue("@idContrato", contrato.IdContrato);
+          conn.Open();
+          return Convert.ToInt32(cmd.ExecuteScalar());
+        }
+      }
+    }
+
+    public int CrearContratoConPago(Contrato contrato, Pago pago)
+    {
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        conn.Open();
+        using (var transaction = conn.BeginTransaction())
+        {
+          try
+          {
+            var sqlContrato = @"
+                    INSERT INTO contrato (id_inquilino, id_inmueble, fecha_desde, fecha_hasta, monto_mensual, tipo, estado, created_at, updated_at) 
+                    VALUES (@id_inquilino, @id_inmueble, @fecha_desde, @fecha_hasta, @monto_mensual, @tipo, @estado, current_timestamp(), current_timestamp());
+                    SELECT LAST_INSERT_ID();";
+            using (var cmdContrato = new MySqlCommand(sqlContrato, conn, transaction))
+            {
+              cmdContrato.Parameters.AddWithValue("@id_inquilino", contrato.IdInquilino);
+              cmdContrato.Parameters.AddWithValue("@id_inmueble", contrato.IdInmueble);
+              cmdContrato.Parameters.AddWithValue("@fecha_desde", contrato.FechaInicio);
+              cmdContrato.Parameters.AddWithValue("@fecha_hasta", contrato.FechaFinalizacion);
+              cmdContrato.Parameters.AddWithValue("@monto_mensual", contrato.Monto);
+              cmdContrato.Parameters.AddWithValue("@tipo", contrato.Tipo);
+              cmdContrato.Parameters.AddWithValue("@estado", 1);
+              contrato.IdContrato = Convert.ToInt32(cmdContrato.ExecuteScalar());
+            }
+
+            pago.IdContrato = contrato.IdContrato;
+            var sqlPago = @"
+                    INSERT INTO pago (id_contrato, numero_pago, fecha_pago, concepto, monto, estado, created_at, updated_at) 
+                    VALUES (@id_contrato, @numero_pago, @fecha_pago, @concepto, @monto, @estado, current_timestamp(), current_timestamp());
+                    SELECT LAST_INSERT_ID();";
+            using (var cmdPago = new MySqlCommand(sqlPago, conn, transaction))
+            {
+              cmdPago.Parameters.AddWithValue("@id_contrato", pago.IdContrato);
+              cmdPago.Parameters.AddWithValue("@numero_pago", pago.numeroPago);
+              cmdPago.Parameters.AddWithValue("@fecha_pago", pago.FechaPago);
+              cmdPago.Parameters.AddWithValue("@concepto", pago.Concepto);
+              cmdPago.Parameters.AddWithValue("@monto", pago.Monto);
+              cmdPago.Parameters.AddWithValue("@estado", 1);
+              pago.IdPago = Convert.ToInt32(cmdPago.ExecuteScalar());
+            }
+            transaction.Commit();
+            return contrato.IdContrato;
+          }
+          catch
+          {
+            transaction.Rollback();
+            return 0;
+          }
+        }
+      }
+    }
+
+
+    public List<Contrato> FechasOcupadas(int idInmueble, string? idContrato)
+    {
+      var contratos = new List<Contrato>();
+
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"
+            SELECT c.fecha_desde, c.fecha_hasta
+            FROM contrato c
+            JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
+            WHERE c.id_inmueble = @idInmueble
+              AND c.estado = 1
+              AND inm.estado = 1 ";
+        if (!string.IsNullOrEmpty(idContrato))
+          sql += " AND c.id_contrato <> @idContrato";
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          cmd.Parameters.AddWithValue("@idInmueble", idInmueble);
+          if (!string.IsNullOrEmpty(idContrato))
+            cmd.Parameters.AddWithValue("@idContrato", idContrato);
+
+          conn.Open();
+          using (var reader = cmd.ExecuteReader())
+          {
+            while (reader.Read())
+            {
+              contratos.Add(new Contrato
+              {
+                FechaInicio = reader.GetDateTime("fecha_desde"),
+                FechaFinalizacion = reader.GetDateTime("fecha_hasta")
+              });
+            }
+          }
+        }
+      }
+      return contratos;
+    }
+
+    public int EliminarContratoConPagoS(int idContrato)
+    {
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        conn.Open();
+        using (var transaction = conn.BeginTransaction())
+        {
+          int res = -1;
+          try
+          {
+            var sqlPago = @"DELETE FROM pago WHERE id_contrato = @id_contrato;";
+            using (var cmdPago = new MySqlCommand(sqlPago, conn, transaction))
+            {
+              cmdPago.Parameters.AddWithValue("@id_contrato", idContrato);
+              cmdPago.ExecuteNonQuery();
+            }
+
+            var sqlContrato = @"DELETE FROM contrato WHERE id_contrato = @id_contrato;";
+            using (var cmdContrato = new MySqlCommand(sqlContrato, conn, transaction))
+            {
+              cmdContrato.Parameters.AddWithValue("@id_contrato", idContrato);
+              res = cmdContrato.ExecuteNonQuery();
+            }
+            transaction.Commit();
+            return res;
+          }
+          catch
+          {
+            transaction.Rollback();
+            return -1; 
+          }
+        }
+      }
+    }
+
+
+
+  }
 }
