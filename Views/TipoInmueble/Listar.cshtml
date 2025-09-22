@@ -2,118 +2,126 @@
 @{
   ViewData["Title"] = "Listado de Tipos de Inmueble";
   Layout = "~/Views/Shared/_Layout.cshtml";
+  var paginaActual = ViewBag.PaginaActual ?? 1;
+  var totalPaginas = ViewBag.TotalPaginas ?? 1;
+  var nombreFiltro = ViewBag.Nombre ?? "";
 }
 
-<h2>Listado de Tipos de Inmueble <a class="btn btn-primary " asp-controller="TipoInmueble" asp-action="Crear">+</a>
-</h2>
+<div class="d-flex align-items-center">
+  <h2 class="text-center py-4">@ViewData["Title"]</h2>
 
-<div class="container px-0 p-3">
-  <div class="d-flex">
-    <div class="zeg-field" style="max-width: 300px;">
-      <input type="text" id="nombreInput" name="nombre" class="zeg-input" placeholder=" " />
-      <label for="nombreInput">Ingrese nombre</label>
+  <a class="btn btn-primary ms-3" asp-action="Crear">
+    <img class="invert-color-icon" src="~/images/icon/Agregar.png" alt="">
+  </a>
+</div>
+
+<div class="d-flex flex-column">
+  <form method="get" asp-action="Listar" class="row g-2 bg-white shadow-sm rounded p-3">
+    <div class="row">
+      <div class="col-md-12 d-flex justify-content-start align-items-center pb-2">
+        <h4 class="ps-2 pe-3 m-0 fw-bold">Filtrar</h4>
+      </div>
+      <div class="col-md-2">
+        <div class="zeg-field" style="max-width: 300px;">
+          <input type="text" id="nombre" name="nombre" value="@nombreFiltro" class="zeg-input"/>
+          <label for="nombre">Filtrar por Nombre</label>
+        </div>
+      </div>
+      <div class="col-md-2 d-flex justify-content-start align-items-center pb-3">
+        <button type="submit" class="btn btn-outline-primary fw-bold me-4">Filtrar</button>
+      </div>
     </div>
-  </div>
+  </form>
 </div>
 
 
-<table class="table table-hover table-caption-top">
-  <thead class="table-dark">
-    <tr>
-      <th>IdTipoInmueble</th>
-      <th>Nombre</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody id="tablaTipo">
-    <!-- Se llenara dinamicamente -->
-  </tbody>
-</table>
-
-<div class="d-flex justify-content-between align-items-center">
-  <button type="button" onclick="cambiarPagina(-1)">&lt;</button>
-  <select id="paginas"></select>
-  <button type="button" onclick="cambiarPagina(1)">&gt;</button>
+<div class="table-responsive shadow-sm rounded mt-4">
+  <table class="table table-hover table-striped align-middle mb-0">
+    <thead class="bg-primary text-white text-center">
+      <tr>
+        <th>@Html.DisplayNameFor(model => model.First().IdTipoInmueble)</th>
+        <th>@Html.DisplayNameFor(model => model.First().Nombre)</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      @if (Model != null && Model.Any())
+      {
+        @foreach (var tipo in Model)
+        {
+          <tr>
+            <td>@tipo.IdTipoInmueble</td>
+            <td>@tipo.Nombre</td>
+            <td class="d-flex justify-content-center">
+              <a asp-action="Modificar" asp-route-id="@tipo.IdTipoInmueble" class="btn btn-link" data-bs-toggle="tooltip"
+                title="Modificar Tipo de Inmueble">
+                <img src="~/images/icon/Editar.png" alt="Editar">
+              </a>
+              <form asp-action="Eliminar" asp-route-id="@tipo.IdTipoInmueble" method="post">
+                <button type="submit" class="btn btn-link" data-bs-toggle="tooltip" title="Eliminar Tipo de Inmueble">
+                  <img src="~/images/icon/Eliminar.png" alt="Eliminar" />
+                </button>
+              </form>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
 </div>
 
-@if (TempData["Mensaje"] != null)
+
+@if (totalPaginas > 1)
 {
-  <div class="alert alert-success alertaTemp">@TempData["Mensaje"]</div>
-}
-@if (TempData["Warning"] != null)
-{
-  <div class="alert alert-warning alertaTemp">@TempData["Warning"]</div>
-}
+  <nav aria-label="Paginación" class="mt-3">
+    <ul class="pagination justify-content-center">
 
-<script>
-  let paginaActual = 1;
+      @* Botón al inicio "<" *@
+      <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+        <a class="page-link" asp-action="Listar" asp-route-dni="@nombreFiltro" asp-route-PaginaActual="1">&lt;</a>
+      </li>
 
-  async function ListarNombre() {
-    const input = document.getElementById("nombreInput").value.trim();
-    try {
-      let url = input
-        ? `/TipoInmueble/ListarPorNombre?nombre=${encodeURIComponent(input)}&PaginaActual=${paginaActual}`
-        : `/TipoInmueble/ListarTodos?PaginaActual=${paginaActual}`;
+      @{
+        int botonesCentrales = 8; // cantidad de botones centrales
+        int mitad = botonesCentrales / 2;
 
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Error en la busqueda");
+        int inicio = Math.Max(paginaActual - mitad + 1, 1);
+        int fin = inicio + botonesCentrales - 1;
 
-      const data = await response.json();
-      const tbody = document.getElementById("tablaTipo");
-      tbody.innerHTML = "";
+        if (fin > totalPaginas - 2)
+        {
+          fin = totalPaginas - 2; // reservamos espacio para los dos últimos
+          inicio = Math.Max(fin - botonesCentrales + 1, 1);
+        }
 
-      if (!data.lista || data.lista.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" class="text-center">No se encontraron tipos de inmueble</td></tr>`;
-        document.getElementById("paginas").innerHTML = "";
-        return;
+        // Botones centrales
+        for (int i = inicio; i <= fin; i++)
+        {
+          <li class="page-item @(i == paginaActual ? "active" : "")">
+            <a class="page-link" asp-action="Listar" asp-route-dni="@nombreFiltro" asp-route-PaginaActual="@i">@i</a>
+          </li>
+        }
+
+        @* Botón "..." *@
+        @if (fin < totalPaginas - 2)
+        {
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+        }
+
+        @* Dos últimos botones *@
+        for (int i = Math.Max(totalPaginas - 1, fin + 1); i <= totalPaginas; i++)
+        {
+          <li class="page-item @(i == paginaActual ? "active" : "")">
+            <a class="page-link" asp-action="Listar" asp-route-dni="@nombreFiltro" asp-route-PaginaActual="@i">@i</a>
+          </li>
+        }
       }
 
-      data.lista.forEach(t => {
-        tbody.innerHTML += `
-                    <tr>
-                        <td>${t.idTipoInmueble}</td>
-                        <td>${t.nombre}</td>
-                        <td class="d-flex justify-content-evenly">
-                            <a href="/TipoInmueble/Modificar/${t.idTipoInmueble}" class="btn btn-warning btn-sm">Modificar</a>
-                            <form action="/TipoInmueble/Eliminar/${t.idTipoInmueble}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>`;
-      });
+      @* Botón final ">" *@
+      <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+        <a class="page-link" asp-action="Listar" asp-route-dni="@nombreFiltro" asp-route-PaginaActual="@totalPaginas">&gt;</a>
+      </li>
 
-      // Actualizamos el select de paginas
-      const select = document.getElementById("paginas");
-      select.innerHTML = "";
-      for (let i = 1; i <= data.totalPaginas; i++) {
-        select.innerHTML += `<option value="${i}" ${i === paginaActual ? "selected" : ""}>${i}</option>`;
-      }
-
-    } catch (err) {
-      console.error(err);
-      alert("Hubo un problema al buscar");
-    }
-  }
-
-  function cambiarPagina(valor) {
-    const select = document.getElementById("paginas");
-    let nuevaPagina = paginaActual + valor;
-    const maxPagina = select.options.length;
-    if (nuevaPagina < 1) nuevaPagina = 1;
-    if (nuevaPagina > maxPagina) nuevaPagina = maxPagina;
-    paginaActual = nuevaPagina;
-    ListarNombre();
-  }
-
-  document.getElementById("paginas").addEventListener("change", function () {
-    paginaActual = parseInt(this.value);
-    ListarNombre();
-  });
-
-  document.getElementById("nombreInput").addEventListener("input", function () {
-    paginaActual = 1;
-    ListarNombre();
-  });
-
-  window.onload = ListarNombre;
-</script>
+    </ul>
+  </nav>
+}
