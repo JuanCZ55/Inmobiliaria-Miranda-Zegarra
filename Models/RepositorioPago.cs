@@ -294,12 +294,12 @@ namespace Inmobiliaria.Models
                 contrato = new Contrato
                 {
                   IdContrato = reader.GetInt32("id_Contrato"),
-                  FechaDesde = reader.GetDateTime("fecha_desde"),
-                  FechaHasta = reader.GetDateTime("fecha_hasta"),
-                  FechaFin = reader.IsDBNull(reader.GetOrdinal("fecha_terminacion_anticipada"))
+                  FechaInicio = reader.GetDateTime("fecha_desde"),
+                  FechaFinalizacion = reader.GetDateTime("fecha_hasta"),
+                  FechaCancelacion = reader.IsDBNull(reader.GetOrdinal("fecha_terminacion_anticipada"))
                                     ? (DateTime?)null
                                     : reader.GetDateTime("fecha_terminacion_anticipada"),
-                  MontoMensual = reader.GetDecimal("monto_mensual"),
+                  Monto = reader.GetDecimal("monto_mensual"),
                   Multa = reader.IsDBNull(reader.GetOrdinal("multa"))
                                     ? (decimal?)null
                                     : reader.GetDecimal(reader.GetOrdinal("multa")),
@@ -452,7 +452,7 @@ namespace Inmobiliaria.Models
             FROM pago p
             JOIN contrato c ON p.id_contrato = c.id_contrato
             WHERE p.id_contrato = @idContrato 
-            AND p.concepto = 'Multa' 
+            AND p.concepto = 'Multa de Cancelacion' 
             And p.estado = 1
           ";
         using (var cmd = new MySqlCommand(sql, conn))
