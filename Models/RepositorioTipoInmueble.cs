@@ -119,53 +119,6 @@ namespace Inmobiliaria.Models
             }
             return tipoInmueble;
         }
-
-        public int ContarPorTodos()
-        {
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql = "SELECT COUNT(*) FROM tipo_inmueble";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    conn.Open();
-                    var count = Convert.ToInt32(cmd.ExecuteScalar());
-                    conn.Close();
-                    return count;
-                }
-            }
-        }
-
-        public List<TipoInmueble> ObtenerTodos(int limit, int offset)
-        {
-            var lista = new List<TipoInmueble>();
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                var sql = "SELECT * FROM tipo_inmueble LIMIT @Limit OFFSET @Offset";
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Limit", limit);
-                    cmd.Parameters.AddWithValue("@Offset", offset);
-                    conn.Open();
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var tipoInmueble = new TipoInmueble
-                            {
-                                IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
-                                Nombre = reader.GetString("Nombre"),
-                            };
-
-                            lista.Add(tipoInmueble);
-                        }
-                    }
-
-                    conn.Close();
-                }
-            }
-            return lista;
-        }
-
         public List<TipoInmueble> TenerTodos()
         {
             var lista = new List<TipoInmueble>();
@@ -194,47 +147,65 @@ namespace Inmobiliaria.Models
             }
             return lista;
         }
-
-        public List<TipoInmueble> ListarPorNombre(string nombre, int limite, int offset)
-        {
-            var lista = new List<TipoInmueble>();
-            using var conn = new MySqlConnection(connectionString);
-            var sql =
-                @"SELECT * FROM tipo_inmueble WHERE Nombre LIKE @Nombre LIMIT @Limite OFFSET @Offset";
-            using var cmd = new MySqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@Nombre", nombre + "%");
-            cmd.Parameters.AddWithValue("@Limite", limite);
-            cmd.Parameters.AddWithValue("@Offset", offset);
-
-            conn.Open();
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                lista.Add(
-                    new TipoInmueble
-                    {
-                        IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
-                        Nombre = reader.GetString("Nombre"),
-                    }
-                );
-            }
-
-            return lista;
-        }
-
-        public int ContarPorNombre(string nombre)
+        public int ContarFiltro(string? nombre)
         {
             using (var conn = new MySqlConnection(connectionString))
             {
-                var sql = "SELECT count(*) FROM tipo_inmueble WHERE Nombre LIKE @Nombre";
+                var sql = "SELECT COUNT(*) FROM tipo_inmueble WHERE 1=1 ";
+
+                if (!string.IsNullOrEmpty(nombre))
+                {
+                    sql += "AND Nombre LIKE @nombre ";
+                }
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
-                    cmd.Parameters.AddWithValue("@Nombre", nombre + "%");
+                    cmd.Parameters.AddWithValue("@nombre", "%" + nombre + "%");
                     conn.Open();
                     var count = Convert.ToInt32(cmd.ExecuteScalar());
                     return count;
                 }
             }
+        }
+        public List<TipoInmueble> Filtro(string? nombre, int limit, int offset)
+        {
+            var lista = new List<TipoInmueble>();
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                var sql = @"SELECT id_tipo_inmueble, Nombre FROM tipo_inmueble WHERE 1=1 ";
+
+                if (!string.IsNullOrEmpty(nombre))
+                {
+                    sql += "AND Nombre LIKE @nombre ";
+                }
+
+                sql += "ORDER BY Nombre ASC LIMIT @limit OFFSET @offset;";
+
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    if (!string.IsNullOrEmpty(nombre))
+                    {
+                        cmd.Parameters.AddWithValue("@nombre", "%" + nombre + "%");
+                    }
+
+                    cmd.Parameters.AddWithValue("@limit", limit);
+                    cmd.Parameters.AddWithValue("@offset", offset);
+
+                    conn.Open();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new TipoInmueble
+                            {
+                                IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
+                                Nombre = reader.GetString("Nombre"),
+                            });
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+            return lista;
         }
     }
 }

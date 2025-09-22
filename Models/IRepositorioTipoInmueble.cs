@@ -6,10 +6,8 @@ namespace Inmobiliaria.Models
     {
         int ExisteTipoInmueble(string nombre);
         int SeEstaUsando(int IdTipoInmueble);
-        int ContarPorTodos();
-        List<TipoInmueble> ObtenerTodos(int limit, int offset);
         List<TipoInmueble> TenerTodos();
-        List<TipoInmueble> ListarPorNombre(string nombre, int limite, int offset);
-        int ContarPorNombre(string nombre);
+        List<TipoInmueble> Filtro(string? nombre, int limit, int offset);
+        int ContarFiltro(string? nombre);
     }
 }
