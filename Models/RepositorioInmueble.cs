@@ -107,7 +107,7 @@ namespace Inmobiliaria.Models
             using (var conn = new MySqlConnection(connectionString))
             {
                 var sql =
-                    @"SELECT * FROM inmueble JOIN tipo_inmueble ON inmueble.id_tipo_inmueble = tipo_inmueble.id_tipo_inmueble WHERE id_inmueble=@IdInmueble";
+                    @"SELECT * FROM inmueble JOIN tipo_inmueble ON inmueble.id_tipo_inmueble = tipo_inmueble.id_tipo_inmueble JOIN propietario ON inmueble.id_propietario = propietario.id_propietario WHERE id_inmueble=@IdInmueble";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@IdInmueble", IdInmueble);
@@ -133,6 +133,13 @@ namespace Inmobiliaria.Models
                             {
                                 IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
                                 Nombre = reader.GetString("nombre"),
+                            };
+                            i.Propietario = new Propietario
+                            {
+                                IdPropietario = reader.GetInt32("id_propietario"),
+                                Nombre = reader.GetString("nombre"),
+                                Apellido = reader.GetString("apellido"),
+                                Dni = reader.GetString("dni"),
                             };
                         }
                     }
