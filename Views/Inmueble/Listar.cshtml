@@ -159,7 +159,6 @@
         <th>Tipo</th>
         <th>Uso</th>
         <th>@Html.DisplayNameFor(model => model.First().CantidadAmbientes)</th>
-        @* <th>@Html.DisplayNameFor(model => model.First().Descripcion)</th> *@
         <th>@Html.DisplayNameFor(model => model.First().Precio)</th>
         <th>@Html.DisplayNameFor(model => model.First().Estado)</th>
         <th>Acciones</th>
@@ -172,7 +171,8 @@
         {
           <tr>
             <td>@i.IdInmueble</td>
-            <td class="text-truncate" style="max-width: 150px;">@i.Direccion</td>
+            <td class="text-truncate" style="max-width: 150px;" title="@i.Direccion" data-bs-toggle="tooltip">@i.Direccion
+            </td>
             <td>@i.Propietario?.Nombre @i.Propietario?.Apellido</td>
             <td>@i.TipoInmueble?.Nombre</td>
             <td>@(i.Uso == 1 ? "Residencial" : "Comercial")</td>
