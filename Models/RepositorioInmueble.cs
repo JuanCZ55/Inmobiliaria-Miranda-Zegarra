@@ -301,6 +301,7 @@ namespace Inmobiliaria.Models
                     FROM inmueble i
                     JOIN propietario pr ON i.id_propietario = pr.id_propietario
                     JOIN tipo_inmueble ti ON i.id_tipo_inmueble = ti.id_tipo_inmueble
+                    LEFT JOIN contrato co ON i.id_inmueble=co.id_inmueble 
                     WHERE 1=1
                 ";
 
