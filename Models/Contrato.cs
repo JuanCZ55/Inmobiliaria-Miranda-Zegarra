@@ -24,6 +24,7 @@ namespace Inmobiliaria.Models
         public decimal Monto { get; set; }
 
         public decimal? Multa { get; set; }
+
         [Required(ErrorMessage = "El tipo de contrato es obligatorio")]
         [Range(1, 2, ErrorMessage = "Seleccione Pago Total o Pagos Mensuales.")]
         public int Tipo { get; set; }
@@ -74,6 +75,7 @@ namespace Inmobiliaria.Models
                 );
             }
         }
+
         public bool Validate()
         {
             return FechaInicio >= FechaFinalizacion;

@@ -1,185 +1,219 @@
-using Microsoft.AspNetCore.Mvc;
-using Inmobiliaria.Models;
 using System.Text.Json;
+using Inmobiliaria.Models;
+using Microsoft.AspNetCore.Mvc;
+
 namespace Inmobiliaria.Controllers
 {
-
-  public class PagoController : Controller
-  {
-    private readonly IRepositorioPago repositorio;
-    private readonly IRepositorioPago repositorioPago;
-    private readonly IRepositorioInmueble repositorioInmueble;
-    private readonly IRepositorioInquilino repositorioInquilino;
-    private readonly IRepositorioContrato repositorioContraro;
-    private readonly IConfiguration config;
-
-    // GET: Contrato
-    public PagoController(
-      IRepositorioPago repositorio, IRepositorioPago repositorioPago, IRepositorioInmueble repositorioInmueble, IRepositorioInquilino repositorioInquilino, IRepositorioContrato repositorioContraro, IConfiguration config)
+    public class PagoController : Controller
     {
-      this.repositorio = repositorio;
-      this.repositorioPago = repositorioPago;
-      this.repositorioInmueble = repositorioInmueble;
-      this.repositorioInquilino = repositorioInquilino;
-      this.repositorioContraro = repositorioContraro;
-      this.config = config;
-    }
-    public IActionResult Index()
-    {
-      return RedirectToAction("Index", "Home");
-    }
+        private readonly IRepositorioPago repositorio;
+        private readonly IRepositorioPago repositorioPago;
+        private readonly IRepositorioInmueble repositorioInmueble;
+        private readonly IRepositorioInquilino repositorioInquilino;
+        private readonly IRepositorioContrato repositorioContraro;
+        private readonly IConfiguration config;
 
-    [HttpGet]
-    public IActionResult Crear(int? idContrato)
-    {
-      Pago pago = new Pago();
-      pago.FechaPago = DateTime.Today;
-      if (idContrato == null)
-      {
-        string? pagoJson = TempData["Pago"] as string;
-        if (!string.IsNullOrEmpty(pagoJson))
+        // GET: Contrato
+        public PagoController(
+            IRepositorioPago repositorio,
+            IRepositorioPago repositorioPago,
+            IRepositorioInmueble repositorioInmueble,
+            IRepositorioInquilino repositorioInquilino,
+            IRepositorioContrato repositorioContraro,
+            IConfiguration config
+        )
         {
-          pago = JsonSerializer.Deserialize<Pago>(pagoJson) ?? new Pago();
+            this.repositorio = repositorio;
+            this.repositorioPago = repositorioPago;
+            this.repositorioInmueble = repositorioInmueble;
+            this.repositorioInquilino = repositorioInquilino;
+            this.repositorioContraro = repositorioContraro;
+            this.config = config;
         }
-        return View("Gestion", pago);
-      }
-      else
-      {
-        try
-        {
-          pago = new Pago
-          {
-            IdContrato = idContrato.Value,
-            contrato = repositorioContraro.ObtenerPorID(idContrato.Value),
 
-            FechaPago = DateTime.Today,
-          };
-          if (pago.contrato.Estado == 2) { 
-            ViewBag.MultaPagada = "Contrato Finalizado";
-            return View("Gestion", pago);
-          }
-          if (pago.contrato.Estado == 3)
-          {
-            if (!repositorio.MultaPagada(idContrato))
+        public IActionResult Index()
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult Crear(int? idContrato)
+        {
+            Pago pago = new Pago();
+            pago.FechaPago = DateTime.Today;
+            if (idContrato == null)
             {
-              pago.Concepto = "Multa";
-              pago.Monto = pago.contrato?.Multa ?? 0;
-              pago.numeroPago = repositorio.CantidadPago(idContrato) + 1;
+                string? pagoJson = TempData["Pago"] as string;
+                if (!string.IsNullOrEmpty(pagoJson))
+                {
+                    pago = JsonSerializer.Deserialize<Pago>(pagoJson) ?? new Pago();
+                }
+                return View("Gestion", pago);
             }
             else
             {
-              ViewBag.MultaPagada = "Multa Pagada";
+                try
+                {
+                    pago = new Pago
+                    {
+                        IdContrato = idContrato.Value,
+                        contrato = repositorioContraro.ObtenerPorID(idContrato.Value),
+
+                        FechaPago = DateTime.Today,
+                    };
+                    if (pago.contrato.Estado == 2)
+                    {
+                        ViewBag.MultaPagada = "Contrato Finalizado";
+                        return View("Gestion", pago);
+                    }
+                    if (pago.contrato.Estado == 3)
+                    {
+                        if (!repositorio.MultaPagada(idContrato))
+                        {
+                            pago.Concepto = "Multa";
+                            pago.Monto = pago.contrato?.Multa ?? 0;
+                            pago.numeroPago = repositorio.CantidadPago(idContrato) + 1;
+                        }
+                        else
+                        {
+                            ViewBag.MultaPagada = "Multa Pagada";
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.MultaPagada = "Sin Multa";
+                        pago.Monto = pago.contrato?.Monto ?? 0;
+                        pago.numeroPago = repositorio.CantidadPago(idContrato) + 1;
+                    }
+                    return View("Gestion", pago);
+                }
+                catch (System.Exception)
+                {
+                    TempData["MensajeError"] = "Error al obtener el contrato";
+                    return View("Gestion", pago);
+                }
             }
-          }
-          else
-          {
-            ViewBag.MultaPagada = "Sin Multa";
-            pago.Monto = pago.contrato?.MontoMensual ?? 0;
-            pago.numeroPago = repositorio.CantidadPago(idContrato) + 1;
-          }
-          return View("Gestion", pago);
         }
-        catch (System.Exception)
+
+        [HttpGet]
+        public IActionResult Ver(int id)
         {
-          TempData["MensajeError"] = "Error al obtener el contrato";
-          return View("Gestion", pago);
+            Pago pago;
+            try
+            {
+                pago = repositorio.ObtenerPorID(id);
+                pago.contrato = repositorioContraro.ObtenerPorID(pago.IdContrato);
+                return View("Gestion", pago);
+            }
+            catch (System.Exception)
+            {
+                pago = new Pago();
+                return View("Gestion", pago);
+            }
         }
-      }
-    }
 
-
-    [HttpGet]
-    public IActionResult Ver(int id)
-    {
-      Pago pago;
-      try
-      {
-        pago = repositorio.ObtenerPorID(id);
-        pago.contrato = repositorioContraro.ObtenerPorID(pago.IdContrato);
-        return View("Gestion", pago);
-      }
-      catch (System.Exception)
-      {
-        pago = new Pago();
-        return View("Gestion", pago);
-      }
-    }
-
-    //POST: Contrato/Crear
-    [HttpPost]
-    public IActionResult Crear(Pago pago)
-    {
-      if (!ModelState.IsValid)
-      {
-        TempData["MensajeError"] = "Modelo invalido";
-        TempData["Pago"] = JsonSerializer.Serialize(pago);
-        return RedirectToAction("Crear");
-      }
-      try
-      {
-        if (repositorioContraro.ObtenerPorID(pago.IdContrato).Estado == 2)
+        //POST: Contrato/Crear
+        [HttpPost]
+        public IActionResult Crear(Pago pago)
         {
-          TempData["MensajeError"] = "Contrato Finalizado";
-          TempData["Pago"] = JsonSerializer.Serialize(pago);
-          return RedirectToAction("Crear");
+            if (!ModelState.IsValid)
+            {
+                TempData["MensajeError"] = "Modelo invalido";
+                TempData["Pago"] = JsonSerializer.Serialize(pago);
+                return RedirectToAction("Crear");
+            }
+            try
+            {
+                if (repositorioContraro.ObtenerPorID(pago.IdContrato).Estado == 2)
+                {
+                    TempData["MensajeError"] = "Contrato Finalizado";
+                    TempData["Pago"] = JsonSerializer.Serialize(pago);
+                    return RedirectToAction("Crear");
+                }
+
+                if (pago.FechaPago != DateTime.Today)
+                {
+                    TempData["MensajeError"] = "Fachas Invalidas";
+                    TempData["Pago"] = JsonSerializer.Serialize(pago);
+                    return RedirectToAction("Crear");
+                }
+
+                Pago nuevo = repositorio.ObtenerPorID(repositorio.Crear(pago));
+                TempData["MensajeError"] = "Pago Creado";
+                return RedirectToAction("Ver", new { id = nuevo.IdContrato });
+            }
+            catch (System.Exception)
+            {
+                TempData["MensajeError"] = "Modelo invalido";
+                TempData["Pago"] = JsonSerializer.Serialize(pago);
+                return RedirectToAction("Crear");
+            }
         }
 
-        if (pago.FechaPago != DateTime.Today)
+        // GET: Pago/Listar
+        [HttpGet]
+        public IActionResult Listar(
+            string? idPago,
+            string? idContrato,
+            string? dniInquilino,
+            string? MontoMenor,
+            string? MontoMayor,
+            string? estado,
+            string? Fecha_desde,
+            string? Fecha_hasta,
+            int PaginaActual = 1
+        )
         {
-          TempData["MensajeError"] = "Fachas Invalidas";
-          TempData["Pago"] = JsonSerializer.Serialize(pago);
-          return RedirectToAction("Crear");
+            int registrosPorPagina = 7;
+            int total = 0;
+            int offset = (PaginaActual - 1) * registrosPorPagina;
+            int limite = registrosPorPagina;
+            List<Pago> lista;
+            try
+            {
+                total = repositorio.CantidadFiltro(
+                    idPago,
+                    idContrato,
+                    dniInquilino,
+                    MontoMenor,
+                    MontoMayor,
+                    estado,
+                    Fecha_desde,
+                    Fecha_hasta
+                );
+                limite = Math.Min(registrosPorPagina, total - offset);
+                lista = repositorio.Filtrar(
+                    idPago,
+                    idContrato,
+                    dniInquilino,
+                    MontoMenor,
+                    MontoMayor,
+                    estado,
+                    Fecha_desde,
+                    Fecha_hasta,
+                    offset,
+                    limite
+                );
+
+                int totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina);
+
+                ViewBag.PaginaActual = PaginaActual;
+                ViewBag.TotalPaginas = totalPaginas;
+                ViewBag.IdPago = idPago;
+                ViewBag.IdContrato = idContrato;
+                ViewBag.DniInquilino = dniInquilino;
+                ViewBag.MontoMenor = MontoMenor;
+                ViewBag.MontoMayor = MontoMayor;
+                ViewBag.estado = estado;
+                ViewBag.FechaDesde = Fecha_desde;
+                ViewBag.FechaHasta = Fecha_hasta;
+
+                return View(lista);
+            }
+            catch (System.Exception)
+            {
+                return View(new List<Pago>());
+            }
         }
-
-        Pago nuevo = repositorio.ObtenerPorID(repositorio.Crear(pago));
-        TempData["MensajeError"] = "Pago Creado";
-        return RedirectToAction("Ver", new { id = nuevo.IdContrato });
-      }
-
-      catch (System.Exception)
-      {
-        TempData["MensajeError"] = "Modelo invalido";
-        TempData["Pago"] = JsonSerializer.Serialize(pago);
-        return RedirectToAction("Crear");
-      }
     }
-
-    // GET: Pago/Listar
-    [HttpGet]
-    public IActionResult Listar(string? idPago, string? idContrato, string? dniInquilino, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta, int PaginaActual = 1)
-    {
-      int registrosPorPagina = 7;
-      int total = 0;
-      int offset = (PaginaActual - 1) * registrosPorPagina;
-      int limite = registrosPorPagina;
-      List<Pago> lista;
-      try
-      {
-        total = repositorio.CantidadFiltro(idPago, idContrato, dniInquilino, MontoMenor, MontoMayor, estado, Fecha_desde, Fecha_hasta);
-        limite = Math.Min(registrosPorPagina, total - offset);
-        lista = repositorio.Filtrar(idPago, idContrato, dniInquilino, MontoMenor, MontoMayor, estado, Fecha_desde, Fecha_hasta, offset, limite);
-
-        int totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina);
-
-        ViewBag.PaginaActual = PaginaActual;
-        ViewBag.TotalPaginas = totalPaginas;
-        ViewBag.IdPago = idPago;
-        ViewBag.IdContrato = idContrato;
-        ViewBag.DniInquilino = dniInquilino;
-        ViewBag.MontoMenor = MontoMenor;
-        ViewBag.MontoMayor = MontoMayor;
-        ViewBag.estado = estado;
-        ViewBag.FechaDesde = Fecha_desde;
-        ViewBag.FechaHasta = Fecha_hasta;
-
-
-
-        return View(lista);
-      }
-      catch (System.Exception)
-      {
-        return View(new List<Pago>());
-      }
-    }
-  }
 }

@@ -64,7 +64,8 @@
           }
         </div>
         <div class="d-flex justify-content-between pt-4 mt-4 gap-2">
-          @if (Model != null && Model.IdPago == 0 && ViewBag.MultaPagada != "Contrato Finalizado" && ViewBag.MultaPagada != "Multa Pagada")
+          @if (Model != null && Model.IdPago == 0 && ViewBag.MultaPagada != "Contrato Finalizado" && ViewBag.MultaPagada
+                    != "Multa Pagada")
           {
             <button type="submit" class="btn btn-success">Crear</button>
           }
@@ -93,17 +94,17 @@
           </div>
           <div class="col-md-6">
             <label class="form-label">Fecha Desde</label>
-            <input type="text" class="form-control" id="Contrato_FechaDesde" value="@Model.contrato?.FechaDesde"
+            <input type="text" class="form-control" id="Contrato_FechaDesde" value="@Model.contrato?.FechaInicio"
               readonly />
           </div>
           <div class="col-md-6">
             <label class="form-label">Fecha Hasta</label>
-            <input type="text" class="form-control" id="Contrato_FechaHasta" value="@Model.contrato?.FechaHasta"
+            <input type="text" class="form-control" id="Contrato_FechaHasta" value="@Model.contrato?.FechaFinalizacion"
               readonly />
           </div>
           <div class="col-md-6">
             <label class="form-label">Monto Mensual</label>
-            <input type="text" class="form-control" id="Contrato_MontoMensual" value="@Model.contrato?.MontoMensual"
+            <input type="text" class="form-control" id="Contrato_MontoMensual" value="@Model.contrato?.Monto"
               readonly />
           </div>
           <div class="col-md-6">
@@ -112,10 +113,10 @@
               value="@(Model.contrato?.Estado == 1 ? "Vigente" : Model.Estado == 3 ? "Cancelado" : Model.Estado == 2 ? "Finalizado" : "")"
               readonly />
           </div>
-          <div class="col-md-6 @(Model.contrato?.FechaFin == null ? "d-none" : "")">
+          <div class="col-md-6 @(Model.contrato?.FechaCancelacion == null ? "d-none" : "")">
             <label class="form-label">Fecha de Cancelación</label>
             <input type="text" class="form-control" id="Contrato_FechaFin"
-              value="@(Model.contrato?.FechaFin?.ToString("yyyy-MM-dd") ?? "")" readonly />
+              value="@(Model.contrato?.FechaCancelacion?.ToString("yyyy-MM-dd") ?? "")" readonly />
           </div>
 
           <div class="col-md-6 @(Model.contrato?.Multa == null ? "d-none" : "")">
