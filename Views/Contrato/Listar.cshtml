@@ -184,14 +184,61 @@
 {
   <nav aria-label="Paginación" class="mt-3">
     <ul class="pagination justify-content-center">
-      @for (int i = 1; i <= totalPaginas; i++)
-      {
-        <li class="page-item @(i == PaginaActual ? "active" : "")">
-          <a class="page-link" asp-action="Listar" asp-route-idContrato="@idContrato" asp-route-dniInquilino="@dniInquilino"
-            asp-route-idInmueble="@idInmueble" asp-route-estado="@estado" asp-route-Fecha_desde="@Fecha_desde"
-            asp-route-Fecha_hasta="@Fecha_hasta" asp-route-PaginaActual="@i">@i</a>
-        </li>
+
+      @* Botón al inicio "<" *@
+      <li class="page-item @(PaginaActual == 1 ? "disabled" : "")">
+        <a class="page-link" asp-action="Listar" asp-route-idContrato="@idContrato" asp-route-dniInquilino="@dniInquilino"
+          asp-route-idInmueble="@idInmueble" asp-route-estado="@estado" asp-route-Fecha_desde="@Fecha_desde"
+          asp-route-Fecha_hasta="@Fecha_hasta" asp-route-PaginaActual="1">&lt;</a>
+      </li>
+
+      @{
+        int botonesCentrales = 8; // cantidad de botones centrales
+        int mitad = botonesCentrales / 2;
+
+        int inicio = Math.Max(PaginaActual - mitad + 1, 1);
+        int fin = inicio + botonesCentrales - 1;
+
+        if (fin > totalPaginas - 2)
+        {
+          fin = totalPaginas - 2; // reservamos los dos últimos
+          inicio = Math.Max(fin - botonesCentrales + 1, 1);
+        }
+
+        // Botones centrales
+        for (int i = inicio; i <= fin; i++)
+        {
+          <li class="page-item @(i == PaginaActual ? "active" : "")">
+            <a class="page-link" asp-action="Listar" asp-route-idContrato="@idContrato" asp-route-dniInquilino="@dniInquilino"
+              asp-route-idInmueble="@idInmueble" asp-route-estado="@estado" asp-route-Fecha_desde="@Fecha_desde"
+              asp-route-Fecha_hasta="@Fecha_hasta" asp-route-PaginaActual="@i">@i</a>
+          </li>
+        }
+
+        @* Botón "..." *@
+        @if (fin < totalPaginas - 2)
+        {
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+        }
+
+        @* Dos últimos botones *@
+        for (int i = Math.Max(totalPaginas - 1, fin + 1); i <= totalPaginas; i++)
+        {
+          <li class="page-item @(i == PaginaActual ? "active" : "")">
+            <a class="page-link" asp-action="Listar" asp-route-idContrato="@idContrato" asp-route-dniInquilino="@dniInquilino"
+              asp-route-idInmueble="@idInmueble" asp-route-estado="@estado" asp-route-Fecha_desde="@Fecha_desde"
+              asp-route-Fecha_hasta="@Fecha_hasta" asp-route-PaginaActual="@i">@i</a>
+          </li>
+        }
       }
+
+      @* Botón final ">" *@
+      <li class="page-item @(PaginaActual == totalPaginas ? "disabled" : "")">
+        <a class="page-link" asp-action="Listar" asp-route-idContrato="@idContrato" asp-route-dniInquilino="@dniInquilino"
+          asp-route-idInmueble="@idInmueble" asp-route-estado="@estado" asp-route-Fecha_desde="@Fecha_desde"
+          asp-route-Fecha_hasta="@Fecha_hasta" asp-route-PaginaActual="@totalPaginas">&gt;</a>
+      </li>
+
     </ul>
   </nav>
 }
