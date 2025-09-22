@@ -17,7 +17,6 @@
 
 <div class="d-flex align-items-center">
   <h2 class="text-center py-4">@ViewData["Title"]</h2>
-
   <a class="btn btn-primary ms-3" asp-action="Crear">
     <img class="invert-color-icon" src="~/images/icon/Agregar.png" alt="">
   </a>
@@ -155,7 +154,8 @@
               <a href="/Pago/Crear?idContrato=@i.IdContrato" data-bs-toggle="tooltip" title="Hacer un pago">
                 <img src="~/images/icon/Pagar.png" alt="Hacer un pago" />
               </a>
-              <a asp-action="Ver" asp-route-id="@i.IdContrato" asp-route-returnUrl="@Url.Action("Listar")" data-bs-toggle="tooltip" title="Ver Contrato">
+              <a asp-action="Ver" asp-route-id="@i.IdContrato" asp-route-returnUrl="@Url.Action("Listar")"
+                data-bs-toggle="tooltip" title="Ver Contrato">
                 <img src="~/images/icon/Gestionar.png" alt="Gestionar" />
               </a>
             </td>
@@ -242,6 +242,8 @@
     </ul>
   </nav>
 }
+
+
 
 
 
