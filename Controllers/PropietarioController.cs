@@ -144,11 +144,35 @@ namespace Inmobiliaria.Controllers
             return View(propietarios);
         }
 
-        public IActionResult ListarPropietarios(string nombre, string dni)
+        [HttpGet]
+        public IActionResult ListarPropietarios(string q)
         {
-            var propietarios = repositorio.ListarPropietarios(nombre, dni);
+            try
+            {
+                string nombre = string.Empty;
+                string dni = string.Empty;
 
-            return Ok(propietarios);
+                if (!string.IsNullOrWhiteSpace(q))
+                {
+                    foreach (char c in q)
+                    {
+                        if (char.IsLetter(c))
+                            nombre += c;
+                        else if (char.IsDigit(c))
+                            dni += c;
+                        // caracteres especiales se ignoran
+                    }
+                }
+
+                var propietarios = repositorio.ListarPropietarios(nombre, dni);
+                return Json(propietarios);
+            }
+            catch (Exception ex)
+            {
+                return Json(
+                    new { error = "Ocurrió un error al buscar propietarios." + ex.Message }
+                );
+            }
         }
     }
 }
