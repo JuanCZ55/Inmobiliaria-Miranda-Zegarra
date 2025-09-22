@@ -1,4 +1,4 @@
--- 1. Usuarios (10 registros)
+-- 1. Usuarios (10 registros) preubas
 INSERT INTO usuario (email, contrasena, rol, nombre, apellido, url, estado) VALUES
 ('admin1@inmob.com', '123456', 1, 'Juan', 'Perez', 'url1.jpg', 1),
 ('empleado1@inmob.com', '123456', 2, 'Maria', 'Gomez', 'url2.jpg', 1),
