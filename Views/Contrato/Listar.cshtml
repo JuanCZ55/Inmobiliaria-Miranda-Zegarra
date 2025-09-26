@@ -12,8 +12,10 @@
   var estado = ViewBag.Estado ?? "";
   var Fecha_desde = ViewBag.FechaDesde ?? "";
   var Fecha_hasta = ViewBag.FechaHasta ?? "";
+  var tipo = ViewBag.Tipo ?? "";
+  var MontoMenor = ViewBag.MontoMenor ?? "";
+  var MontoMayor = ViewBag.MontoMayor ?? "";
 }
-
 
 <div class="d-flex align-items-center">
   <h2 class="text-center py-4">@ViewData["Title"]</h2>
@@ -50,46 +52,47 @@
         </div>
       </div>
 
+
+
       <div class="col-md-2">
         <div class="zeg-field">
-          <select class="zeg-input" name="estado">
-            <option value="" class="d-none"></option>
-            <option value=" ">Todos</option>
-            @if (estado == "1")
+          <select class="zeg-input" name="tipo">
+            <option value="">&nbsp;&nbsp;Todos</option>
+            @if (tipo == "1")
             {
-              <option value="1" selected>Vigente</option>
+              <option value="1" selected>Pago Total</option>
             }
             else
             {
-
-              <option value="1">Vigente
+              <option value="1">Pago Total
               </option>
             }
-            @if (estado == "2")
+            @if (tipo == "2")
             {
-              <option value="2" selected>Finalizado</option>
+              <option value="2" selected>Pago Mensual</option>
             }
             else
             {
-
-              <option value="2">Finalizado
-              </option>
-            }
-            @if (estado == "3")
-            {
-              <option value="3" selected>Cancelado</option>
-            }
-            else
-            {
-
-              <option value="3">Cancelado
+              <option value="2">Pago Mensual
               </option>
             }
           </select>
-          <label for="estado">Estado</label>
+          <label for="tipo">Tipo de Pago</label>
         </div>
       </div>
-
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input" type="number" id="MontoMenor" name="MontoMenor" value="@MontoMenor"
+            placeholder=" " />
+          <label for="MontoMenor">Monto desde</label>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input" type="number" id="MontoMayor" name="MontoMayor" value="@MontoMayor" placeholder=" ">
+          <label for="MontoMayor">Monto hasta</label>
+        </div>
+      </div>
       <div class="col-md-2">
         <div class="zeg-field">
           <input class="zeg-input-date" type="date" id="Fecha_desde" name="Fecha_desde" value="@Fecha_desde"
@@ -105,13 +108,65 @@
           <label for="Fecha_hasta">Fecha hasta &nbsp;</label>
         </div>
       </div>
-      <div class="col-md-12 d-flex justify-content-end align-items-center pb-2">
-        <button type="submit" class="btn btn-outline-primary fw-bold me-4">Filtrar</button>
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <select class="zeg-input" name="estado">
+            <option value="">&nbsp;&nbsp;Todos</option>
+            @if (estado == "1")
+            {
+              <option value="1" selected>Vigente</option>
+            }
+            else
+            {
+              <option value="1">Vigente
+              </option>
+            }
+            @if (estado == "2")
+            {
+              <option value="2" selected>Finalizado</option>
+            }
+            else
+            {
+              <option value="2">Finalizado
+              </option>
+            }
+            @if (estado == "3")
+            {
+              <option value="3" selected>Cancelado</option>
+            }
+            else
+            {
+              <option value="3">Cancelado
+              </option>
+            }
+            @if (estado == "4")
+            {
+              <option value="4" selected>Cancelado - Multa Saldada</option>
+            }
+            else
+            {
+              <option value="4">Cancelado - Multa Saldada
+              </option>
+            }
+            @if (estado == "5")
+            {
+              <option value="5" selected>Cancelado - Multa Pendiente</option>
+            }
+            else
+            {
+              <option value="5">Cancelado - Multa Pendiente
+              </option>
+            }
+          </select>
+          <label for="estado">Estado</label>
+        </div>
+      </div>
+      <div class="col-md-2 d-flex justify-content-start align-items-center pb-3">
+        <button type="submit" class="btn btn-outline-primary fw-bold">Filtrar</button>
       </div>
     </div>
   </form>
 </div>
-
 
 <div class="table-responsive shadow-sm rounded mt-4">
   <table class="table table-hover table-striped align-middle mb-0">
@@ -121,32 +176,36 @@
         <th>@Html.DisplayNameFor(model => model.First().IdInquilino)</th>
         <th>@Html.DisplayNameFor(model => model.First().IdInmueble)</th>
         <th>@Html.DisplayNameFor(model => model.First().Monto)</th>
+        <th>@Html.DisplayNameFor(model => model.First().Tipo)</th>
         <th>Fecha</th>
         <th>@Html.DisplayNameFor(model => model.First().Estado)</th>
         <th>Acciones</th>
       </tr>
     </thead>
     <tbody class="text-center">
+
       @if (Model != null && Model.Any())
       {
         @foreach (var i in Model)
         {
           <tr>
             <td>@i.IdContrato</td>
-            <td class="id-inquilino" data-dni="@i.Inquilino?.Dni" data-nombre="@i.Inquilino?.Nombre"
-              data-apellido="@i.Inquilino?.Apellido" data-telefono="@i.Inquilino?.Telefono" data-email="@i.Inquilino?.Email"
+            <td class="id-inquilino" data-id-inquilino="@i.IdInquilino" data-dni="@i.Inquilino?.Dni"
+              data-nombre="@i.Inquilino?.Nombre" data-apellido="@i.Inquilino?.Apellido"
+              data-telefono="@i.Inquilino?.Telefono" data-email="@i.Inquilino?.Email"
               data-direccion="@i.Inquilino?.Direccion">
               @i.Inquilino?.Nombre @i.Inquilino?.Apellido
             </td>
-            <td class="id-inmueble" data-tipo="@i.Inmueble?.TipoInmueble?.Nombre" data-direccion="@i.Inmueble?.Direccion"
+            <td class="text-truncate id-inmueble" style="max-width: 200px;" data-id-inmueble="@i.IdInmueble"
+              data-tipo="@i.Inmueble?.TipoInmueble?.Nombre" data-direccion="@i.Inmueble?.Direccion"
               data-dni-propietario="@i.Inmueble?.Propietario?.Dni" data-propietario="@i.Inmueble?.Propietario?.Nombre"
               data-ambientes="@i.Inmueble?.CantidadAmbientes" data-precio="@i.Inmueble?.Precio">
               @i.Inmueble?.Direccion
             </td>
             <td>@i.Monto</td>
+            <td>@(i.Tipo == 1 ? "Pago Total" : "Pago Mensual")</td>
             <td>@i.FechaInicio.ToShortDateString() - @i.FechaFinalizacion.ToShortDateString()</td>
-            <td>@(i.Estado == 1 ? "Vigente" : i.Estado == 2 ? "Finalizado" : i.Estado == 3 ? "Cancelado" : "Desconocido")
-            </td>
+            <td>@i.Estado</td>
             <td class="d-flex justify-content-evenly">
               <a href="/Pago/Listar?idContrato=@i.IdContrato" data-bs-toggle="tooltip" title="Todos los pagos">
                 <img src="~/images/icon/ListaPagos.png" alt="Todos los pagos" />
@@ -161,8 +220,6 @@
             </td>
           </tr>
         }
-
-
       }
       else
       {
@@ -189,7 +246,8 @@
       <li class="page-item @(PaginaActual == 1 ? "disabled" : "")">
         <a class="page-link" asp-action="Listar" asp-route-idContrato="@idContrato" asp-route-dniInquilino="@dniInquilino"
           asp-route-idInmueble="@idInmueble" asp-route-estado="@estado" asp-route-Fecha_desde="@Fecha_desde"
-          asp-route-Fecha_hasta="@Fecha_hasta" asp-route-PaginaActual="1">&lt;</a>
+          asp-route-Fecha_hasta="@Fecha_hasta" asp-route-tipo=@tipo asp-route-PaginaActual="1"
+          asp-route-MontoMenor="@MontoMenor" asp-route-MontoMayor="@MontoMayor">&lt;</a>
       </li>
 
       @{
@@ -211,7 +269,8 @@
           <li class="page-item @(i == PaginaActual ? "active" : "")">
             <a class="page-link" asp-action="Listar" asp-route-idContrato="@idContrato" asp-route-dniInquilino="@dniInquilino"
               asp-route-idInmueble="@idInmueble" asp-route-estado="@estado" asp-route-Fecha_desde="@Fecha_desde"
-              asp-route-Fecha_hasta="@Fecha_hasta" asp-route-PaginaActual="@i">@i</a>
+              asp-route-Fecha_hasta="@Fecha_hasta" asp-route-tipo="@tipo" asp-route-PaginaActual="@i"
+              asp-route-MontoMenor="@MontoMenor" asp-route-MontoMayor="@MontoMayor">@i</a>
           </li>
         }
 
@@ -227,7 +286,8 @@
           <li class="page-item @(i == PaginaActual ? "active" : "")">
             <a class="page-link" asp-action="Listar" asp-route-idContrato="@idContrato" asp-route-dniInquilino="@dniInquilino"
               asp-route-idInmueble="@idInmueble" asp-route-estado="@estado" asp-route-Fecha_desde="@Fecha_desde"
-              asp-route-Fecha_hasta="@Fecha_hasta" asp-route-PaginaActual="@i">@i</a>
+              asp-route-Fecha_hasta="@Fecha_hasta" asp-route-tipo="@tipo" asp-route-PaginaActual="@i"
+              asp-route-MontoMenor="@MontoMenor" asp-route-MontoMayor="@MontoMayor">@i</a>
           </li>
         }
       }
@@ -236,7 +296,8 @@
       <li class="page-item @(PaginaActual == totalPaginas ? "disabled" : "")">
         <a class="page-link" asp-action="Listar" asp-route-idContrato="@idContrato" asp-route-dniInquilino="@dniInquilino"
           asp-route-idInmueble="@idInmueble" asp-route-estado="@estado" asp-route-Fecha_desde="@Fecha_desde"
-          asp-route-Fecha_hasta="@Fecha_hasta" asp-route-PaginaActual="@totalPaginas">&gt;</a>
+          asp-route-Fecha_hasta="@Fecha_hasta" asp-route-tipo="@tipo" asp-route-PaginaActual="@totalPaginas"
+          asp-route-MontoMenor="@MontoMenor" asp-route-MontoMayor="@MontoMayor">&gt;</a>
       </li>
 
     </ul>
@@ -272,7 +333,7 @@
     document.querySelectorAll(".id-inquilino").forEach(cell => {
       cell.addEventListener("mouseenter", e => {
         tooltip.innerHTML = `
-          <strong>Inquilino</strong><br>
+          <strong>Inquilino - ${cell.dataset.idInquilino}</strong><br>
           <strong>DNI:</strong> ${cell.dataset.dni}<br>
           <strong>Nombre:</strong> ${cell.dataset.nombre}<br>
           <strong>Apellido:</strong> ${cell.dataset.apellido}<br>
@@ -292,7 +353,7 @@
     document.querySelectorAll(".id-inmueble").forEach(cell => {
       cell.addEventListener("mouseenter", e => {
         tooltip.innerHTML = `
-          <strong>Inmueble</strong><br>
+          <strong>Inmueble - ${cell.dataset.idInmueble}</strong><br>
           <strong>Dirección:</strong> ${cell.dataset.direccion}<br>
           <strong>Propietario:</strong> ${cell.dataset.propietario} (DNI: ${cell.dataset.dniPropietario})<br>
           <strong>Tipo:</strong> ${cell.dataset.tipo}<br>
