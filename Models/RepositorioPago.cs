@@ -206,12 +206,73 @@ namespace Inmobiliaria.Models
       {
         var sql = @"
           SELECT 
-            p.id_pago, p.numero_pago, p.fecha_pago, p.concepto, p.monto, p.estado AS pago_estado, p.id_contrato,
-            c.fecha_desde, c.fecha_hasta, c.fecha_terminacion_anticipada, c.monto_mensual, c.multa, c.estado AS contrato_estado, c.created_at AS contrato_created_at, c.updated_at AS contrato_updated_at,
-            inm.id_inmueble, inm.direccion AS inm_direccion, inm.cantidad_ambientes AS inm_cantidad_ambientes, inm.descripcion AS inm_descripcion, inm.precio AS inm_precio, inm.id_propietario AS inm_id_propietario,
-            prop.id_propietario AS prop_id_propietario, prop.dni AS prop_dni, prop.nombre AS prop_nombre, prop.apellido AS prop_apellido, prop.telefono AS prop_telefono, prop.email AS prop_email,
-            ti.id_tipo_inmueble, ti.nombre AS ti_nombre,
-            inq.id_inquilino, inq.dni AS inq_dni, inq.nombre AS inq_nombre, inq.apellido AS inq_apellido, inq.telefono AS inq_telefono, inq.email AS inq_email
+              p.id_pago AS pago_id,
+              p.numero_pago AS pago_numero,
+              p.fecha_pago AS pago_fecha,
+              p.concepto AS pago_concepto,
+              p.monto AS pago_monto,
+              p.estado AS pago_estado,
+              p.id_contrato AS pago_id_contrato,
+
+              c.id_contrato AS contrato_id,
+              c.fecha_desde AS contrato_fecha_desde,
+              c.fecha_hasta AS contrato_fecha_hasta,
+              c.fecha_terminacion_anticipada AS contrato_fecha_cancelacion,
+              c.monto_mensual AS contrato_monto,
+              c.multa AS contrato_multa,
+              CASE
+                  WHEN c.fecha_terminacion_anticipada IS NULL 
+                      AND c.fecha_hasta >= CURDATE()
+                      THEN 'Vigente'
+
+                  WHEN c.fecha_terminacion_anticipada IS NULL 
+                      AND c.fecha_hasta < CURDATE()
+                      THEN 'Finalizado'
+
+                  WHEN c.fecha_terminacion_anticipada IS NOT NULL 
+                      AND EXISTS (
+                            SELECT 1 FROM pago pa
+                            WHERE pa.id_contrato = c.id_contrato
+                            AND pa.concepto = 'Multa de Cancelacion'
+                            AND pa.estado = 1
+                      )
+                      THEN 'Cancelado con Multa Saldada'
+
+                  WHEN c.fecha_terminacion_anticipada IS NOT NULL 
+                      AND NOT EXISTS (
+                            SELECT 1 FROM pago pa
+                            WHERE pa.id_contrato = c.id_contrato
+                            AND pa.concepto = 'Multa de Cancelacion'
+                            AND pa.estado = 1
+                      )
+                      THEN 'Cancelado con Multa Pendiente'
+              END AS contrato_estado,
+              c.created_at AS contrato_created_at,
+              c.updated_at AS contrato_updated_at,
+
+              inm.id_inmueble AS inm_id,
+              inm.direccion AS inm_direccion,
+              inm.cantidad_ambientes AS inm_cantidad,
+              inm.descripcion AS inm_descripcion,
+              inm.precio AS inm_precio,
+              inm.id_propietario AS inm_id_propietario,
+
+              prop.id_propietario AS prop_id,
+              prop.dni AS prop_dni,
+              prop.nombre AS prop_nombre,
+              prop.apellido AS prop_apellido,
+              prop.telefono AS prop_telefono,
+              prop.email AS prop_email,
+
+              ti.id_tipo_inmueble AS ti_id,
+              ti.nombre AS ti_nombre,
+
+              inq.id_inquilino AS inq_id,
+              inq.dni AS inq_dni,
+              inq.nombre AS inq_nombre,
+              inq.apellido AS inq_apellido,
+              inq.telefono AS inq_telefono,
+              inq.email AS inq_email
           FROM pago p
           JOIN contrato c ON p.id_contrato = c.id_contrato
           JOIN inmueble inm ON c.id_inmueble = inm.id_inmueble
@@ -219,6 +280,7 @@ namespace Inmobiliaria.Models
           JOIN propietario prop ON inm.id_propietario = prop.id_propietario
           JOIN inquilino inq ON c.id_inquilino = inq.id_inquilino
           WHERE 1=1
+
           ";
 
         if (!string.IsNullOrEmpty(idPago))
@@ -284,34 +346,34 @@ namespace Inmobiliaria.Models
             {
               lista.Add(new Pago
               {
-                IdPago = reader.GetInt32("id_pago"),
-                numeroPago = reader.GetInt32("numero_pago"),
-                FechaPago = reader.GetDateTime("fecha_pago"),
-                Concepto = reader.GetString("concepto"),
-                Monto = reader.GetDecimal("monto"),
+                IdPago = reader.GetInt32("pago_id"),
+                numeroPago = reader.GetInt32("pago_numero"),
+                FechaPago = reader.GetDateTime("pago_fecha"),
+                Concepto = reader.GetString("pago_concepto"),
+                Monto = reader.GetDecimal("pago_monto"),
                 Estado = reader.GetInt32("pago_estado"),
-                IdContrato = reader.GetInt32("id_contrato"),
+                IdContrato = reader.GetInt32("pago_id_contrato"),
                 contrato = new Contrato
                 {
-                  IdContrato = reader.GetInt32("id_Contrato"),
-                  FechaInicio = reader.GetDateTime("fecha_desde"),
-                  FechaFinalizacion = reader.GetDateTime("fecha_hasta"),
-                  FechaCancelacion = reader.IsDBNull(reader.GetOrdinal("fecha_terminacion_anticipada"))
-                                    ? (DateTime?)null
-                                    : reader.GetDateTime("fecha_terminacion_anticipada"),
-                  Monto = reader.GetDecimal("monto_mensual"),
-                  Multa = reader.IsDBNull(reader.GetOrdinal("multa"))
-                                    ? (decimal?)null
-                                    : reader.GetDecimal(reader.GetOrdinal("multa")),
-                  Estado = reader.GetInt32("contrato_estado"),
-                  IdInmueble = reader.GetInt32("id_inmueble"),
+                  IdContrato = reader.GetInt32("contrato_id"),
+                  FechaInicio = reader.GetDateTime("contrato_fecha_desde"),
+                  FechaFinalizacion = reader.GetDateTime("contrato_fecha_hasta"),
+                  FechaCancelacion = reader.IsDBNull(reader.GetOrdinal("contrato_fecha_cancelacion"))
+                                        ? (DateTime?)null
+                                        : reader.GetDateTime("contrato_fecha_cancelacion"),
+                  Monto = reader.GetDecimal("contrato_monto"),
+                  Multa = reader.IsDBNull(reader.GetOrdinal("contrato_multa"))
+                                        ? (decimal?)null
+                                        : reader.GetDecimal("contrato_multa"),
+                  Estado = reader.GetString("contrato_estado"),
+                  IdInmueble = reader.GetInt32("inm_id"),
                   Inmueble = new Inmueble
                   {
-                    IdInmueble = reader.GetInt32("id_inmueble"),
+                    IdInmueble = reader.GetInt32("inm_id"),
                     IdPropietario = reader.GetInt32("inm_id_propietario"),
                     Propietario = new Propietario
                     {
-                      IdPropietario = reader.GetInt32("prop_id_propietario"),
+                      IdPropietario = reader.GetInt32("prop_id"),
                       Dni = reader.GetString("prop_dni"),
                       Nombre = reader.GetString("prop_nombre"),
                       Apellido = reader.GetString("prop_apellido"),
@@ -320,19 +382,19 @@ namespace Inmobiliaria.Models
                     },
                     TipoInmueble = new TipoInmueble
                     {
-                      IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
+                      IdTipoInmueble = reader.GetInt32("ti_id"),
                       Nombre = reader.GetString("ti_nombre"),
                     },
                     Direccion = reader.GetString("inm_direccion"),
-                    CantidadAmbientes = reader.GetInt32("inm_cantidad_ambientes"),
+                    CantidadAmbientes = reader.GetInt32("inm_cantidad"),
                     Descripcion = reader.GetString("inm_descripcion"),
                     Precio = reader.GetDecimal("inm_precio"),
-                    IdTipoInmueble = reader.GetInt32("id_tipo_inmueble")
+                    IdTipoInmueble = reader.GetInt32("ti_id")
                   },
-                  IdInquilino = reader.GetInt32("id_inquilino"),
+                  IdInquilino = reader.GetInt32("inq_id"),
                   Inquilino = new Inquilino
                   {
-                    IdInquilino = reader.GetInt32("id_inquilino"),
+                    IdInquilino = reader.GetInt32("inq_id"),
                     Dni = reader.GetString("inq_dni"),
                     Nombre = reader.GetString("inq_nombre"),
                     Apellido = reader.GetString("inq_apellido"),
