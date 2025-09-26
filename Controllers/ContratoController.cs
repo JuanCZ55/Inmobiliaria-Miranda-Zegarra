@@ -80,8 +80,17 @@ namespace Inmobiliaria.Controllers
           return RedirectToAction("Crear");
         }
 
+        Inquilino? inquilino = repositorioInquilino.ObtenerPorDni(DniInquilino);
+        if (inquilino == null || inquilino.IdInquilino == 0)
+        {
+          TempData["Error"] = "El DNI del inquilino no fue encontrado o no es válido.";
+          TempData["Contrato"] = JsonSerializer.Serialize(contrato);
+          TempData["DniInquilino"] = DniInquilino;
+          return RedirectToAction("Crear");
+        }
+        contrato.IdInquilino = inquilino.IdInquilino;
         var errores = new List<string>();
-        errores.AddRange(ValidarInquilino(null, DniInquilino));
+        errores.AddRange(ValidarInquilino(contrato.IdInquilino, null));
         errores.AddRange(ValidarInmueble(contrato.IdInmueble));
         errores.AddRange(ValidarFechaContrato(contrato));
         if (errores.Any())
@@ -144,13 +153,33 @@ namespace Inmobiliaria.Controllers
       try
       {
         Contrato contrato = repositorio.ObtenerPorID(idContrato);
+        if (contrato.FechaCancelacion != null)
+        {
+          if (!repositorioPago.MultaPagada(contrato.IdContrato))
+          {
+            contrato.Estado = "Cancelado con Multa Pendiente";
+          }
+          else
+          {
+            contrato.Estado = "Cancelado con Multa Saldada";
+          }
+        }
+        else if (contrato.FechaFinalizacion < DateTime.Now)
+        {
+          contrato.Estado = "Finalizado";
+        }
+        else
+        {
+          ViewBag.Pagos = repositorioPago.BuscarPorContrato(contrato.IdContrato).Count == 1;
+          contrato.Estado = "Vigente";
+          contrato.Multa = CalcularMulta(contrato);
+        }
         ViewBag.ReturnUrl = returnUrl ?? Url.Action("Listar");
-        ViewBag.PagarMulta = contrato.IdContrato > 0 && contrato.Estado == 3 && !repositorioPago.MultaPagada(contrato.IdContrato);
-        ViewBag.Pagos = repositorioPago.BuscarPorContrato(contrato.IdContrato).Count == 1;
         return View("Gestion", contrato);
       }
       catch (Exception)
       {
+        TempData["Error"] = "Error al intentar obtener el Contrato";
         return RedirectToAction("Listar");
       }
     }
@@ -196,42 +225,65 @@ namespace Inmobiliaria.Controllers
       }
     }
 
-    // POST: Contrato/Cancelar
     [HttpPost]
-    public IActionResult Cancelar(Contrato contrato)
+    public IActionResult RenovarContrato(Contrato contrato, int IdContratoOriginal)
     {
+      var id = IdContratoOriginal;
       try
       {
-        if (ModelState.IsValid)
+        Contrato contratoViejo = repositorio.ObtenerPorID(IdContratoOriginal);
+        if (contratoViejo.FechaCancelacion != null || contratoViejo.FechaFinalizacion >= DateTime.Today)
         {
-
-          if (contrato.FechaCancelacion != null && repositorio.validarContratoCancelar(contrato.IdContrato, contrato.FechaCancelacion) != 1)
+          TempData["Error"] = "Contrato no renobable";
+          return RedirectToAction("Ver", "Contrato", new { id });
+        }
+        var errores = new List<string>();
+        errores.AddRange(ValidarInquilino(contrato.IdInquilino, null));
+        errores.AddRange(ValidarInmueble(contrato.IdInmueble));
+        errores.AddRange(ValidarFechaContrato(contrato));
+        if (errores.Any())
+        {
+          TempData["Error"] = string.Join(" | ", errores);
+          return RedirectToAction("Ver", "Contrato", new { id });
+        }
+        Pago pago = new Pago
+        {
+          numeroPago = 1,
+          FechaPago = DateTime.Today
+        };
+        if (contrato.Tipo == 1)
+        {
+          pago.Concepto = "Deposito de todo el Alquiler del Contrato";
+          pago.Monto = contrato.Monto;
+        }
+        else
+        {
+          if (((contrato.FechaFinalizacion.Year - contrato.FechaInicio.Year) * 12) + (contrato.FechaFinalizacion.Month - contrato.FechaInicio.Month) < 4)
           {
-            TempData["MensajeError"] = "Contrato no cancelable";
-            return View("Gestion", contrato);
-          }
-          if (repositorio.validarFechaMayorMulta(contrato.IdContrato, contrato.FechaCancelacion) == 1)
-          {
-            TempData["MensajeError"] = "Multa de un mes";
-            contrato.Multa = contrato.Monto;
+            pago.Concepto = "Deposito de un mes";
+            pago.Monto = contrato.Monto;
           }
           else
           {
-            TempData["MensajeError"] = "Multa de dos meses";
-            contrato.Multa = contrato.Monto * 2;
+            pago.Concepto = "Deposito de dos meses";
+            pago.Monto = contrato.Monto * 2;
           }
-          repositorio.Cancelado(contrato);
-          Contrato nuevo = repositorio.ObtenerPorID(contrato.IdContrato);
-          return RedirectToAction("Ver", new { id = nuevo.IdContrato });
         }
-        else
-          TempData["MensajeError"] = "Modelo invalido";
-        return View("Gestion", contrato);
+        var idContrato = repositorio.CrearContratoConPago(contrato, pago);
+        if (idContrato <= 0)
+        {
+          TempData["Error"] = "Error al intentar renovar el Contrato";
+          TempData["Contrato"] = JsonSerializer.Serialize(contrato);
+          return RedirectToAction("Ver", "Contrato", new { id });
+        }
+
+        TempData["Success"] = "Se renovo correctamente el Contrato";
+        return RedirectToAction("Ver", "Contrato", new { id = idContrato, returnUrl = Url.Action("Ver", "Contrato", new { id })  });
       }
-      catch (System.Exception)
+      catch (Exception)
       {
-        TempData["MensajeError"] = JsonSerializer.Serialize(contrato);
-        return View("Gestion", contrato);
+        TempData["Error"] = "Ocurrió un error inesperado al renovar el contrato";
+        return RedirectToAction("Ver", "Contrato", new { id });
       }
     }
 
@@ -258,7 +310,7 @@ namespace Inmobiliaria.Controllers
 
     // GET: Contrato/Listar
     [HttpGet]
-    public IActionResult Listar(string? idContrato, string? dniInquilino, string? idInmueble, string? estado, string? Fecha_desde, string? Fecha_hasta, int PaginaActual = 1)
+    public IActionResult Listar(string? idContrato, string? dniInquilino, string? idInmueble, string? estado, string? Fecha_desde, string? Fecha_hasta, string? tipo, string? MontoMenor, string? MontoMayor,int PaginaActual = 1)
     {
       int registrosPorPagina = 9;
       int total = 0;
@@ -267,9 +319,9 @@ namespace Inmobiliaria.Controllers
       List<Contrato> lista;
       try
       {
-        total = repositorio.CantidadFiltro(idContrato, dniInquilino, idInmueble, estado, Fecha_desde, Fecha_hasta);
+        total = repositorio.CantidadFiltro(idContrato, dniInquilino, idInmueble, estado, Fecha_desde, Fecha_hasta, tipo, MontoMenor, MontoMayor);
         limite = Math.Min(registrosPorPagina, total - offset);
-        lista = repositorio.Filtrar(idContrato, dniInquilino, idInmueble, estado, Fecha_desde, Fecha_hasta, offset, limite);
+        lista = repositorio.Filtrar(idContrato, dniInquilino, idInmueble, estado, Fecha_desde, Fecha_hasta, tipo, MontoMenor, MontoMayor, offset, limite);
 
         int totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina);
 
@@ -281,6 +333,9 @@ namespace Inmobiliaria.Controllers
         ViewBag.Estado = estado;
         ViewBag.FechaDesde = Fecha_desde;
         ViewBag.FechaHasta = Fecha_hasta;
+        ViewBag.Tipo = tipo;
+        ViewBag.MontoMenor = MontoMenor;
+        ViewBag.MontoMayor = MontoMayor;
 
         return View(lista);
       }
@@ -381,30 +436,46 @@ namespace Inmobiliaria.Controllers
     }
 
     [HttpPost]
-    public IActionResult Cancelacion(Contrato contrato)
+    public IActionResult CancelarContrato(int idContrato, decimal Multa = 0)
     {
+      var id = idContrato;
       try
       {
-        if (!ModelState.IsValid)
-        {
-          TempData["Error"] = "Modelo inválido, al cancelar contrato";
-          return RedirectToAction("Ver", new { id = contrato.IdContrato });
-        }
-        if (repositorio.ObtenerPorID(contrato.IdContrato).IdContrato == 0)
+        Contrato contrato = repositorio.ObtenerPorID(idContrato);
+        if (contrato.IdContrato == 0)
         {
           TempData["Error"] = "Contrato no encontrado, al cancelar contrato";
-          return RedirectToAction(nameof(Listar));
+          return RedirectToAction("Ver", "Contrato", new { id });
         }
+        if (contrato.Estado != "Vigente")
+        {
+          TempData["Error"] = "Contrato no cancelable";
+        }
+        if (Multa == 0)
+        {
+          Pago pago = new Pago
+          {
+            IdContrato = idContrato,
+            Monto = Multa,
+            numeroPago = repositorioPago.CantidadPago(idContrato) + 1,
+            Concepto = "Multa de Cancelacion",
+            FechaPago = DateTime.Today
+          };
+          repositorio.CancalarContratoConPago(contrato, pago);
+          TempData["Success"] = "Contrato cancelado";
+          return RedirectToAction("Ver", "Contrato", new { id });
+        }
+        contrato.Multa = Multa;
         var resultado = repositorio.Cancelado(contrato);
         if (resultado != -1)
         {
-          TempData["Mensaje"] = "Contrato cancelado";
+          TempData["Success"] = "Contrato cancelado";
         }
-        return RedirectToAction(nameof(Listar));
+        return RedirectToAction("Ver", "Contrato", new { id });
       }
       catch (System.Exception)
       {
-        return RedirectToAction(nameof(Listar));
+        return RedirectToAction("Ver", "Contrato", new { id });
       }
     }
 
@@ -414,7 +485,6 @@ namespace Inmobiliaria.Controllers
       try
       {
         decimal multa = -1;
-
         switch (c.Tipo)
         {
           case 1:
@@ -429,18 +499,16 @@ namespace Inmobiliaria.Controllers
             );
             //si fuera 5 meses, si cancela en el mes 1 o 2 paga multa de 2 meses, si cancela en el 3,4 o 5 paga multa de 1 mes
             //si fuera 6 meses, si cancela en el mes 1,2 o 3 paga multa de 2 meses, si cancela en el 4,5 o 6 paga multa de 1 mes
-            if (c.FechaCancelacion <= mitad)
+            if ((c.FechaCancelacion ?? DateTime.Today) <= mitad)
             {
               multa = c.Monto * 2;
             }
-            else if (c.FechaCancelacion > mitad)
+            else
             {
               multa = c.Monto;
             }
-
             return multa;
         }
-
         return multa;
       }
       catch
