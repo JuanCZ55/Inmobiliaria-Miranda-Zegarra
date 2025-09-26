@@ -714,7 +714,7 @@ public List<Contrato> FechasOcupadas(int idInmueble, string? idContrato)
       }
     }
 
-    public int CancalarContratoConPago(Contrato contrato, Pago pago)
+    public int CancelarContratoConPago(Contrato contrato, Pago pago)
     {
       using (var conn = new MySqlConnection(connectionString))
       {
@@ -726,9 +726,10 @@ public List<Contrato> FechasOcupadas(int idInmueble, string? idContrato)
             var sqlContrato = @"UPDATE contrato SET fecha_terminacion_anticipada=@fecha_fin, multa=@multa, updated_at=NOW() WHERE id_contrato=@id_contrato";
             using (var cmdContrato = new MySqlCommand(sqlContrato, conn, transaction))
             {
-              cmdContrato.Parameters.AddWithValue("@fecha_fin", DateTime.Now);
+              cmdContrato.Parameters.AddWithValue("@fecha_fin", DateTime.Today);
               cmdContrato.Parameters.AddWithValue("@multa", contrato.Multa);
               cmdContrato.Parameters.AddWithValue("@id_contrato", contrato.IdContrato);
+              cmdContrato.ExecuteNonQuery(); 
             }
 
             pago.IdContrato = contrato.IdContrato;

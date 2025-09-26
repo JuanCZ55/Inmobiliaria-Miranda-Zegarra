@@ -15,6 +15,6 @@ namespace Inmobiliaria.Models
         public int CrearContratoConPago(Contrato contrato, Pago pago);
         public List<Contrato> FechasOcupadas(int idInmueble, string? idContrato);
         public int EliminarContratoConPagoS(int idContrato);
-        int CancalarContratoConPago(Contrato contrato, Pago pago);
+        int CancelarContratoConPago(Contrato contrato, Pago pago);
     }
 }
