@@ -11,5 +11,6 @@ namespace Inmobiliaria.Models
         int CantidadFiltro(string? idPago, string? idContrato, string? dniInquilino, string? MontoMenor, string? MontoMayor, string? estado, string? Fecha_desde, string? Fecha_hasta);
         int CantidadPago(int? idContrato);
         bool MultaPagada(int? idContrato);
+        int SetEstado(int idPago, int estado);
     }
 }

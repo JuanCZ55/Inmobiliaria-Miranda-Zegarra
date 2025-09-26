@@ -308,7 +308,7 @@ namespace Inmobiliaria.Models
         if (!string.IsNullOrEmpty(estado))
           sql += " AND estado = @estado";
 
-        sql += " LIMIT @limite OFFSET @offset";
+        sql += " ORDER BY p.id_pago DESC LIMIT @limite OFFSET @offset";
 
         using (var cmd = new MySqlCommand(sql, conn))
         {
@@ -528,5 +528,25 @@ namespace Inmobiliaria.Models
       return total > 0;
     }
 
+    public int SetEstado(int idPago, int estado)
+    { 
+      int res = -1;
+      using (var conn = new MySqlConnection(connectionString))
+      {
+        var sql = @"
+        UPDATE pago SET estado=@estado, updated_at=NOW()
+        WHERE id_pago=@id";
+
+        using (var cmd = new MySqlCommand(sql, conn))
+        {
+          cmd.Parameters.AddWithValue("@estado", estado);
+          cmd.Parameters.AddWithValue("@id", idPago);
+          conn.Open();
+          res = cmd.ExecuteNonQuery();
+          conn.Close();
+        }
+      }
+      return res;
+    }
   }
 }
