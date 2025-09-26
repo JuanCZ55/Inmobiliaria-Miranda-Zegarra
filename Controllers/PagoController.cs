@@ -144,12 +144,18 @@ namespace Inmobiliaria.Controllers
                     TempData["Pago"] = JsonSerializer.Serialize(pago);
                     return RedirectToAction("Crear");
                 }
-
-                Pago nuevo = repositorio.ObtenerPorID(repositorio.Crear(pago));
-                TempData["MensajeError"] = "Pago Creado";
-                return RedirectToAction("Ver", new { id = nuevo.IdContrato });
+                pago.numeroPago = repositorio.CantidadPago(pago.IdContrato) + 1;
+                var idPago = repositorio.Crear(pago);
+                if (idPago <= 0)
+                {
+                    TempData["MensajeError"] = "Error al crear el pago";
+                    TempData["Pago"] = JsonSerializer.Serialize(pago);
+                    return RedirectToAction("Crear");
+                }
+                TempData["Success"] = "Pago Creado";
+                return RedirectToAction("Ver", new { id = idPago });
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 TempData["MensajeError"] = "Modelo invalido";
                 TempData["Pago"] = JsonSerializer.Serialize(pago);
@@ -255,6 +261,59 @@ namespace Inmobiliaria.Controllers
             {
                 TempData["Error"] = "Error al intentar pagar la multa";
                 return RedirectToAction("Ver", "Contrato", new { id = IdContrato });
+            }
+        }
+
+        public IActionResult CancelarPago(int idPago)
+        {
+            try
+            {
+                Pago pago = repositorio.ObtenerPorID(idPago);
+                if (pago.Estado != 1)
+                {
+                    TempData["Error"] = "Pago no cancelable";
+                    return RedirectToAction("Ver", "Pago", new { id = idPago });
+                }
+                repositorio.SetEstado(idPago, 2);
+                TempData["Success"] = "Pago cancelado";
+                return RedirectToAction("Ver", "Pago", new { id = idPago });
+            }
+            catch (System.Exception)
+            {
+                TempData["Error"] = "Error al intentar cancelar el pago";
+                return RedirectToAction("Ver", "Pago", new { id = idPago });
+            }
+        }
+
+        public IActionResult ActivarPago(int idPago)
+        { 
+            try
+            {
+                Pago pago = repositorio.ObtenerPorID(idPago);
+                pago.contrato = repositorioContraro.ObtenerPorID(pago.IdContrato);
+                if (pago.Estado != 2)
+                {
+                    TempData["Error"] = "Pago no activable";
+                    return RedirectToAction("Ver", "Pago", new { id = idPago });
+                }
+                if (pago.contrato.Estado == "Finalizado")
+                {
+                    TempData["Error"] = "No se pueden modificar pagos de contratos finalizado";
+                    return RedirectToAction("Ver", "Pago", new { id = idPago });
+                }
+                else if (pago.contrato.Estado == "No se pueden modificar pagos de contratos cancelados con multa saldada")
+                {
+                    TempData["Error"] = "Contrato Cancelado con Multa Saldada";
+                    return RedirectToAction("Ver", "Pago", new { id = idPago });
+                }
+                repositorio.SetEstado(idPago, 1);
+                TempData["Success"] = "Pago Restaurado";
+                return RedirectToAction("Ver", "Pago", new { id = idPago });
+            }
+            catch (System.Exception)
+            {
+                TempData["Error"] = "Error al intentar cancelar el pago";
+                return RedirectToAction("Ver", "Pago", new { id = idPago });
             }
         }
 
