@@ -451,6 +451,7 @@ namespace Inmobiliaria.Controllers
         {
           TempData["Error"] = "Contrato no cancelable";
         }
+        contrato.Multa = Multa;
         if (Multa == 0)
         {
           Pago pago = new Pago
@@ -461,11 +462,10 @@ namespace Inmobiliaria.Controllers
             Concepto = "Multa de Cancelacion",
             FechaPago = DateTime.Today
           };
-          repositorio.CancalarContratoConPago(contrato, pago);
+          repositorio.CancelarContratoConPago(contrato, pago);
           TempData["Success"] = "Contrato cancelado";
           return RedirectToAction("Ver", "Contrato", new { id });
         }
-        contrato.Multa = Multa;
         var resultado = repositorio.Cancelado(contrato);
         if (resultado != -1)
         {
