@@ -58,15 +58,14 @@ namespace Inmobiliaria.Controllers
                     {
                         IdContrato = idContrato.Value,
                         contrato = repositorioContraro.ObtenerPorID(idContrato.Value),
-
                         FechaPago = DateTime.Today,
                     };
-                    if (pago.contrato.Estado == 2)
+                    if (pago.contrato.Estado == "Finalizado")
                     {
                         ViewBag.MultaPagada = "Contrato Finalizado";
                         return View("Gestion", pago);
                     }
-                    if (pago.contrato.Estado == 3)
+                    if (pago.contrato.Estado == "Cancelado con Multa Saldada")
                     {
                         if (!repositorio.MultaPagada(idContrato))
                         {
@@ -79,11 +78,12 @@ namespace Inmobiliaria.Controllers
                             ViewBag.MultaPagada = "Multa Pagada";
                         }
                     }
-                    else
+                    else if (pago.contrato.Estado == "Cancelado con Multa Pendiente")
                     {
                         ViewBag.MultaPagada = "Sin Multa";
                         pago.Monto = pago.contrato?.Monto ?? 0;
                         pago.numeroPago = repositorio.CantidadPago(idContrato) + 1;
+
                     }
                     return View("Gestion", pago);
                 }
@@ -124,9 +124,16 @@ namespace Inmobiliaria.Controllers
             }
             try
             {
-                if (repositorioContraro.ObtenerPorID(pago.IdContrato).Estado == 2)
+                Contrato contrato = repositorioContraro.ObtenerPorID(pago.IdContrato);
+                if (contrato.Estado == "Finalizado")
                 {
                     TempData["MensajeError"] = "Contrato Finalizado";
+                    TempData["Pago"] = JsonSerializer.Serialize(pago);
+                    return RedirectToAction("Crear");
+                }
+                if (contrato.Estado == "Cancelado con Multa Saldada")
+                {
+                    TempData["MensajeError"] = "Contrato Cancelado";
                     TempData["Pago"] = JsonSerializer.Serialize(pago);
                     return RedirectToAction("Crear");
                 }
@@ -215,5 +222,41 @@ namespace Inmobiliaria.Controllers
                 return View(new List<Pago>());
             }
         }
+
+        [HttpPost]
+        public IActionResult PagarMulta(int IdContrato)
+        {
+            try
+            {
+                Contrato contrato = repositorioContraro.ObtenerPorID(IdContrato);
+                if (contrato.Estado != "Cancelado con Multa Pendiente" || contrato.Multa == null)
+                {
+                    TempData["Error"] = "No se puede pagar la multa";
+                    return RedirectToAction("Ver", "Contrato", new { id = IdContrato });
+                }
+                Pago pago = new Pago
+                {
+                    IdContrato = IdContrato,
+                    Monto = (decimal)contrato.Multa,
+                    FechaPago = DateTime.Today,
+                    numeroPago = repositorio.CantidadPago(IdContrato) + 1,
+                    Concepto = "Multa de Cancelacion"
+                };
+                int id = repositorio.Crear(pago);
+                if (id <= 0)
+                {
+                    TempData["Error"] = "Error al intentar pagar la multa";
+                    return RedirectToAction("Ver", "Contrato", new { id = IdContrato });
+                }
+                TempData["Success"] = "Se pago correctamente la multa";
+                return RedirectToAction("Ver", "Contrato", new { id = IdContrato });
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "Error al intentar pagar la multa";
+                return RedirectToAction("Ver", "Contrato", new { id = IdContrato });
+            }
+        }
+
     }
 }
