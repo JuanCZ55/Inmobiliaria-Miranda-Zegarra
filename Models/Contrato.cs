@@ -29,7 +29,7 @@ namespace Inmobiliaria.Models
         [Range(1, 2, ErrorMessage = "Seleccione Pago Total o Pagos Mensuales.")]
         public int Tipo { get; set; }
 
-        public int Estado { get; set; } = 1;
+        public string? Estado { get; set; }
 
         [Required(ErrorMessage = "El Inquilino es obligatorio")]
         [Display(Name = "Inquilino")]
