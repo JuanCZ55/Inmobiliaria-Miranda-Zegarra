@@ -246,7 +246,7 @@
       <li class="page-item @(PaginaActual == 1 ? "disabled" : "")">
         <a class="page-link" asp-action="Listar" asp-route-idContrato="@idContrato" asp-route-dniInquilino="@dniInquilino"
           asp-route-idInmueble="@idInmueble" asp-route-estado="@estado" asp-route-Fecha_desde="@Fecha_desde"
-          asp-route-Fecha_hasta="@Fecha_hasta" asp-route-tipo=@tipo asp-route-PaginaActual="1"
+          asp-route-Fecha_hasta="@Fecha_hasta" asp-route-tipo="@tipo" asp-route-PaginaActual="1"
           asp-route-MontoMenor="@MontoMenor" asp-route-MontoMayor="@MontoMayor">&lt;</a>
       </li>
 

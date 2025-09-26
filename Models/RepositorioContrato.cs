@@ -496,6 +496,7 @@ namespace Inmobiliaria.Models
           sql += " AND c.monto_mensual >= @MontoMenor";
 
         if (!string.IsNullOrEmpty(MontoMayor))
+            sql += " AND c.monto_mensual <= @MontoMayor";
 
         if (!string.IsNullOrEmpty(estado))
           {
