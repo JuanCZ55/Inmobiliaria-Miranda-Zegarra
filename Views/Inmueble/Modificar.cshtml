@@ -10,7 +10,7 @@
 <div class="px-3 py-1 row justify-content-center h-100">
   <div class="col-md-8 p-3">
 
-    <form asp-action="Modificar" method="post"
+    <form asp-action="Modificar" method="post" enctype="multipart/form-data"
       class="row shadow-lg rounded border bg-light p-4 h-100 justify-content-evenly">
 
       <div class="col-md-12 d-flex justify-content-center align-items-center">
@@ -118,170 +118,101 @@
           </div>
         }
       </div>
+ @* --- IMAGENES (NUEVA LÓGICA PARA MODIFICAR) --- *@
+            <div class="row mt-4">
+                <h4 class="text-center mb-3">Gestión de Imágenes</h4>
 
-      <div class="d-flex justify-content-end align-items-center">
-        <button type="submit" class="btn btn-success">Guardar Cambios</button>
-      </div>
+                <div class="col-md-12 pb-3 border-bottom">
+                    <label class="form-label fw-bold">Portada Actual</label>
+                    <div id="portada-existente-container">
+                        @{
+                            var portada = Model.listImagenes?.FirstOrDefault(i => i.Tipo == 1);
+                        }
+                        @if (portada != null)
+                        {
+                            <div class="position-relative d-inline-block" id="container-img-@portada.IdImagen">
+                                <img src="@portada.Url" alt="Portada actual" class="img-thumbnail" style="max-height: 200px;">
+                                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
+                                        onclick="marcarParaEliminar(@portada.IdImagen, 'container-img-@portada.IdImagen')">&times; Eliminar</button>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No hay imagen de portada.</p>
+                        }
+                    </div>
+                    <label for="FilePortada" class="form-label mt-2">Reemplazar o agregar portada:</label>
+                    <input type="file" asp-for="FilePortada" class="form-control" accept="image/*" id="input-portada-modificar" />
+                    <div id="preview-portada-modificar" class="mt-2"></div>
+                </div>
 
-    </form>
-  </div>
+                <div class="col-md-12 pt-3">
+                    <label class="form-label fw-bold">Galería Actual</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        @{
+                            var galeria = Model.listImagenes?.Where(i => i.Tipo == 2).ToList() ?? new List<Imagen>();
+                        }
+                        @if (galeria.Any())
+                        {
+                            foreach (var imagen in galeria)
+                            {
+                                <div class="position-relative" id="container-img-@imagen.IdImagen">
+                                    <img src="@imagen.Url" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
+                                    <button type="button" class="btn btn-danger btn-xs position-absolute top-0 end-0 m-1" style="--bs-btn-padding-y: .1rem; --bs-btn-padding-x: .4rem; --bs-btn-font-size: .75rem;"
+                                            onclick="marcarParaEliminar(@imagen.IdImagen, 'container-img-@imagen.IdImagen')">&times;</button>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">No hay imágenes en la galería.</p>
+                        }
+                    </div>
+
+                    <label for="FileGaleria" class="form-label mt-3">Agregar nuevas imágenes a la galería:</label>
+                    <input type="file" asp-for="FileGaleria" class="form-control" multiple accept="image/*" id="input-galeria-modificar" />
+                    <div id="preview-galeria-modificar" class="mt-2 d-flex flex-wrap gap-2"></div>
+                </div>
+
+                <div id="container-eliminar-ids"></div>
+            </div>
+            @* --- FIN DE LA SECCIÓN DE IMÁGENES --- *@
+
+            <br>
+            <div class="d-flex justify-content-end align-items-center mt-4">
+                <a asp-action="Listar" class="btn btn-secondary me-2">Cancelar</a>
+                <button type="submit" class="btn btn-success">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
 </div>
 
-<style>
-  .autocomplete-list {
-    position: absolute;
-    z-index: 19999;
-    width: 99%;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-
-  .autocomplete-list li {
-    padding: 8px 12px;
-    cursor: pointer;
-    background-color: white;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  .autocomplete-list li:hover {
-    background-color: #0971da;
-    color: white;
-  }
-
-  .autocomplete-list li:last-child {
-    border-bottom: none;
-  }
-</style>
 
 @section Scripts {
-  @await Html.PartialAsync("_ValidationScriptsPartial")
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script src="~/js/inmueble-form.js"></script>
+    <script src="~/js/manejo-imagenes-modificar.js"></script>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializamos el mapa y Select2
+            inicializarFormularioInmueble({
+                idPropietario: @Model.IdPropietario,
+                propietarioNombre: '@(Model.Propietario?.Nombre + " " + Model.Propietario?.Apellido + " (" + Model.Propietario?.Dni + ")")'
+            });
 
-  <script>
-    $(document).ready(function () {
-      // === Select2 Propietario con valor inicial ===
-      const propietarioActual = @Model.IdPropietario;
-      const propietarioNombre = '@(Model.Propietario?.Nombre + " " + Model.Propietario?.Apellido + " (" + Model.Propietario?.Dni + ")")';
-
-      $('#select-propietario').select2({
-        theme: 'bootstrap-5',
-        placeholder: 'Busque un propietario...',
-        minimumInputLength: 3,
-        ajax: {
-          url: '@Url.Action("ListarPropietarios", "Propietario")',
-          dataType: 'json',
-          delay: 250,
-          data: params => ({ q: params.term }),
-          processResults: data => ({
-            results: $.map(data, item => ({
-              id: item.idPropietario,
-              text: item.nombre + ' ' + item.apellido + ' (' + item.dni + ')'
-            }))
-          })
-        }
-      });
-
-      if (propietarioActual && propietarioNombre) {
-        const option = new Option(propietarioNombre, propietarioActual, true, true);
-        $('#select-propietario').append(option).trigger('change');
-      }
-
-      // === MAPA + DIRECCIÓN (igual que en Crear) ===
-      const $dir = $('#direccion');
-      const $lat = $('#latitud');
-      const $lng = $('#longitud');
-      const $list = $('#addrList');
-
-      const DEF_LAT = -33.302160, DEF_LNG = -66.336993;
-      const initLat = parseFloat($lat.val()) || DEF_LAT;
-      const initLng = parseFloat($lng.val()) || DEF_LNG;
-
-      const map = L.map('mapa').setView([initLat, initLng], 15);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-      }).addTo(map);
-      const marker = L.marker([initLat, initLng], { draggable: true }).addTo(map);
-
-      function setInputs(lat, lng) {
-        $lat.val(lat.toFixed(6));
-        $lng.val(lng.toFixed(6));
-      }
-      setInputs(initLat, initLng);
-
-      async function reverseGeo(lat, lon) {
-        try {
-          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`, {
-            headers: { 'Accept-Language': 'es' }
-          });
-          const j = await r.json();
-          return j.display_name || '';
-        } catch { return ''; }
-      }
-
-      async function searchAddr(q) {
-        try {
-          const r = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q=${encodeURIComponent(q)}`, {
-            headers: { 'Accept-Language': 'es' }
-          });
-          return await r.json();
-        } catch { return []; }
-      }
-
-      function showList(items) {
-        $list.empty();
-        if (!items.length) { $list.hide(); return; }
-
-        items.forEach(it => {
-          const $li = $('<li>').text(it.display_name).data({ lat: it.lat, lon: it.lon });
-          $li.on('click', function () {
-            const lat = parseFloat($(this).data('lat')),
-              lon = parseFloat($(this).data('lon'));
-            $dir.val(it.display_name);
-            marker.setLatLng([lat, lon]);
-            map.setView([lat, lon], 15);
-            setInputs(lat, lon);
-            $list.hide();
-          });
-          $list.append($li);
+            // Inicializamos las previews para los nuevos archivos a subir
+            inicializarPreviewsModificar({
+                idInputPortada: 'input-portada-modificar',
+                idPreviewPortada: 'preview-portada-modificar',
+                idInputGaleria: 'input-galeria-modificar',
+                idPreviewGaleria: 'preview-galeria-modificar'
+            });
         });
-        $list.show();
-      }
-
-      const debounce = (fn, ms = 300) => {
-        let t;
-        return (...a) => {
-          clearTimeout(t);
-          t = setTimeout(() => fn(...a), ms);
-        };
-      };
-
-      const doSuggest = debounce(async q => {
-        if (q.trim().length < 2) { $list.hide(); return; }
-        showList(await searchAddr(q));
-      }, 300);
-
-      $dir.on('input', () => doSuggest($dir.val()));
-
-      $(document).on('click', e => {
-        if (!$(e.target).closest('.position-relative').length) $list.hide();
-      });
-
-      marker.on('dragend', async e => {
-        const p = e.target.getLatLng();
-        setInputs(p.lat, p.lng);
-        $dir.val(await reverseGeo(p.lat, p.lng));
-      });
-
-      map.on('click', async e => {
-        marker.setLatLng(e.latlng);
-        map.panTo(e.latlng);
-        setInputs(e.latlng.lat, e.latlng.lng);
-        $dir.val(await reverseGeo(e.latlng.lat, e.latlng.lng));
-      });
-    });
-  </script>
+    </script>
 }
