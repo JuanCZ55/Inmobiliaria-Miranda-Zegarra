@@ -99,120 +99,118 @@
         </div>
 
         <!-- Estado -->
-        @if (Model.Estado == 2)
-        {
-          <div class="alert alert-warning col-md-12" role="alert">
-            El inmueble está actualmente ocupado. No se puede cambiar su estado.
-          </div>
-        }
-        else
-        {
-          <div class="col-md-12 pb-2">
-            <label asp-for="Estado" class="form-label"></label>
-            <select asp-for="Estado" class="form-select">
-              <option value="">Seleccione un estado</option>
-              <option value="1">Disponible</option>
-              <option value="3">Suspendido</option>
-            </select>
-            <span asp-validation-for="Estado" class="text-danger"></span>
-          </div>
-        }
+
+        <div class="col-md-12 pb-2">
+          <label asp-for="Estado" class="form-label"></label>
+          <select asp-for="Estado" class="form-select">
+            <option value="">Seleccione un estado</option>
+            <option value="1">Disponible</option>
+            <option value="2">Suspendido</option>
+          </select>
+          <span asp-validation-for="Estado" class="text-danger"></span>
+        </div>
+
       </div>
- @* --- IMAGENES (NUEVA LÓGICA PARA MODIFICAR) --- *@
-            <div class="row mt-4">
-                <h4 class="text-center mb-3">Gestión de Imágenes</h4>
+      @* --- IMAGENES --- *@
+      <div class="row mt-4">
+        <div class="col-md-12 pb-3">
+          <label class="form-label fw-bold">Portada</label>
 
-                <div class="col-md-12 pb-3 border-bottom">
-                    <label class="form-label fw-bold">Portada Actual</label>
-                    <div id="portada-existente-container">
-                        @{
-                            var portada = Model.listImagenes?.FirstOrDefault(i => i.Tipo == 1);
-                        }
-                        @if (portada != null)
-                        {
-                            <div class="position-relative d-inline-block" id="container-img-@portada.IdImagen">
-                                <img src="@portada.Url" alt="Portada actual" class="img-thumbnail" style="max-height: 200px;">
-                                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
-                                        onclick="marcarParaEliminar(@portada.IdImagen, 'container-img-@portada.IdImagen')">&times; Eliminar</button>
-                            </div>
-                        }
-                        else
-                        {
-                            <p class="text-muted">No hay imagen de portada.</p>
-                        }
-                    </div>
-                    <label for="FilePortada" class="form-label mt-2">Reemplazar o agregar portada:</label>
-                    <input type="file" asp-for="FilePortada" class="form-control" accept="image/*" id="input-portada-modificar" />
-                    <div id="preview-portada-modificar" class="mt-2"></div>
-                </div>
+          <div id="portada-unificada-container" class="mt-2"></div>
+          <p id="portada-placeholder-mensaje" class="text-muted" style="display: none;">No hay imagen de portada.</p>
 
-                <div class="col-md-12 pt-3">
-                    <label class="form-label fw-bold">Galería Actual</label>
-                    <div class="d-flex flex-wrap gap-2">
-                        @{
-                            var galeria = Model.listImagenes?.Where(i => i.Tipo == 2).ToList() ?? new List<Imagen>();
-                        }
-                        @if (galeria.Any())
-                        {
-                            foreach (var imagen in galeria)
-                            {
-                                <div class="position-relative" id="container-img-@imagen.IdImagen">
-                                    <img src="@imagen.Url" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
-                                    <button type="button" class="btn btn-danger btn-xs position-absolute top-0 end-0 m-1" style="--bs-btn-padding-y: .1rem; --bs-btn-padding-x: .4rem; --bs-btn-font-size: .75rem;"
-                                            onclick="marcarParaEliminar(@imagen.IdImagen, 'container-img-@imagen.IdImagen')">&times;</button>
-                                </div>
-                            }
-                        }
-                        else
-                        {
-                            <p class="text-muted">No hay imágenes en la galería.</p>
-                        }
-                    </div>
 
-                    <label for="FileGaleria" class="form-label mt-3">Agregar nuevas imágenes a la galería:</label>
-                    <input type="file" asp-for="FileGaleria" class="form-control" multiple accept="image/*" id="input-galeria-modificar" />
-                    <div id="preview-galeria-modificar" class="mt-2 d-flex flex-wrap gap-2"></div>
-                </div>
+          <input type="file" asp-for="FilePortada" class="form-control mt-3" accept="image/*"
+            id="input-portada-modificar" />
 
-                <div id="container-eliminar-ids"></div>
+          @{
+            var portadaActual = Model.listImagenes?
+            .Where(i => i.Tipo == 1)
+            .Select(i => new { i.IdImagen, i.Url })
+            .FirstOrDefault();
+          }
+          <script>
+            var imagenPortadaExistente = @Html.Raw(portadaActual != null ? Json.Serialize(portadaActual) : "null");
+          </script>
+        </div>
+
+        <div class="col-md-12 pt-3">
+          <label class="form-label fw-bold">Galeria</label>
+
+          <div id="galeria-unificada-carousel" class="carousel slide mb-3" data-bs-ride="carousel"
+            style="display: none;">
+            <div class="carousel-inner" id="galeria-unificada-inner">
             </div>
-            @* --- FIN DE LA SECCIÓN DE IMÁGENES --- *@
+            <button class="carousel-control-prev" type="button" data-bs-target="#galeria-unificada-carousel"
+              data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#galeria-unificada-carousel"
+              data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+          </div>
 
-            <br>
-            <div class="d-flex justify-content-end align-items-center mt-4">
-                <a asp-action="Listar" class="btn btn-secondary me-2">Cancelar</a>
-                <button type="submit" class="btn btn-success">Guardar Cambios</button>
-            </div>
-        </form>
-    </div>
+
+          <input type="file" asp-for="FileGaleria" class="form-control" multiple accept="image/*"
+            id="input-galeria-modificar" />
+
+          @{
+            var galeriaActual = (Model.listImagenes ?? new List<Imagen>())
+            .Where(i => i.Tipo == 2)
+            .Select(i => new { i.IdImagen, i.Url })
+            .ToList();
+          }
+          <script>
+            // img que vienen del servidor
+            var imagenesExistentes = @Html.Raw(Json.Serialize(galeriaActual));
+          </script>
+        </div>
+
+        <div id="container-eliminar-ids"></div>
+      </div>
+      @* --- FIN IMÁGENES --- *@
+
+      <br>
+      <div class="d-flex justify-content-end align-items-center mt-4">
+        <a asp-action="Listar" class="btn btn-secondary me-2">Cancelar</a>
+        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 
 @section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
+  @await Html.PartialAsync("_ValidationScriptsPartial")
 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <script src="~/js/inmueble-form.js"></script>
-    <script src="~/js/manejo-imagenes-modificar.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inicializamos el mapa y Select2
-            inicializarFormularioInmueble({
-                idPropietario: @Model.IdPropietario,
-                propietarioNombre: '@(Model.Propietario?.Nombre + " " + Model.Propietario?.Apellido + " (" + Model.Propietario?.Dni + ")")'
-            });
+  <script src="~/js/inmueble-form.js"></script>
+  <script src="~/js/manejo-imagenes-modificar.js"></script>
 
-            // Inicializamos las previews para los nuevos archivos a subir
-            inicializarPreviewsModificar({
-                idInputPortada: 'input-portada-modificar',
-                idPreviewPortada: 'preview-portada-modificar',
-                idInputGaleria: 'input-galeria-modificar',
-                idPreviewGaleria: 'preview-galeria-modificar'
-            });
-        });
-    </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Inicializamos el mapa y Select2
+      inicializarFormularioInmueble({
+        idPropietario: @Model.IdPropietario,
+        propietarioNombre: '@(Model.Propietario?.Nombre + " " + Model.Propietario?.Apellido + " (" + Model.Propietario?.Dni + ")")'
+      });
+      //Imagenes
+      inicializarPortadaUnificada({
+        idInputPortada: 'input-portada-modificar',
+        idPreviewContainer: 'portada-unificada-container',
+        idPlaceholder: 'portada-placeholder-mensaje'
+      });
+
+
+      inicializarGaleriaUnificada({
+        idInputGaleria: 'input-galeria-modificar',
+        idCarousel: 'galeria-unificada-carousel',
+        idCarouselInner: 'galeria-unificada-inner'
+      });
+    });
+  </script>
 }
