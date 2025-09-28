@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Inmobiliaria.Models
@@ -8,8 +10,8 @@ namespace Inmobiliaria.Models
     public class Inmueble
     {
         [Key]
-        [Display(Name = "Codigo")]
-        public int IdInmueble { get; set; } = 0;
+        [Display(Name = "Código")]
+        public int IdInmueble { get; set; }
 
         [Display(Name = "Propietario")]
         [Required(ErrorMessage = "El campo Propietario es obligatorio.")]
@@ -20,37 +22,29 @@ namespace Inmobiliaria.Models
         public Propietario? Propietario { get; set; }
 
         [Required(ErrorMessage = "El campo Tipo de Inmueble es obligatorio.")]
-        public int IdTipoInmueble { get; set; } = 0;
-
         [Display(Name = "Tipo de Inmueble")]
+        public int IdTipoInmueble { get; set; }
+
         [ForeignKey(nameof(IdTipoInmueble))]
+        [BindNever]
         public TipoInmueble? TipoInmueble { get; set; }
 
-        [Required(ErrorMessage = "La direccion es obligatoria.")]
-        [StringLength(255, ErrorMessage = "La direccion no puede superar los 255 caracteres.")]
+        [Required(ErrorMessage = "La dirección es obligatoria.")]
+        [StringLength(255, ErrorMessage = "La dirección no puede superar los 255 caracteres.")]
         public string Direccion { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El uso es obligatorio.")]
-        [Range(1, 2, ErrorMessage = "Seleccione 1 (Residencial) o 2 (Comercial)")]
+        [Range(1, 2, ErrorMessage = "El uso debe ser 1 (Residencial) o 2 (Comercial).")]
         public int Uso { get; set; }
 
-        [Display(Name = "Cantidad de Ambientes")]
         [Required(ErrorMessage = "La cantidad de ambientes es obligatoria.")]
-        [Range(1, 20, ErrorMessage = "Debe tener al menos 1 ambiente.")]
+        [Display(Name = "Cantidad de Ambientes")]
         public int CantidadAmbientes { get; set; }
 
         [Required(ErrorMessage = "La longitud es obligatoria.")]
-        [RegularExpression(
-            @"^(\+|-)?(?:180(?:\.0+)?|1[0-7]\d(?:\.\d+)?|\d{1,2}(?:\.\d+)?)$",
-            ErrorMessage = "La longitud no es válida."
-        )]
         public string Longitud { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La latitud es obligatoria.")]
-        [RegularExpression(
-            @"^(\+|-)?(?:90(?:\.0+)?|[0-8]?\d(?:\.\d+)?)$",
-            ErrorMessage = "La latitud no es válida."
-        )]
         public string Latitud { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El precio es obligatorio.")]
@@ -61,14 +55,22 @@ namespace Inmobiliaria.Models
         )]
         public decimal Precio { get; set; }
 
-        [StringLength(255, ErrorMessage = "La descripcion no puede superar los 255 caracteres.")]
+        [StringLength(255, ErrorMessage = "La descripción no puede superar los 255 caracteres.")]
         public string? Descripcion { get; set; } = " -";
 
-        [Range(1, 3, ErrorMessage = "El estado debe ser 1, 2 o 3")]
+        [Range(1, 2, ErrorMessage = "El estado debe ser 1 o 2")]
         public int Estado { get; set; } = 1;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
+        public IFormFile? FilePortada { get; set; }
+
+        public List<IFormFile>? FileGaleria { get; set; }
+
+        public List<Imagen>? listImagenes { get; set; } = new List<Imagen>();
+
+        public List<int>? EliminarIDs { get; set; }
     }
 }
