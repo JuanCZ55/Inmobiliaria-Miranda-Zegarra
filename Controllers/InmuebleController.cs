@@ -1,4 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Inmobiliaria.Models;
+using Inmobiliaria.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
@@ -10,27 +17,26 @@ namespace Inmobiliaria.Controllers
         private readonly IRepositorioTipoInmueble repoTipo;
         private readonly IRepositorioPropietario repoPropietario;
         private readonly IConfiguration config;
+        private readonly IFileService _fileService;
+        private const string RUTA_CARPETA_IMAGENES = "Uploads/Inmuebles";
 
         public InmuebleController(
             IRepositorioInmueble repositorio,
             IRepositorioTipoInmueble repoTipo,
             IRepositorioPropietario repoPropietario,
-            IConfiguration config
+            IConfiguration config,
+            IFileService fileService
         )
         {
             this.repositorio = repositorio;
             this.repoTipo = repoTipo;
             this.repoPropietario = repoPropietario;
             this.config = config;
-        }
-
-        // GET: Inmueble
-        public IActionResult Index()
-        {
-            return RedirectToAction("Index", "Home");
+            this._fileService = fileService;
         }
 
         // GET: Inmueble/Crear
+        [HttpGet]
         public IActionResult Crear()
         {
             ViewBag.Tipos = repoTipo.TenerTodos();
@@ -39,77 +45,116 @@ namespace Inmobiliaria.Controllers
 
         // POST: Inmueble/Crear
         [HttpPost]
-        public IActionResult Crear(Inmueble inmueble)
+        public async Task<IActionResult> Crear(Inmueble inmueble)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (ModelState.IsValid)
-                {
-                    repositorio.Crear(inmueble);
-                    TempData["Success"] =
-                        $"Se agrego correctamente el inmueble en {inmueble.Direccion}";
-                    return RedirectToAction(nameof(Listar));
-                }
                 ViewBag.Tipos = repoTipo.TenerTodos();
                 return View(inmueble);
             }
-            catch (System.Exception ex)
+
+            var nombresArchivosGuardados = new List<string>();
+            try
             {
-                ViewBag.Error = "Error al crear inmueble: " + ex.Message;
+                inmueble.listImagenes = new List<Imagen>();
+                if (inmueble.FilePortada != null)
+                {
+                    string nombreArchivo = await _fileService.GuardarArchivoAsync(
+                        inmueble.FilePortada,
+                        RUTA_CARPETA_IMAGENES
+                    );
+                    nombresArchivosGuardados.Add(nombreArchivo);
+                    inmueble.listImagenes.Add(
+                        new Imagen { Url = $"/{RUTA_CARPETA_IMAGENES}/{nombreArchivo}", Tipo = 1 }
+                    );
+                }
+                if (inmueble.FileGaleria != null)
+                {
+                    foreach (var archivo in inmueble.FileGaleria)
+                    {
+                        string nombreArchivo = await _fileService.GuardarArchivoAsync(
+                            archivo,
+                            RUTA_CARPETA_IMAGENES
+                        );
+                        nombresArchivosGuardados.Add(nombreArchivo);
+                        inmueble.listImagenes.Add(
+                            new Imagen
+                            {
+                                Url = $"/{RUTA_CARPETA_IMAGENES}/{nombreArchivo}",
+                                Tipo = 2,
+                            }
+                        );
+                    }
+                }
+                await repositorio.CrearAsync(inmueble);
+                TempData["Success"] =
+                    $"Se agregó correctamente el inmueble en {inmueble.Direccion}";
+                return RedirectToAction(nameof(Listar));
+            }
+            catch (Exception ex)
+            {
+                foreach (var nombreArchivo in nombresArchivosGuardados)
+                {
+                    _fileService.BorrarArchivo(nombreArchivo, RUTA_CARPETA_IMAGENES);
+                }
+                TempData["Error"] = "Error al crear inmueble: " + ex.Message;
                 ViewBag.Tipos = repoTipo.TenerTodos();
                 return View(inmueble);
             }
         }
 
-        // GET: Inmueble/Modificar/5
+        // GET: Inmueble/Modificar/{id}
         [HttpGet]
         public IActionResult Modificar(int id)
         {
             try
             {
-                Inmueble i = repositorio.ObtenerPorID(id);
-                if (i == null)
+                var inmueble = repositorio.ObtenerPorID(id);
+                if (inmueble == null || inmueble.IdInmueble == 0)
                 {
+                    TempData["Error"] = "El inmueble no existe.";
                     return RedirectToAction(nameof(Listar));
                 }
-
                 ViewBag.Tipos = repoTipo.TenerTodos();
-                return View(i);
+                return View(inmueble);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                ViewBag.Error = "Error al cargar inmueble: " + ex.Message;
+                TempData["Error"] = "Error al cargar el inmueble para modificar: " + ex.Message;
                 return RedirectToAction(nameof(Listar));
             }
         }
 
         // POST: Inmueble/Modificar
         [HttpPost]
-        public IActionResult Modificar(Inmueble inmueble)
+        public async Task<IActionResult> Modificar(Inmueble inmueble)
         {
             try
             {
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
-                    repositorio.Modificar(inmueble);
-                    TempData["Success"] =
-                        $"Se modifico correctamente el inmueble de {inmueble.Direccion}";
-                    return RedirectToAction(nameof(Listar));
+                    var original = repositorio.ObtenerPorID(inmueble.IdInmueble);
+                    inmueble.listImagenes = original.listImagenes;
+                    ViewBag.TipoInmuebles = repoTipo.TenerTodos();
+                    return View(inmueble);
                 }
 
-                ViewBag.Tipos = repoTipo.TenerTodos();
-                return View(inmueble);
+                await ProcesarImagenesModificacionAsync(inmueble);
+
+                await repositorio.ModificarAsync(inmueble);
+
+                TempData["Success"] =
+                    $"Se modificó correctamente el inmueble de {inmueble.Direccion}";
+                return RedirectToAction(nameof(Listar));
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                ViewBag.Error = "Error al modificar inmueble: " + ex.Message;
-                ViewBag.Tipos = repoTipo.TenerTodos();
+                TempData["Error"] = "Error al modificar inmueble: " + ex.Message;
                 return View(inmueble);
             }
         }
 
-        // POST: Inmueble/Eliminar/5
+        // POST: Inmueble/Eliminar
         [HttpPost]
         public IActionResult Eliminar(int id)
         {
@@ -120,35 +165,87 @@ namespace Inmobiliaria.Controllers
                     TempData["Warning"] = "No se puede eliminar el inmueble porque está en uso";
                     return RedirectToAction(nameof(Listar));
                 }
-                if (repositorio.Eliminar(id) > 0)
+
+                var imagenesAEliminar = repositorio.ObtenerImagenesPorInmueble(id);
+                foreach (var imagen in imagenesAEliminar)
                 {
-                    TempData["Success"] = "Se elimino correctamente el inmueble";
-                    return RedirectToAction(nameof(Listar));
+                    _fileService.BorrarArchivo(Path.GetFileName(imagen.Url), RUTA_CARPETA_IMAGENES);
                 }
 
-                TempData["Error"] = "No se pudo eliminar el inmueble";
+                if (repositorio.Eliminar(id) > 0)
+                {
+                    TempData["Success"] = "Se eliminó correctamente el inmueble";
+                }
+                else
+                {
+                    TempData["Error"] = "No se pudo eliminar el inmueble";
+                }
                 return RedirectToAction(nameof(Listar));
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
+                TempData["Error"] = "Ocurrió un error al eliminar el inmueble: " + ex.Message;
                 return RedirectToAction(nameof(Listar));
             }
         }
 
-        // POST: Inmueble/SetEstado/5
-        [HttpPost]
-        public IActionResult SetEstado(int id, int estado)
+        [NonAction]
+        private async Task ProcesarImagenesModificacionAsync(Inmueble inmueble)
         {
-            try
+            if (inmueble.EliminarIDs != null && inmueble.EliminarIDs.Any())
             {
-                repositorio.SetEstado(id, estado);
-                TempData["Success"] = "Se actualizo el estado del inmueble correctamente";
-                return RedirectToAction(nameof(Listar));
+                foreach (var id in inmueble.EliminarIDs)
+                {
+                    var imagen = repositorio.ObtenerImagenPorId(id);
+                    if (imagen != null)
+                    {
+                        _fileService.BorrarArchivo(
+                            Path.GetFileName(imagen.Url),
+                            RUTA_CARPETA_IMAGENES
+                        );
+                        repositorio.EliminarImagen(id);
+                    }
+                }
             }
-            catch
+
+            if (inmueble.FilePortada != null)
             {
-                TempData["Success"] = "No se pudo actualizar el estado";
-                return RedirectToAction(nameof(Listar));
+                var portadaActual = repositorio
+                    .ObtenerImagenesPorInmueble(inmueble.IdInmueble)
+                    .FirstOrDefault(i => i.Tipo == 1);
+
+                if (portadaActual != null)
+                {
+                    _fileService.BorrarArchivo(
+                        Path.GetFileName(portadaActual.Url),
+                        RUTA_CARPETA_IMAGENES
+                    );
+                    repositorio.EliminarImagen(portadaActual.IdImagen);
+                }
+
+                var nombreArchivo = await _fileService.GuardarArchivoAsync(
+                    inmueble.FilePortada,
+                    RUTA_CARPETA_IMAGENES
+                );
+                inmueble.listImagenes = inmueble.listImagenes ?? new List<Imagen>();
+                inmueble.listImagenes.Add(
+                    new Imagen { Url = $"/{RUTA_CARPETA_IMAGENES}/{nombreArchivo}", Tipo = 1 }
+                );
+            }
+
+            if (inmueble.FileGaleria != null && inmueble.FileGaleria.Any())
+            {
+                inmueble.listImagenes = inmueble.listImagenes ?? new List<Imagen>();
+                foreach (var archivo in inmueble.FileGaleria)
+                {
+                    var nombreArchivo = await _fileService.GuardarArchivoAsync(
+                        archivo,
+                        RUTA_CARPETA_IMAGENES
+                    );
+                    inmueble.listImagenes.Add(
+                        new Imagen { Url = $"/{RUTA_CARPETA_IMAGENES}/{nombreArchivo}", Tipo = 2 }
+                    );
+                }
             }
         }
 
@@ -209,10 +306,11 @@ namespace Inmobiliaria.Controllers
             return View(inmuebles);
         }
 
+        // GET: Inmueble/Inmueble/{idInmueble}
         public IActionResult Inmueble(int idInmueble)
         {
             var inmueble = repositorio.ObtenerPorID(idInmueble);
-            if (inmueble.Estado == 1)
+            if (inmueble != null && inmueble.Estado == 1)
             {
                 return Ok(inmueble);
             }
