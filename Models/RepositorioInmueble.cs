@@ -397,7 +397,7 @@ namespace Inmobiliaria.Models
             using (var conn = new MySqlConnection(connectionString))
             {
                 string sql =
-                    "SELECT i.*, p.Nombre AS PropietarioNombre, p.Apellido AS PropietarioApellido, t.Nombre AS TipoInmuebleNombre FROM inmueble i INNER JOIN propietario p ON i.id_propietario = p.id_propietario INNER JOIN tipo_inmueble t ON i.id_tipo_inmueble = t.id_tipo_inmueble WHERE i.id_inmueble = @IdInmueble;";
+                    "SELECT i.*, p.Nombre AS PropietarioNombre, p.Apellido AS PropietarioApellido,p.dni AS dni, t.Nombre AS TipoInmuebleNombre FROM inmueble i INNER JOIN propietario p ON i.id_propietario = p.id_propietario INNER JOIN tipo_inmueble t ON i.id_tipo_inmueble = t.id_tipo_inmueble WHERE i.id_inmueble = @IdInmueble;";
 
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
@@ -423,6 +423,7 @@ namespace Inmobiliaria.Models
                                     IdPropietario = reader.GetInt32("id_propietario"),
                                     Nombre = reader.GetString("PropietarioNombre"),
                                     Apellido = reader.GetString("PropietarioApellido"),
+                                    Dni = reader.GetString("dni"),
                                 },
                                 TipoInmueble = new TipoInmueble
                                 {
