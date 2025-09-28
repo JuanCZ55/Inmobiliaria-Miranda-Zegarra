@@ -117,23 +117,15 @@
             {
               case 1:
                 <option value="1" selected>Disponible</option>
-                <option value="2">Ocupado</option>
-                <option value="3">Suspendido</option>
+                <option value="2">Suspendido</option>
                 break;
               case 2:
                 <option value="1">Disponible</option>
-                <option value="2" selected>Ocupado</option>
-                <option value="3">Suspendido</option>
-                break;
-              case 3:
-                <option value="1">Disponible</option>
-                <option value="2">Ocupado</option>
-                <option value="3" selected>Suspendido</option>
+                <option value="2" selected>Suspendido</option>
                 break;
               default:
                 <option value="1">Disponible</option>
-                <option value="2">Ocupado</option>
-                <option value="3">Suspendido</option>
+                <option value="2">Suspendido</option>
                 break;
             }
 
@@ -180,7 +172,7 @@
             @* <td>@i.Descripcion</td> *@
             <td>@i.Precio</td>
             <td>
-              @(i.Estado == 1 ? "Disponible" : i.Estado == 2 ? "Ocupado" : i.Estado == 3 ? "Suspendido" : "Desconocido")
+              @(i.Estado == 1 ? "Disponible" : i.Estado == 2 ? "Suspendido" : "Desconocido")
             </td>
             <td class="d-flex justify-content-center">
               @if (i.Estado != 1)
