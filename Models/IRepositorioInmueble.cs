@@ -4,7 +4,6 @@ namespace Inmobiliaria.Models
 {
     public interface IRepositorioInmueble : IRepositorio<Inmueble>
     {
-        int SetEstado(int IdInmueble, int Estado);
         bool SeEstaUsando(int idInmueble);
         int ContarFiltro(
             string? direccion,
@@ -28,5 +27,11 @@ namespace Inmobiliaria.Models
             int? limit,
             int? offset
         );
+        Task<int> CrearAsync(Inmueble inmueble);
+        Task<int> ModificarAsync(Inmueble inmueble);
+
+        List<Imagen> ObtenerImagenesPorInmueble(int idInmueble); // <-- Agregado
+        Imagen? ObtenerImagenPorId(int idImagen);
+        int EliminarImagen(int idImagen);
     }
 }
