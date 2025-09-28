@@ -99,7 +99,8 @@
       @* ---IMAGENES--- *@
       <!-- Portada -->
       <div class="col-md-12 pb-2">
-        <label for="NuevaPortada" class="form-label">Imagen de portada</label>
+        <label class="form-label fw-bold">Portada</label>
+
         <input type="file" asp-for="FilePortada" class="form-control" accept="image/*" id="input-portada-crear" />
         <span asp-validation-for="FilePortada" class="text-danger"></span>
         <div id="preview-portada-crear" class="mt-2 position-relative"></div>
@@ -107,9 +108,8 @@
 
       <!-- Galeria -->
       <div class="col-md-12 pb-2">
-        <label for="NuevasImagenesGaleria" class="form-label">
-          Imágenes de la galería
-        </label>
+        <label class="form-label fw-bold">Galeria</label>
+
         <input type="file" asp-for="FileGaleria" class="form-control" multiple accept="image/*"
           id="input-galeria-crear" />
         <span asp-validation-for="FileGaleria" class="text-danger"></span>
@@ -147,19 +147,19 @@
   <script src="~/js/manejo-imagenes-crear.js"></script>
   <script src="~/js/inmueble-form.js""></script>
 
-                                                                          <script>
-                                                                            document.addEventListener('DOMContentLoaded', () => {
-                                                                              //select2+ mapa
-                                                                              inicializarFormularioInmueble();
-                                                                              inicializarGestionImagenes({
-                                                                                idInputPortada: 'input-portada-crear',
-                                                                                idPreviewPortada: 'preview-portada-crear',
-                                                                                idInputGaleria: 'input-galeria-crear',
-                                                                                idCarouselInner: 'carousel-inner-galeria',
-                                                                                idCarousel: 'carouselGaleria' // El ID del div principal del carrusel
-                                                                              });
-                                                                            });
-                                                                          </script>
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            //select2+ mapa
+            inicializarFormularioInmueble();
+            inicializarGestionImagenes({
+              idInputPortada: 'input-portada-crear',
+              idPreviewPortada: 'preview-portada-crear',
+              idInputGaleria: 'input-galeria-crear',
+              idCarouselInner: 'carousel-inner-galeria',
+              idCarousel: 'carouselGaleria' // El ID del div principal del carrusel
+            });
+          });
+        </script>
 
 
 }
