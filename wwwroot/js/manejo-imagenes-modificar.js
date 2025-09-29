@@ -1,9 +1,4 @@
-/**
- * ========================================================================
- * GESTIÓN DE IMÁGENES TOTALMENTE UNIFICADA PARA MODIFICAR
- * Versión Final
- * ========================================================================
- */
+//  GESTIÓN DE IMÁGENES TOTALMENTE UNIFICADA PARA MODIFICAR
 
 // --- FUNCIÓN GENERAL PARA MARCAR ITEMS PARA ELIMINAR ---
 function marcarParaEliminar(id, containerId) {
@@ -30,9 +25,7 @@ function marcarParaEliminar(id, containerId) {
 }
 
 /**
- * ========================================================================
  * LÓGICA PARA LA GESTIÓN DE PORTADA UNIFICADA
- * ========================================================================
  */
 function inicializarPortadaUnificada(config) {
   const inputPortada = document.getElementById(config.idInputPortada);
@@ -122,11 +115,7 @@ function inicializarPortadaUnificada(config) {
   renderizarPortada();
 }
 
-/**
- * ========================================================================
- * LÓGICA PARA LA GESTIÓN DE GALERÍA UNIFICADA
- * ========================================================================
- */
+//  LÓGICA PARA LA GESTIÓN DE GALERÍA UNIFICADA
 function inicializarGaleriaUnificada(config) {
   const inputGaleria = document.getElementById(config.idInputGaleria);
   const carousel = document.getElementById(config.idCarousel);
