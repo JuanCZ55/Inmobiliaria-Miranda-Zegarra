@@ -1,13 +1,4 @@
-﻿/**
- * Inicializa la gestión de imágenes para un formulario de creación.
- * Se encarga de la previsualización de la portada y de la galería de imágenes.
- * @param {string} idInputPortada - El ID del input file para la portada.
- * @param {string} idPreviewPortada - El ID del div contenedor para la previsualización de la portada.
- * @param {string} idInputGaleria - El ID del input file para la galería.
- * @param {string} idCarouselInner - El ID del div 'carousel-inner' de Bootstrap para la galería.
- * @param {string} idCarousel - El ID del contenedor principal del carrusel.
- */
-function inicializarGestionImagenes(config) {
+﻿function inicializarGestionImagenes(config) {
   // --- SELECTORES ---
   const inputPortada = document.getElementById(config.idInputPortada);
   const previewPortada = document.getElementById(config.idPreviewPortada);
