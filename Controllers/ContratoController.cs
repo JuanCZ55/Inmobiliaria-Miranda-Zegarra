@@ -28,7 +28,7 @@ namespace Inmobiliaria.Controllers
     }
 
     [HttpGet]
-    public IActionResult Crear(int? idInmueble)
+    public IActionResult Crear(int? idInmueble, DateTime? fecha)
     {
       Contrato contrato = new Contrato
       {
@@ -63,9 +63,9 @@ namespace Inmobiliaria.Controllers
 
         ViewBag.ListFechas = System.Text.Json.JsonSerializer.Serialize(fechas);
       }
-
-
-
+      if (fecha != null) { 
+        contrato.FechaInicio = fecha.Value;
+      }
       return View("Gestion", contrato);
     }
     public IActionResult CrearContrato(Contrato contrato, string DniInquilino)
