@@ -313,7 +313,9 @@ header {
 }
 
 /* Día de hoy que no está seleccionado */
-.flatpickr-day.today:not(.fecha-seleccionada-inicio):not(.fecha-seleccionada-fin):not(.fecha-en-rango) {
+.flatpickr-day.today:not(.fecha-seleccionada-inicio):not(
+    .fecha-seleccionada-fin
+  ):not(.fecha-en-rango) {
   background: none !important;
   color: inherit !important;
 }
@@ -336,4 +338,12 @@ header {
 .flatpickr-day.fecha-en-rango {
   background: #b6d4fe !important;
   color: #000 !important;
+}
+.today {
+  border: 3px solid rgb(154, 247, 250) !important;
+}
+
+.bloqueado {
+  color: #ccc !important;
+  pointer-events: none;
 }
