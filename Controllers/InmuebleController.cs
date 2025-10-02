@@ -316,5 +316,17 @@ namespace Inmobiliaria.Controllers
             }
             return Ok(null);
         }
+
+        [HttpGet]
+        public IActionResult Calendario(int id)
+        {
+            var inmueble = repositorio.ObtenerPorID(id);
+            if (inmueble == null || inmueble.IdInmueble <= 0)
+            {
+                TempData["Error"] = "Error al cargar el Calendario, no exite ese inmueble";
+                return RedirectToAction(nameof(Listar));
+            }
+            return View(inmueble);
+        }
     }
 }
