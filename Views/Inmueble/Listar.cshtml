@@ -199,6 +199,10 @@
                   <img src="~/images/icon/Eliminar.png" alt="Eliminar" />
                 </button>
               </form>
+              <a asp-controller="Inmueble" asp-action="Calendario" asp-route-id="@i.IdInmueble" class="btn btn-link"
+                data-bs-toggle="tooltip" title="Ver Calendario">
+                <img src="~/images/icon/Calendario.png" alt="Calendario">
+              </a>
             </td>
           </tr>
         }

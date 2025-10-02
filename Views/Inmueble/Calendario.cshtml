@@ -1,0 +1,103 @@
+@model Inmobiliaria.Models.Inmueble
+@{
+  ViewData["Title"] = " Calendario ";
+  ViewData["SubTitle"] = "Inmuebles";
+
+  Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+
+<h3>Calendario de Contratos para la direccion: </h3>
+<h4>@Model.Direccion</h4>
+<div id="calendar"></div>
+
+@* Sección para scripts específicos de esta página *@
+@section Scripts {
+  <link rel="stylesheet" href="https://unpkg.com/js-year-calendar@latest/dist/js-year-calendar.min.css" />
+  <script src="https://unpkg.com/js-year-calendar@latest/dist/js-year-calendar.min.js"></script>
+  <script src="https://unpkg.com/js-year-calendar@latest/locales/js-year-calendar.es.js"></script>
+  <script>
+    const idInmueble = @Model.IdInmueble;
+
+    const urlApiCalendario = '@Url.Action("Calendario", "Contrato")';
+    const urlVerContrato = '@Url.Action("Ver", "Contrato")';
+    const urlCrearContrato = '@Url.Action("Crear", "Contrato")';
+
+    //  fetch
+    async function cargarContratos(year) {
+      try {
+        const url = `${urlApiCalendario}?year=${year}&idInmueble=${idInmueble}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(errorText);
+          throw new Error("Error en la respuesta del servidor");
+        }
+        const contratos = await response.json();
+
+        return contratos.map((c) => ({
+          idContrato: c.idContrato,
+          startDate: new Date(c.fechaInicio),
+          endDate: new Date(c.fechaCancelacion || c.fechaFinalizacion),
+          color: "#f19c94"
+        }));
+
+      } catch (err) {
+        console.error("Error al cargar contratos:", err);
+        alert("Error 400");
+      }
+    }
+
+    // calendario
+    const calendar = new Calendar("#calendar", {
+      language: 'es',
+      style: "background",
+      enableRangeSelection: false,
+      dataSource: [],
+      clickDay: function (e) {
+        const hoy = new Date();
+        const unMesAtras = new Date();
+        unMesAtras.setMonth(hoy.getMonth() - 1);
+        const dia = new Date(e.date.getFullYear(), e.date.getMonth(), e.date.getDate());
+
+        if (e.events.length > 0) {
+          const contrato = e.events[0];
+          // Usamos la URL generada por Razor
+          window.location.href = `${urlVerContrato}/${contrato.idContrato}`;
+        } else {
+          if (dia < unMesAtras) {
+            alert("No se pueden crear contratos más de un mes atrás.");
+            return;
+          }
+          const fechaStr = dia.toISOString().split("T")[0];
+          // Usamos la URL generada por Razor
+          window.location.href = `${urlCrearContrato}?idInmueble=${idInmueble}&fecha=${fechaStr}`;
+        }
+      },
+      customDayRenderer: function (element, date) {
+        const hoy = new Date();
+        const unMesAtras = new Date();
+        unMesAtras.setMonth(hoy.getMonth() - 1);
+
+        if (date.toDateString() === hoy.toDateString()) {
+          element.classList.add("today");
+        }
+        if (date < unMesAtras) {
+          element.classList.add("bloqueado");
+        }
+      },
+      yearChanged: async function (e) {
+        const events = await cargarContratos(e.currentYear);
+        calendar.setDataSource(events);
+      },
+    });
+
+    // Carga inicial del año actual
+    (async () => {
+      const events = await cargarContratos(new Date().getFullYear());
+      calendar.setDataSource(events);
+    })();
+  </script>
+}
