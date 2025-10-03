@@ -15,6 +15,9 @@
   var precioMinFiltro = ViewBag.PrecioMin ?? "";
   var precioMaxFiltro = ViewBag.PrecioMax ?? "";
   var estadoFiltro = ViewBag.Estado ?? 0;
+  var fechaInicio = ViewBag.fechaInicio ?? "";
+  var fechaFin = ViewBag.fechaFin ?? "";
+
 }
 
 <div class="d-flex align-items-center ">
@@ -59,7 +62,7 @@
               }
             }
           </select>
-          <label for="idTipoInmueble">Tipo de Inmueble</label>
+          <label for="idTipoInmueble">Tipo </label>
         </div>
       </div>
       <div class="col-md-2">
@@ -133,8 +136,27 @@
           <label for="estado">Estado</label>
         </div>
       </div>
+      <div class="col-md-2 adio">
+        <div class="zeg-field">
+          <input class="zeg-input-date" type="date" />
 
-      <div class="col-md-8 d-flex justify-content-end align-items-center pb-3">
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input-date" type="date" id="fechaInicio" name="fechaInicio" value="@fechaInicio"
+            placeholder=" " />
+          <label for="fechaInicio">Fecha Inicio &nbsp;</label>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input-date" type="date" id="fechaFin" name="fechaFin" value="@fechaFin" placeholder=" " />
+          <label for="fechaFin">Fecha Fin &nbsp; &nbsp;</label>
+        </div>
+      </div>
+      <div class="col-md-1 d-flex justify-content-end align-items-center  ms-5 pb-3">
         <button type="submit" class="btn btn-outline-primary fw-bold">Filtrar</button>
       </div>
     </div>
@@ -150,7 +172,7 @@
         <th>Propietario</th>
         <th>Tipo</th>
         <th>Uso</th>
-        <th>@Html.DisplayNameFor(model => model.First().CantidadAmbientes)</th>
+        <th>Ambientes</th>
         <th>@Html.DisplayNameFor(model => model.First().Precio)</th>
         <th>@Html.DisplayNameFor(model => model.First().Estado)</th>
         <th>Acciones</th>
@@ -234,7 +256,8 @@
       <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
         <a class="page-link" asp-action="Listar" asp-route-direccion="@direccionFiltro" asp-route-dni="@dniFiltro"
           asp-route-idTipoInmueble="@idTipoFiltro" asp-route-uso="@usoFiltro"
-          asp-route-cantidadAmbientesMin="@ambientesFiltro" asp-route-precioMin="@precioMinFiltro"
+          asp-route-cantidadAmbientesMin="@ambientesFiltro" asp-route-precioMin="@precioMinFiltro" asp-route-fechaInicio="@fechaInicio"
+          asp-route-fechaFin="@fechaFin"
           asp-route-precioMax="@precioMaxFiltro" asp-route-estado="@estadoFiltro" asp-route-paginaActual="1">&lt;</a>
       </li>
 
@@ -257,7 +280,8 @@
           <li class="page-item @(i == paginaActual ? "active" : "")">
             <a class="page-link" asp-action="Listar" asp-route-direccion="@direccionFiltro" asp-route-dni="@dniFiltro"
               asp-route-idTipoInmueble="@idTipoFiltro" asp-route-uso="@usoFiltro"
-              asp-route-cantidadAmbientesMin="@ambientesFiltro" asp-route-precioMin="@precioMinFiltro"
+              asp-route-cantidadAmbientesMin="@ambientesFiltro" asp-route-precioMin="@precioMinFiltro" asp-route-fechaInicio="@fechaInicio"
+              asp-route-fechaFin="@fechaFin"
               asp-route-precioMax="@precioMaxFiltro" asp-route-estado="@estadoFiltro" asp-route-paginaActual="@i">@i</a>
           </li>
         }
@@ -274,7 +298,8 @@
           <li class="page-item @(i == paginaActual ? "active" : "")">
             <a class="page-link" asp-action="Listar" asp-route-direccion="@direccionFiltro" asp-route-dni="@dniFiltro"
               asp-route-idTipoInmueble="@idTipoFiltro" asp-route-uso="@usoFiltro"
-              asp-route-cantidadAmbientesMin="@ambientesFiltro" asp-route-precioMin="@precioMinFiltro"
+              asp-route-cantidadAmbientesMin="@ambientesFiltro" asp-route-precioMin="@precioMinFiltro" asp-route-fechaInicio="@fechaInicio"
+              asp-route-fechaFin="@fechaFin"
               asp-route-precioMax="@precioMaxFiltro" asp-route-estado="@estadoFiltro" asp-route-paginaActual="@i">@i</a>
           </li>
         }
@@ -284,7 +309,8 @@
       <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
         <a class="page-link" asp-action="Listar" asp-route-direccion="@direccionFiltro" asp-route-dni="@dniFiltro"
           asp-route-idTipoInmueble="@idTipoFiltro" asp-route-uso="@usoFiltro"
-          asp-route-cantidadAmbientesMin="@ambientesFiltro" asp-route-precioMin="@precioMinFiltro"
+          asp-route-cantidadAmbientesMin="@ambientesFiltro" asp-route-precioMin="@precioMinFiltro" asp-route-fechaInicio="@fechaInicio"
+          asp-route-fechaFin="@fechaFin"
           asp-route-precioMax="@precioMaxFiltro" asp-route-estado="@estadoFiltro"
           asp-route-paginaActual="@totalPaginas">&gt;</a>
       </li>
@@ -312,7 +338,50 @@
         else input.classList.remove('active');
       });
     });
+    document.querySelectorAll('select.zeg-input').forEach(select => {
+      if (select.value !== "") select.classList.add('active');
 
+      select.addEventListener('change', () => {
+        if (select.value !== "") select.classList.add('active');
+        else select.classList.remove('active');
+      });
+    });
+
+    document.querySelectorAll('input.zeg-input, textarea.zeg-input').forEach(input => {
+      if (input.value !== "") input.classList.add('active');
+      input.addEventListener('input', () => {
+        if (input.value !== "") input.classList.add('active');
+        else input.classList.remove('active');
+      });
+    });
+
+
+    document.querySelectorAll('input.zeg-input-date[type="date"]').forEach(input => {
+
+      const checkDateActive = () => {
+        const val = input.value;
+
+        // Validar fecha
+        const isValidDate = (val) => {
+          if (!val || val.trim() === "" || val === "0000-00-00" || val.toLowerCase() === "dd/mm/aaaa") return false;
+          const d = new Date(val);
+          return !isNaN(d.getTime());
+        };
+
+        if (isValidDate(val)) {
+          input.classList.add('active');
+        } else {
+          input.classList.remove('active');
+        }
+      };
+
+      // Inicial
+      checkDateActive();
+
+      // Eventos
+      input.addEventListener('input', checkDateActive);
+      input.addEventListener('change', checkDateActive);
+    });
   });
 
 </script>

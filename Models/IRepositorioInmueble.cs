@@ -13,7 +13,9 @@ namespace Inmobiliaria.Models
             int? cantidadAmbientesMin,
             decimal? precioMin,
             decimal? precioMax,
-            int? estado
+            int? estado,
+            DateTime? fechaInicio,
+            DateTime? fechaFin
         );
         List<Inmueble> Filtro(
             string? direccion,
@@ -25,7 +27,9 @@ namespace Inmobiliaria.Models
             decimal? precioMax,
             int? estado,
             int? limit,
-            int? offset
+            int? offset,
+            DateTime? fechaInicio,
+            DateTime? fechaFin
         );
         Task<int> CrearAsync(Inmueble inmueble);
         Task<int> ModificarAsync(Inmueble inmueble);

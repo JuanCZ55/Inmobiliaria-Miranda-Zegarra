@@ -498,7 +498,9 @@ namespace Inmobiliaria.Models
             int? cantidadAmbientes,
             decimal? precioMin,
             decimal? precioMax,
-            int? estado
+            int? estado,
+            DateTime? fechaInicio,
+            DateTime? fechaFin
         )
         {
             int total = 0;
@@ -546,7 +548,19 @@ namespace Inmobiliaria.Models
                 {
                     sql += " AND i.estado = @Estado";
                 }
-
+                if (fechaInicio.HasValue || fechaFin.HasValue)
+                {
+                    sql +=
+                        @" AND NOT EXISTS (
+                SELECT 1 FROM contrato c
+                WHERE c.id_inmueble = i.id_inmueble AND c.estado != 2 
+                AND (
+                    (@FechaInicio IS NOT NULL AND @FechaFin IS NOT NULL AND c.fecha_desde < @FechaFin AND c.fecha_hasta > @FechaInicio) OR
+                    (@FechaInicio IS NOT NULL AND @FechaFin IS NULL AND c.fecha_hasta > @FechaInicio) OR
+                    (@FechaInicio IS NULL AND @FechaFin IS NOT NULL AND c.fecha_desde < @FechaFin)
+                )
+            )";
+                }
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
                     if (!string.IsNullOrEmpty(direccion))
@@ -581,7 +595,18 @@ namespace Inmobiliaria.Models
                     {
                         cmd.Parameters.AddWithValue("@Estado", estado);
                     }
+                    if (fechaInicio.HasValue || fechaFin.HasValue)
+                    {
+                        cmd.Parameters.AddWithValue(
+                            "@FechaInicio",
+                            fechaInicio.HasValue ? fechaInicio.Value : DBNull.Value
+                        );
 
+                        cmd.Parameters.AddWithValue(
+                            "@FechaFin",
+                            fechaFin.HasValue ? fechaFin.Value : DBNull.Value
+                        );
+                    }
                     conn.Open();
                     total = Convert.ToInt32(cmd.ExecuteScalar());
                 }
@@ -600,7 +625,9 @@ namespace Inmobiliaria.Models
             decimal? precioMax,
             int? estado,
             int? limit,
-            int? offset
+            int? offset,
+            DateTime? fechaInicio,
+            DateTime? fechaFin
         )
         {
             var lista = new List<Inmueble>();
@@ -668,7 +695,19 @@ namespace Inmobiliaria.Models
                 {
                     sql += " AND i.estado = @Estado";
                 }
-
+                if (fechaInicio.HasValue || fechaFin.HasValue)
+                {
+                    sql +=
+                        @" AND NOT EXISTS (
+                SELECT 1 FROM contrato c
+                WHERE c.id_inmueble = i.id_inmueble AND c.estado != 2 
+                AND (
+                    (@FechaInicio IS NOT NULL AND @FechaFin IS NOT NULL AND c.fecha_desde < @FechaFin AND c.fecha_hasta > @FechaInicio) OR
+                    (@FechaInicio IS NOT NULL AND @FechaFin IS NULL AND c.fecha_hasta > @FechaInicio) OR
+                    (@FechaInicio IS NULL AND @FechaFin IS NOT NULL AND c.fecha_desde < @FechaFin)
+                )
+            )";
+                }
                 // Si todos los filtros están vacíos o nulos, aplicar ORDER BY IdInmueble DESC
                 if (
                     string.IsNullOrEmpty(direccion)
@@ -722,7 +761,18 @@ namespace Inmobiliaria.Models
                     {
                         cmd.Parameters.AddWithValue("@Estado", estado);
                     }
+                    if (fechaInicio.HasValue || fechaFin.HasValue)
+                    {
+                        cmd.Parameters.AddWithValue(
+                            "@FechaInicio",
+                            fechaInicio.HasValue ? fechaInicio.Value : DBNull.Value
+                        );
 
+                        cmd.Parameters.AddWithValue(
+                            "@FechaFin",
+                            fechaFin.HasValue ? fechaFin.Value : DBNull.Value
+                        );
+                    }
                     cmd.Parameters.AddWithValue("@Limit", limit);
                     cmd.Parameters.AddWithValue("@Offset", offset);
 

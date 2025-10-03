@@ -260,6 +260,8 @@ namespace Inmobiliaria.Controllers
             decimal? precioMin,
             decimal? precioMax,
             int? estado,
+            DateTime? fechaInicio,
+            DateTime? fechaFin,
             int paginaActual = 1
         )
         {
@@ -273,7 +275,9 @@ namespace Inmobiliaria.Controllers
                 cantidadAmbientesMin,
                 precioMin,
                 precioMax,
-                estado
+                estado,
+                fechaInicio,
+                fechaFin
             );
             int limit = Math.Max(0, Math.Min(registrosPorPagina, total - offset));
 
@@ -287,7 +291,9 @@ namespace Inmobiliaria.Controllers
                 precioMax,
                 estado,
                 limit,
-                offset
+                offset,
+                fechaInicio,
+                fechaFin
             );
             var tipos = repoTipo.TenerTodos();
             int totalPaginas = (int)Math.Ceiling((double)total / registrosPorPagina);
@@ -301,6 +307,8 @@ namespace Inmobiliaria.Controllers
             ViewBag.PrecioMin = precioMin;
             ViewBag.PrecioMax = precioMax;
             ViewBag.Estado = estado;
+            ViewBag.fechaInicio = fechaInicio?.ToString("yyyy-MM-dd");
+            ViewBag.fechaFin = fechaFin?.ToString("yyyy-MM-dd");
             ViewBag.Tipos = tipos;
 
             return View(inmuebles);
