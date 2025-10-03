@@ -68,7 +68,6 @@
           window.location.href = `${urlVerContrato}/${contrato.idContrato}`;
         } else {
           if (dia < unMesAtras) {
-            alert("No se pueden crear contratos más de un mes atrás.");
             return;
           }
           const fechaStr = dia.toISOString().split("T")[0];
