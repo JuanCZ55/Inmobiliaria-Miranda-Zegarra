@@ -175,6 +175,10 @@
               @(i.Estado == 1 ? "Disponible" : i.Estado == 2 ? "Suspendido" : "Desconocido")
             </td>
             <td class="d-flex justify-content-center">
+              <a asp-controller="Contrato" asp-action="Listar" asp-route-idInmueble="@i.IdInmueble" class="btn btn-link"
+                data-bs-toggle="tooltip" title="Ver Contratos">
+                <img src="~/images/icon/Ver-Contrato.png" alt="Calendario">
+              </a>
               @if (i.Estado != 1)
               {
 
@@ -203,6 +207,7 @@
                 data-bs-toggle="tooltip" title="Ver Calendario">
                 <img src="~/images/icon/Calendario.png" alt="Calendario">
               </a>
+
             </td>
           </tr>
         }
