@@ -347,3 +347,6 @@ header {
   color: #ccc !important;
   pointer-events: none;
 }
+.adio {
+  visibility: hidden;
+}
