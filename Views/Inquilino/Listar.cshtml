@@ -70,12 +70,13 @@
               title="Modificar Inquilino">
               <img src="~/images/icon/Editar.png" alt="Editar">
             </a>
-
-            <form asp-action="Eliminar" asp-route-id="@i.IdInquilino" method="post">
-              <button type="submit" class="btn btn-link" data-bs-toggle="tooltip" title="Eliminar Inquilino">
-                <img src="~/images/icon/Eliminar.png" alt="Eliminar" />
-              </button>
-            </form>
+            @if (User.IsInRole("Administrador")){
+              <form asp-action="Eliminar" asp-route-id="@i.IdInquilino" method="post">
+                <button type="submit" class="btn btn-link" data-bs-toggle="tooltip" title="Eliminar Inquilino">
+                  <img src="~/images/icon/Eliminar.png" alt="Eliminar" />
+                </button>
+              </form>
+            }
           </td>
         </tr>
       }
