@@ -1,0 +1,251 @@
+@model IEnumerable<Inmobiliaria.Models.Usuario>
+
+@{
+  ViewData["Title"] = "Listado de Usuarios";
+  ViewData["SubTitle"] = "Usuarios";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  var PaginaActual = ViewBag.PaginaActual ?? 1;
+  var totalPaginas = ViewBag.TotalPaginas ?? 1;
+  var idUsuario = ViewBag.IdUsuario ?? "";
+  var nombre = ViewBag.Nombre ?? "";
+  var apellido = ViewBag.Apellido ?? "";
+  var email = ViewBag.Email ?? "";
+  var rol = ViewBag.Rol ?? "";
+  var estado = ViewBag.Estado ?? "";
+}
+
+<div class="d-flex align-items-center">
+  <h2 class="text-center py-4">@ViewData["Title"]</h2>
+  <a class="btn btn-primary ms-3" asp-action="Registrar">
+    <img class="invert-color-icon" src="~/images/icon/Agregar.png" alt="">
+  </a>
+</div>
+
+<div class="d-flex flex-column">
+  <form action="Listar" method="get" class="row g-2 bg-white shadow-sm rounded p-3">
+    <div class="row">
+      <div class="col-md-12 d-flex justify-content-start align-items-center pb-2">
+        <h4 class="ps-2 pe-3 m-0 fw-bold">Filtrar</h4>
+      </div>
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input" type="text" id="idUsuario" name="idUsuario" value="@idUsuario" placeholder=" " />
+          <label for="idUsuario">Cod. Usuario</label>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input" type="text" id="nombre" name="nombre" value="@nombre" placeholder=" " />
+          <label for="nombre">Nombre</label>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input" type="text" id="apellido" name="apellido" value="@apellido" placeholder=" " />
+          <label for="apellido">Apellido</label>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <input class="zeg-input" type="email" id="email" name="email" value="@email" placeholder=" " />
+          <label for="email">Email</label>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <select class="zeg-input" name="rol">
+            <option value=" " selected="@string.IsNullOrEmpty(rol)">Todos</option>
+            <option value="Administrador" selected="@(rol == "Administrador")">Administrador</option>
+            <option value="Empleado" selected="@(rol == "Empleado")">Empleado</option>
+          </select>
+          <label for="rol">Rol</label>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="zeg-field">
+          <select class="zeg-input" name="estado">
+            <option  value=" " selected="@string.IsNullOrEmpty(estado)">Todos</option>
+            <option value="1" selected="@(estado == "1")">Activo</option>
+            <option value="2" selected="@(estado == "2")">Inactivo</option>
+          </select>
+          <label for="estado">Estado</label>
+        </div>
+      </div>
+
+      <div class="col-md-2 d-flex justify-content-start align-items-center pb-3">
+        <button type="submit" class="btn btn-outline-primary fw-bold">Filtrar</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="table-responsive shadow-sm rounded mt-4">
+  <table class="table table-hover table-striped align-middle mb-0">
+    <thead class="bg-primary text-white text-center">
+      <tr>
+        <th>@Html.DisplayNameFor(model => model.First().IdUsuario)</th>
+        <th>Avatar</th>
+        <th>@Html.DisplayNameFor(model => model.First().Nombre)</th>
+        <th>@Html.DisplayNameFor(model => model.First().Apellido)</th>
+        <th>@Html.DisplayNameFor(model => model.First().Email)</th>
+        <th>@Html.DisplayNameFor(model => model.First().Rol)</th>
+        <th>@Html.DisplayNameFor(model => model.First().Estado)</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody class="text-center">
+
+      @if (Model.Any())
+      {
+        @foreach (var i in Model)
+        {
+          <tr>
+            <td>@i.IdUsuario</td>
+            <td>
+              <img src="@(string.IsNullOrEmpty(i.AvatarURL) ? (i.Genero == 2 ? "/images/user/AvatarFemenino.png" : "/images/user/AvatarMasculino.png") : i.AvatarURL)"
+                alt="Avatar" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" />
+            </td>
+            <td>@i.Nombre</td>
+            <td>@i.Apellido</td>
+            <td>@i.Email</td>
+            <td>@i.Rol</td>
+            <td>@(i.Estado == 1 ? "Activo" : "Inactivo")</td>
+            <td>
+              <a asp-action="Ver" asp-route-IdUsuario="@i.IdUsuario" data-bs-toggle="tooltip" title="Gestionar Usuario">
+                <img src="~/images/icon/Gestionar.png" alt="Gestionar" />
+              </a>
+            </td>
+          </tr>
+        }
+      }
+      else
+      {
+        <tr>
+          <td colspan="8">No se encontraron Usuarios</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+@if (totalPaginas > 1)
+{
+  <nav aria-label="Paginación" class="mt-3">
+    <ul class="pagination justify-content-center">
+
+      @* Botón al inicio "<" *@
+      <li class="page-item @(PaginaActual == 1 ? "disabled" : "")">
+        <a class="page-link" asp-action="Listar" asp-route-idUsuario="@idUsuario" asp-route-nombre="@nombre"
+          asp-route-apellido="@apellido" asp-route-email="@email" asp-route-rol="@rol" asp-route-estado="@estado" asp-route-PaginaActual="1">&lt;</a>
+      </li>
+
+      @{
+        int botonesCentrales = 8; // cantidad de botones centrales
+        int mitad = botonesCentrales / 2;
+
+        int inicio = Math.Max(PaginaActual - mitad + 1, 1);
+        int fin = inicio + botonesCentrales - 1;
+
+        if (fin > totalPaginas - 2)
+        {
+          fin = totalPaginas - 2; // reservamos los dos últimos
+          inicio = Math.Max(fin - botonesCentrales + 1, 1);
+        }
+
+        // Botones centrales
+        for (int i = inicio; i <= fin; i++)
+        {
+          <li class="page-item @(i == PaginaActual ? "active" : "")">
+            <a class="page-link" asp-action="Listar" asp-route-idUsuario="@idUsuario" asp-route-nombre="@nombre"
+              asp-route-apellido="@apellido" asp-route-email="@email" asp-route-rol="@rol" asp-route-estado="@estado" asp-route-PaginaActual="@i">@i</a>
+          </li>
+        }
+
+        @* Botón "..." *@
+        @if (fin < totalPaginas - 2)
+        {
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+        }
+
+        @* Dos últimos botones *@
+        for (int i = Math.Max(totalPaginas - 1, fin + 1); i <= totalPaginas; i++)
+        {
+          <li class="page-item @(i == PaginaActual ? "active" : "")">
+            <a class="page-link" asp-action="Listar" asp-route-idUsuario="@idUsuario" asp-route-nombre="@nombre"
+              asp-route-apellido="@apellido" asp-route-email="@email" asp-route-rol="@rol" asp-route-estado="@estado" asp-route-PaginaActual="@i">@i</a>
+          </li>
+        }
+      }
+
+      @* Botón final ">" *@
+      <li class="page-item @(PaginaActual == totalPaginas ? "disabled" : "")">
+        <a class="page-link" asp-action="Listar" asp-route-idUsuario="@idUsuario" asp-route-nombre="@nombre"
+          asp-route-apellido="@apellido" asp-route-email="@email" asp-route-rol="@rol" asp-route-estado="@estado" asp-route-PaginaActual="@totalPaginas">&gt;</a>
+      </li>
+
+    </ul>
+  </nav>
+}
+
+
+
+
+
+@if (TempData["Mensaje"] != null)
+{
+  <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('select.zeg-input').forEach(select => {
+      if (select.value !== "") select.classList.add('active');
+
+      select.addEventListener('change', () => {
+        if (select.value !== "") select.classList.add('active');
+        else select.classList.remove('active');
+      });
+    });
+
+    document.querySelectorAll('input.zeg-input, textarea.zeg-input').forEach(input => {
+      if (input.value !== "") input.classList.add('active');
+      input.addEventListener('input', () => {
+        if (input.value !== "") input.classList.add('active');
+        else input.classList.remove('active');
+      });
+    });
+
+
+    document.querySelectorAll('input.zeg-input-date[type="date"]').forEach(input => {
+
+      const checkDateActive = () => {
+        const val = input.value;
+
+        // Validar fecha
+        const isValidDate = (val) => {
+          if (!val || val.trim() === "" || val === "0000-00-00" || val.toLowerCase() === "dd/mm/aaaa") return false;
+          const d = new Date(val);
+          return !isNaN(d.getTime());
+        };
+
+        if (isValidDate(val)) {
+          input.classList.add('active');
+        } else {
+          input.classList.remove('active');
+        }
+      };
+
+      // Inicial
+      checkDateActive();
+
+      // Eventos
+      input.addEventListener('input', checkDateActive);
+      input.addEventListener('change', checkDateActive);
+    });
+  });
+</script>
