@@ -1,0 +1,110 @@
+@if (User.Identity?.IsAuthenticated == true)
+{
+  <!-- Modal de Edición de Perfil -->
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true"
+    data-bs-backdrop="static" 
+    data-male-avatar="@Url.Content("~/images/user/AvatarMasculino.png")"
+    data-female-avatar="@Url.Content("~/images/user/AvatarFemenino.png")">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0 pt-2 px-3">
+          <ul class="nav nav-tabs" id="profileTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane"
+                type="button" role="tab" aria-controls="info-pane" aria-selected="true">Información Personal</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password-pane"
+                type="button" role="tab" aria-controls="password-pane" aria-selected="false">Cambiar
+                Contraseña</button>
+            </li>
+          </ul>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body p-4">
+          <div class="profile-modal-body-wrapper">
+            <div class="tab-content h-100" id="profileTabContent">
+              <!-- Pestaña de Información Personal -->
+              <div class="tab-pane fade show active h-100" id="info-pane" role="tabpanel" aria-labelledby="info-tab">
+                <!-- Contenedor de alertas para la pestaña de perfil -->
+                <div id="profile-alert-container"></div>
+                <form id="profileForm" enctype="multipart/form-data" class="d-flex flex-column h-100">
+                  @Html.AntiForgeryToken()
+                  <input type="hidden" name="IdUsuario" id="profileIdUsuario" />
+
+                  <div class="d-flex justify-content-center align-items-center">
+                    <div class="col-md-4 text-center border-end h-100">
+                      <img id="avatarPreview" src="" alt="Avatar actual" class="rounded-circle border shadow-sm mb-3"
+                        style="width: 150px; height: 150px; object-fit: cover;" />
+                      <div>
+                        <label for="profileAvatar" class="btn btn-outline-primary btn-sm">Cambiar foto</label>                        
+                        <button type="button" id="cancelAvatarChange" class="btn btn-outline-danger btn-sm d-none ms-1">Quitar</button>
+                        <input name="AvatarFile" id="profileAvatar" type="file" class="d-none" accept="image/*" />
+                        <input type="hidden" name="AvatarURL" id="profileAvatarURL"/>
+                      </div>
+                    </div>
+                    <div class="col-md-8 ps-4">
+                      <div class="mb-3"><label for="profileNombre" class="form-label">Nombre</label><input name="Nombre"
+                          id="profileNombre" class="form-control" required /></div>
+                      <div class="mb-3"><label for="profileApellido" class="form-label">Apellido</label><input
+                          name="Apellido" id="profileApellido" class="form-control" required /></div>
+                      <div class="mb-3"><label for="profileEmail" class="form-label">Email</label><input name="Email"
+                          id="profileEmail" type="email" class="form-control" required /></div>
+                      <div class="mb-3"><label for="profileGenero" class="form-label">Género</label><select
+                          name="Genero" id="profileGenero" class="form-select" required>
+                          <option value="1">Masculino</option>
+                          <option value="2">Femenino</option>
+                        </select></div>
+                    </div>
+                  </div>
+                  <div class="modal-footer pb-0 border-0 mt-auto">
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Salir</button>
+                  </div>
+                </form>
+              </div>
+              <!-- Pestaña de Cambio de Contraseña -->
+              <div class="tab-pane fade h-100" id="password-pane" role="tabpanel" aria-labelledby="password-tab">
+                <form id="passwordForm" class="d-flex flex-column h-100">
+                  <!-- Contenedor de alertas para la pestaña de contraseña -->
+                  <div id="password-alert-container"></div>
+
+                  @Html.AntiForgeryToken()
+                  <div class="row justify-content-center">
+                    <div class="col-md-10">
+                      <div class="mb-3">
+                        <label for="OldPassword" class="form-label">Contraseña Actual</label>
+                        <input type="password" name="OldPassword" id="OldPassword" class="form-control" required />
+                      </div>
+                      <div class="mb-3">
+                        <label for="profileNewPassword" class="form-label">Nueva Contraseña</label>
+                        <input type="password" name="NewPassword" id="profileNewPassword" class="form-control" required/>
+                        <span class="text-danger" data-valmsg-for="profileNewPassword"></span>
+                      </div>
+                      <div class="mb-3">
+                        <label for="profileConfirmPassword" class="form-label">Confirmar Nueva Contraseña</label>
+                        <input type="password" name="ConfirmPassword" id="profileConfirmPassword" class="form-control"
+                          required/>
+                        <span class="text-danger" data-valmsg-for="profileConfirmPassword"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer pb-0 border-0 mt-auto">
+                    <button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Salir</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <style>
+    .profile-modal-body-wrapper {
+      min-height: 380px;
+    }
+  </style>
+}
