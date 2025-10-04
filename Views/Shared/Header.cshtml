@@ -1,0 +1,109 @@
+<div class="d-flex align-items-center">
+  @if (User.Identity?.IsAuthenticated == true)
+  {
+    <!-- Botón para abrir sidebar en móvil -->
+    <button class="btn btn-outline-secondary me-3 d-md-none" id="mobileToggle" type="button" aria-label="Abrir menú">
+      <i class="bi bi-list"></i> <!-- FIX: Añadir contenido al botón para evitar error de JS -->
+    </button>
+  }
+  <h4 class="mb-0 fw-bold color-gris">@ViewData["SubTitle"]</h4>
+</div>
+
+
+@using System.Security.Claims
+
+<div class="d-flex align-items-center">
+  @if (User.Identity?.IsAuthenticated == true)
+  {
+    <!-- Usuario logueado -->
+    <div class="dropdown">
+      <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown"
+        data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="@User.FindFirstValue("AvatarURL")" alt="Usuario" width="32" height="32" class="rounded-circle me-2">
+        <div class="d-flex flex-column align-items-start">
+          @{
+              string nombreCompleto = User.FindFirst("Nombre")?.Value ?? string.Empty;
+              int maxLength = 40; 
+
+              string nombreMostrar = nombreCompleto;
+              if (nombreCompleto.Length > maxLength)
+              {
+                nombreMostrar = nombreCompleto.Substring(0, maxLength) + "...";
+              }
+          }
+          <span class="fw-semibold color-gris">@nombreMostrar</span>
+          @if (User.IsInRole("Administrador"))
+          {
+            <small class="text-warning" style="font-size: 0.7rem;">Administrador</small>
+          }
+        </div>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+        <li>
+          <button type="button" class="dropdown-item" data-bs-toggle="modal"
+            data-bs-target="#profileModal">Perfil</button>
+        </li>
+        <li>
+          <hr class="dropdown-divider">
+        </li>
+        <li>
+          <form method="post" asp-controller="Usuario" asp-action="Logout">
+            <button class="dropdown-item" type="submit">Cerrar sesión</button>
+          </form>
+        </li>
+      </ul>
+    </div>
+
+  }
+  else
+  {
+    <!-- Usuario NO logueado -->
+    <button class="btn-sesion me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
+      Iniciar sesión
+    </button>
+
+  }
+</div>
+
+@if (User.Identity?.IsAuthenticated != true)
+{
+  <!-- Modales solo para usuarios no autenticados -->
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true"
+    data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-login">
+      <div class="modal-content border-0 shadow-lg rounded-4" style="background-color: #1e1e1e; color: #f5f5f5;">
+
+        <!-- Header -->
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="loginModalLabel">Iniciar Sesión</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <form asp-controller="Usuario" asp-action="Login" method="post" class="needs-validation" novalidate>
+
+            <div class="mb-3">
+              <label for="Email" class="form-label small text-uppercase text-light">Email</label>
+              <input name="Email" id="Email" class="form-control bg-dark text-light border-0 rounded-3 px-3 py-2" required />
+              <span class="text-danger" data-valmsg-for="Email"></span>
+            </div>
+
+            <div class="mb-3">
+              <label for="Password" class="form-label small text-uppercase text-light">Contraseña</label>
+              <input name="Password" id="Password" type="password"
+                class="form-control bg-dark text-light border-0 rounded-3 px-3 py-2" required />
+              <span class="text-danger" data-valmsg-for="Password"></span>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn-ingresar justify-content-center">
+                Ingresar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+}
