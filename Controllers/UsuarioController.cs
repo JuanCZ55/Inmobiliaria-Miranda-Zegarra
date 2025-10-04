@@ -51,13 +51,17 @@ public class UsuarioController : Controller
   [Authorize(Roles = "Administrador")]
   public async Task<IActionResult> Registrar(Usuario user, string ConfirmPassword)
   {
+    ModelState.Remove(nameof(user.AvatarURL));
     if (!ModelState.IsValid)
-      return View("Gestion", user);
-    if (user.Password != ConfirmPassword)
     {
-      ModelState.AddModelError("ConfirmPassword", "Las contraseñas no coinciden.");
+      TempData["Error"] = "Los datos ingresados no son válidos.";
       return View("Gestion", user);
     }
+    if (user.Password != ConfirmPassword)
+      {
+        ModelState.AddModelError("ConfirmPassword", "Las contraseñas no coinciden.");
+        return View("Gestion", user);
+      }
     try
     {
       if (repositorio.ObtenerPorEmail(user.Email).IdUsuario > 0)
@@ -86,8 +90,10 @@ public class UsuarioController : Controller
       TempData["Success"] = "Usuario creado correctamente.";
       return RedirectToAction("Ver", new { IdUsuario = idUser });
     }
-    catch (Exception)
+    catch (Exception ex)
     {
+      TempData["Error"] = "Ocurrió un error inesperado al registrar el usuario: " + ex.Message;
+      TempData["Usuario"] = JsonSerializer.Serialize(user);
       return RedirectToAction("Registrar");
     }
   }
@@ -478,7 +484,7 @@ public class UsuarioController : Controller
     }
   }
 
-
+  
   [HttpPost]
   [Authorize(Roles = "Administrador,Empleado")]
   [ValidateAntiForgeryToken]
