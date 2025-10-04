@@ -1,9 +1,11 @@
 using System.Text.Json;
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria.Controllers
 {
+    [Authorize(Roles = "Administrador,Empleado")]
     public class PagoController : Controller
     {
         private readonly IRepositorioPago repositorio;
@@ -286,7 +288,7 @@ namespace Inmobiliaria.Controllers
         }
 
         public IActionResult ActivarPago(int idPago)
-        { 
+        {
             try
             {
                 Pago pago = repositorio.ObtenerPorID(idPago);

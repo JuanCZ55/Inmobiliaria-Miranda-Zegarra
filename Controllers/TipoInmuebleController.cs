@@ -1,10 +1,12 @@
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Mysqlx.Crud;
 
 namespace Inmobiliaria.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class TipoInmuebleController : Controller
     {
         private readonly IRepositorioTipoInmueble repositorio;

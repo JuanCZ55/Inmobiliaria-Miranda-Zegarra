@@ -7,10 +7,12 @@ using Inmobiliaria.Models;
 using Inmobiliaria.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 
 namespace Inmobiliaria.Controllers
 {
+    [Authorize]
     public class InmuebleController : Controller
     {
         private readonly IRepositorioInmueble repositorio;
@@ -37,6 +39,7 @@ namespace Inmobiliaria.Controllers
 
         // GET: Inmueble/Crear
         [HttpGet]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Crear()
         {
             ViewBag.Tipos = repoTipo.TenerTodos();
@@ -45,6 +48,7 @@ namespace Inmobiliaria.Controllers
 
         // POST: Inmueble/Crear
         [HttpPost]
+        [Authorize(Roles = "Administrador,Empleado")]
         public async Task<IActionResult> Crear(Inmueble inmueble)
         {
             if (!ModelState.IsValid)
@@ -105,6 +109,7 @@ namespace Inmobiliaria.Controllers
 
         // GET: Inmueble/Modificar/{id}
         [HttpGet]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Modificar(int id)
         {
             try
@@ -127,6 +132,7 @@ namespace Inmobiliaria.Controllers
 
         // POST: Inmueble/Modificar
         [HttpPost]
+        [Authorize(Roles = "Administrador,Empleado")]
         public async Task<IActionResult> Modificar(Inmueble inmueble)
         {
             try
@@ -156,6 +162,7 @@ namespace Inmobiliaria.Controllers
 
         // POST: Inmueble/Eliminar
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Eliminar(int id)
         {
             try
@@ -190,6 +197,7 @@ namespace Inmobiliaria.Controllers
         }
 
         [NonAction]
+        [Authorize(Roles = "Administrador,Empleado")]
         private async Task ProcesarImagenesModificacionAsync(Inmueble inmueble)
         {
             if (inmueble.EliminarIDs != null && inmueble.EliminarIDs.Any())
@@ -251,6 +259,7 @@ namespace Inmobiliaria.Controllers
 
         // GET: Inmueble/Listar
         [HttpGet]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Listar(
             string? direccion,
             string? dni,
@@ -315,6 +324,7 @@ namespace Inmobiliaria.Controllers
         }
 
         // GET: Inmueble/Inmueble/{idInmueble}
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Inmueble(int idInmueble)
         {
             var inmueble = repositorio.ObtenerPorID(idInmueble);
@@ -326,6 +336,7 @@ namespace Inmobiliaria.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Calendario(int id)
         {
             var inmueble = repositorio.ObtenerPorID(id);

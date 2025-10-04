@@ -1,9 +1,11 @@
 using System.Text.Json;
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria.Controllers
 {
+    [Authorize]
     public class ContratoController : Controller
     {
         private readonly IRepositorioContrato repositorio;
@@ -35,6 +37,7 @@ namespace Inmobiliaria.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Crear(int? idInmueble, DateTime? fecha)
         {
             Contrato contrato = new Contrato
@@ -80,6 +83,7 @@ namespace Inmobiliaria.Controllers
             return View("Gestion", contrato);
         }
 
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult CrearContrato(Contrato contrato, string DniInquilino)
         {
             try
@@ -164,6 +168,7 @@ namespace Inmobiliaria.Controllers
 
         [HttpGet]
         [Route("Contrato/Ver/{idContrato}")]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Ver(int idContrato, string returnUrl)
         {
             try
@@ -202,6 +207,7 @@ namespace Inmobiliaria.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult ModificarContrato(Contrato contrato)
         {
             try
@@ -243,6 +249,7 @@ namespace Inmobiliaria.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult RenovarContrato(Contrato contrato, int IdContratoOriginal)
         {
             var id = IdContratoOriginal;
@@ -313,6 +320,7 @@ namespace Inmobiliaria.Controllers
 
         // POST: Contrato/Eliminar/5
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public IActionResult EliminarContrato(int IdContrato)
         {
             try
@@ -342,6 +350,7 @@ namespace Inmobiliaria.Controllers
 
         // GET: Contrato/Listar
         [HttpGet]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Listar(
             string? idContrato,
             string? dniInquilino,
@@ -411,6 +420,7 @@ namespace Inmobiliaria.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Contrato(int idContrato)
         {
             Contrato contrato = new Contrato();
@@ -490,6 +500,7 @@ namespace Inmobiliaria.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Fechas(int idInmueble, string? idContrato)
         {
             var contratos = repositorio.FechasOcupadas(idInmueble, idContrato);
@@ -502,6 +513,7 @@ namespace Inmobiliaria.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult CancelarContrato(int idContrato, decimal Multa = 0)
         {
             var id = idContrato;
@@ -585,6 +597,7 @@ namespace Inmobiliaria.Controllers
 
         [HttpGet]
         // GET: Contrato/Calendario/{year}/{idInmueble}
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Calendario(int year, int idInmueble)
         {
             try

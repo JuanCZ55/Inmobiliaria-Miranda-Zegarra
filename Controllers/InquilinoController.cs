@@ -1,8 +1,10 @@
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria.Controllers
 {
+    [Authorize(Roles = "Administrador,Empleado")]
     public class InquilinoController : Controller
     {
         private readonly IRepositorioInquilino repositorio;
@@ -96,6 +98,7 @@ namespace Inmobiliaria.Controllers
 
         // POST: Inquilino/Eliminar/5
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Eliminar(int id)
         {
             try
