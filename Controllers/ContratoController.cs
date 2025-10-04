@@ -2,6 +2,7 @@ using System.Text.Json;
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Inmobiliaria.Controllers
 {
@@ -93,6 +94,17 @@ namespace Inmobiliaria.Controllers
                     TempData["Error"] = "Modelo invalido";
                     TempData["Contrato"] = JsonSerializer.Serialize(contrato);
                     TempData["DniInquilino"] = DniInquilino;
+                    return RedirectToAction("Crear");
+                }
+
+                var idUsuarioClaim = User.FindFirstValue("IdUsuario");
+                if (int.TryParse(idUsuarioClaim, out int idUsuario))
+                {
+                    contrato.IdUsuarioCreador = idUsuario;
+                }
+                else
+                {
+                    TempData["Error"] = "No se pudo identificar al usuario creador. Sesión inválida.";
                     return RedirectToAction("Crear");
                 }
 
@@ -516,19 +528,31 @@ namespace Inmobiliaria.Controllers
         [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult CancelarContrato(int idContrato, decimal Multa = 0)
         {
-            var id = idContrato;
             try
             {
                 Contrato contrato = repositorio.ObtenerPorID(idContrato);
                 if (contrato.IdContrato == 0)
                 {
                     TempData["Error"] = "Contrato no encontrado, al cancelar contrato";
-                    return RedirectToAction("Ver", "Contrato", new { id });
+                    return RedirectToAction("Ver", "Contrato", new { id = idContrato });
                 }
                 if (contrato.Estado != "Vigente")
                 {
                     TempData["Error"] = "Contrato no cancelable";
+                    return RedirectToAction("Ver", "Contrato", new { id = idContrato });
                 }
+
+                var idUsuarioClaim = User.FindFirstValue("IdUsuario");
+                if (int.TryParse(idUsuarioClaim, out int idUsuario))
+                {
+                    contrato.IdUsuarioFinalizador = idUsuario;
+                }
+                else
+                {
+                    TempData["Error"] = "No se pudo identificar al usuario para finalizar el contrato. Sesión inválida.";
+                    return RedirectToAction("Ver", "Contrato", new { id = idContrato });
+                }
+
                 contrato.Multa = Multa;
                 if (Multa == 0)
                 {
@@ -542,18 +566,23 @@ namespace Inmobiliaria.Controllers
                     };
                     repositorio.CancelarContratoConPago(contrato, pago);
                     TempData["Success"] = "Contrato cancelado";
-                    return RedirectToAction("Ver", "Contrato", new { id });
+                    return RedirectToAction("Ver", "Contrato", new { id=idContrato });
                 }
                 var resultado = repositorio.Cancelado(contrato);
-                if (resultado != -1)
+                if (resultado > 0)
                 {
                     TempData["Success"] = "Contrato cancelado";
                 }
-                return RedirectToAction("Ver", "Contrato", new { id });
+                else
+                {
+                    TempData["Error"] = "No se pudo cancelar el contrato.";
+                }
+                return RedirectToAction("Ver", "Contrato", new { id = idContrato });
             }
-            catch (System.Exception)
+            catch (Exception)
             {
-                return RedirectToAction("Ver", "Contrato", new { id });
+                TempData["Error"] = "Ocurrió un error inesperado al cancelar el contrato.";
+                return RedirectToAction("Ver", "Contrato", new { id = idContrato });
             }
         }
 

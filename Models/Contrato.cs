@@ -48,17 +48,9 @@ namespace Inmobiliaria.Models
         [BindNever]
         public Inmueble? Inmueble { get; set; }
 
-        /*
-            public int IdUsuarioCreador { get; set; }
-            [ForeignKey(nameof(IdUsuarioCreador))]
-            [BindNever]
-            public Usuario? UsuarioCreador { get; set; }
-            
-            public int IdUsuarioFinalizador { get; set; }
-            [ForeignKey(nameof(IdUsuarioCreador))]
-            [BindNever]
-            public Usuario? UsuarioFinalizador { get; set; }
-        */
+        public int IdUsuarioCreador { get; set; }
+
+        public int IdUsuarioFinalizador { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 

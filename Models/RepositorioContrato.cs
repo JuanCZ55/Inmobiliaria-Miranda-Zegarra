@@ -17,8 +17,8 @@ namespace Inmobiliaria.Models
             {
                 var sql =
                     @"
-        INSERT INTO contrato (id_inquilino, id_inmueble, fecha_desde, fecha_hasta, monto_mensual, tipo, created_at, updated_at) 
-        VALUES (@id_inquilino, @id_inmueble, @fecha_desde, @fecha_hasta, @monto_mensual, @tipo, current_timestamp(), current_timestamp()); 
+        INSERT INTO contrato (id_inquilino, id_inmueble, fecha_desde, fecha_hasta, monto_mensual, tipo, id_usuario_creador, created_at, updated_at) 
+        VALUES (@id_inquilino, @id_inmueble, @fecha_desde, @fecha_hasta, @monto_mensual, @tipo, @id_usuario_creador,current_timestamp(), current_timestamp()); 
         SELECT LAST_INSERT_ID();";
 
                 using (var cmd = new MySqlCommand(sql, conn))
@@ -29,6 +29,7 @@ namespace Inmobiliaria.Models
                     cmd.Parameters.AddWithValue("@fecha_hasta", contrato.FechaFinalizacion);
                     cmd.Parameters.AddWithValue("@monto_mensual", contrato.Monto);
                     cmd.Parameters.AddWithValue("@tipo", contrato.Tipo);
+                    cmd.Parameters.AddWithValue("@id_usuario_creador", contrato.IdUsuarioCreador);
                     conn.Open();
                     res = System.Convert.ToInt32(cmd.ExecuteScalar());
                     contrato.IdContrato = res;
@@ -44,11 +45,12 @@ namespace Inmobiliaria.Models
             using (var conn = new MySqlConnection(connectionString))
             {
                 var sql =
-                    @"UPDATE contrato SET fecha_terminacion_anticipada=@fecha_fin, multa=@multa, updated_at=NOW() WHERE id_contrato=@id_contrato";
+                    @"UPDATE contrato SET fecha_terminacion_anticipada=@fecha_fin, multa=@multa, id_usuario_finalizador=@id_usuario_finalizador, updated_at=NOW() WHERE id_contrato=@id_contrato";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@fecha_fin", DateTime.Now);
-                    cmd.Parameters.AddWithValue("@multa", contrato.Multa);
+                    cmd.Parameters.AddWithValue("@multa", contrato.Multa ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@id_usuario_finalizador", contrato.IdUsuarioFinalizador);
                     cmd.Parameters.AddWithValue("@id_contrato", contrato.IdContrato);
                     conn.Open();
                     res = cmd.ExecuteNonQuery();
@@ -643,8 +645,8 @@ namespace Inmobiliaria.Models
                     {
                         var sqlContrato =
                             @"
-                    INSERT INTO contrato (id_inquilino, id_inmueble, fecha_desde, fecha_hasta, monto_mensual, tipo, created_at, updated_at) 
-                    VALUES (@id_inquilino, @id_inmueble, @fecha_desde, @fecha_hasta, @monto_mensual, @tipo, current_timestamp(), current_timestamp());
+                    INSERT INTO contrato (id_inquilino, id_inmueble, fecha_desde, fecha_hasta, monto_mensual, tipo, id_usuario_creador,created_at, updated_at) 
+                    VALUES (@id_inquilino, @id_inmueble, @fecha_desde, @fecha_hasta, @monto_mensual, @tipo, @id_usuario_creador,current_timestamp(), current_timestamp());
                     SELECT LAST_INSERT_ID();";
                         using (var cmdContrato = new MySqlCommand(sqlContrato, conn, transaction))
                         {
@@ -666,14 +668,15 @@ namespace Inmobiliaria.Models
                             );
                             cmdContrato.Parameters.AddWithValue("@monto_mensual", contrato.Monto);
                             cmdContrato.Parameters.AddWithValue("@tipo", contrato.Tipo);
+                            cmdContrato.Parameters.AddWithValue("@id_usuario_creador", contrato.IdUsuarioCreador);
                             contrato.IdContrato = Convert.ToInt32(cmdContrato.ExecuteScalar());
                         }
 
                         pago.IdContrato = contrato.IdContrato;
                         var sqlPago =
                             @"
-                    INSERT INTO pago (id_contrato, numero_pago, fecha_pago, concepto, monto, estado, created_at, updated_at) 
-                    VALUES (@id_contrato, @numero_pago, @fecha_pago, @concepto, @monto, @estado, current_timestamp(), current_timestamp());
+                    INSERT INTO pago (id_contrato, numero_pago, fecha_pago, concepto, monto, estado, id_usuario,created_at, updated_at) 
+                    VALUES (@id_contrato, @numero_pago, @fecha_pago, @concepto, @monto, @estado, @id_usuario, current_timestamp(), current_timestamp());
                     SELECT LAST_INSERT_ID();";
                         using (var cmdPago = new MySqlCommand(sqlPago, conn, transaction))
                         {
@@ -682,6 +685,7 @@ namespace Inmobiliaria.Models
                             cmdPago.Parameters.AddWithValue("@fecha_pago", pago.FechaPago);
                             cmdPago.Parameters.AddWithValue("@concepto", pago.Concepto);
                             cmdPago.Parameters.AddWithValue("@monto", pago.Monto);
+                            cmdPago.Parameters.AddWithValue("@id_usuario", contrato.IdUsuarioCreador);
                             cmdPago.Parameters.AddWithValue("@estado", 1);
                             pago.IdPago = Convert.ToInt32(cmdPago.ExecuteScalar());
                         }
@@ -792,23 +796,21 @@ namespace Inmobiliaria.Models
                     try
                     {
                         var sqlContrato =
-                            @"UPDATE contrato SET fecha_terminacion_anticipada=@fecha_fin, multa=@multa, updated_at=NOW() WHERE id_contrato=@id_contrato";
+                            @"UPDATE contrato SET fecha_terminacion_anticipada=@fecha_fin, multa=@multa, id_usuario_finalizador=@id_usuario_finalizador, updated_at=NOW() WHERE id_contrato=@id_contrato";
                         using (var cmdContrato = new MySqlCommand(sqlContrato, conn, transaction))
                         {
                             cmdContrato.Parameters.AddWithValue("@fecha_fin", DateTime.Today);
                             cmdContrato.Parameters.AddWithValue("@multa", contrato.Multa);
-                            cmdContrato.Parameters.AddWithValue(
-                                "@id_contrato",
-                                contrato.IdContrato
-                            );
+                            cmdContrato.Parameters.AddWithValue("@id_usuario_finalizador", contrato.IdUsuarioFinalizador);
+                            cmdContrato.Parameters.AddWithValue("@id_contrato",contrato.IdContrato);
                             cmdContrato.ExecuteNonQuery();
                         }
 
                         pago.IdContrato = contrato.IdContrato;
                         var sqlPago =
                             @"
-                    INSERT INTO pago (id_contrato, numero_pago, fecha_pago, concepto, monto, estado, created_at, updated_at) 
-                    VALUES (@id_contrato, @numero_pago, @fecha_pago, @concepto, @monto, @estado, current_timestamp(), current_timestamp());
+                    INSERT INTO pago (id_contrato, numero_pago, fecha_pago, concepto, monto, id_usuario, estado, created_at, updated_at) 
+                    VALUES (@id_contrato, @numero_pago, @fecha_pago, @concepto, @monto, @id_usuario, @estado, current_timestamp(), current_timestamp());
                     SELECT LAST_INSERT_ID();";
                         using (var cmdPago = new MySqlCommand(sqlPago, conn, transaction))
                         {
@@ -817,6 +819,7 @@ namespace Inmobiliaria.Models
                             cmdPago.Parameters.AddWithValue("@fecha_pago", pago.FechaPago);
                             cmdPago.Parameters.AddWithValue("@concepto", pago.Concepto);
                             cmdPago.Parameters.AddWithValue("@monto", pago.Monto);
+                            cmdPago.Parameters.AddWithValue("@id_usuario", contrato.IdUsuarioFinalizador);
                             cmdPago.Parameters.AddWithValue("@estado", 1);
                             pago.IdPago = Convert.ToInt32(cmdPago.ExecuteScalar());
                         }
