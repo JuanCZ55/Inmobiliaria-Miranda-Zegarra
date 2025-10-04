@@ -1,0 +1,102 @@
+<nav id="sidebar" class="d-flex flex-column p-2">
+  <button class="btn btn-sm btn-secondary mb-3" id="toggleSidebar">
+    <i class="bi bi-list"></i>
+  </button>
+
+  <button class="btn btn-sm btn-light mb-2 d-md-none ms-auto" id="mobileClose" aria-label="Cerrar menú">
+    <i class="bi bi-x-lg"></i>
+  </button>
+  <div class="sidebar-content">
+    <ul class="nav nav-pills flex-column pt-5">
+      <li class="nav-item mb-1">
+        <a class="nav-link d-flex align-items-center" href="/">Inicio</a>
+      </li>
+
+      <li class="nav-item mb-1">
+        <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#propietarioMenu">Propietarios</a>
+        <div class="collapse" id="propietarioMenu">
+          <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+            <li><a class="nav-link color-gris py-1" asp-controller="Propietario" asp-action="Crear">Crear</a>
+            </li>
+            <li><a class="nav-link color-gris py-1" asp-controller="Propietario" asp-action="Listar">Lista
+                Gestion</a></li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="nav-item mb-1">
+        <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#inquilinoMenu">Inquilinos</a>
+        <div class="collapse" id="inquilinoMenu">
+          <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+            <li><a class="nav-link color-gris py-1" asp-controller="Inquilino" asp-action="Crear">Crear</a></li>
+            <li><a class="nav-link color-gris py-1" asp-controller="Inquilino" asp-action="Listar">Lista
+                Gestion</a></li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="nav-item mb-1">
+        <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#inmuebleMenu">Inmuebles</a>
+        <div class="collapse" id="inmuebleMenu">
+          <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+            <li><a class="nav-link color-gris py-1" asp-controller="Inmueble" asp-action="Crear">Crear</a></li>
+            <li><a class="nav-link color-gris py-1" asp-controller="Inmueble" asp-action="Listar">Lista
+                Gestion</a></li>
+          </ul>
+        </div>
+      </li>
+
+      @if (User.IsInRole("Administrador"))
+      {
+        // solo el suario con el rol administrador tendra acceso a los Tipos de Inmuebles
+        <li class="nav-item mb-1">
+          <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#tipoMenu">Tipos de
+            Inmueble</a>
+          <div class="collapse" id="tipoMenu">
+            <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+              <li><a class="nav-link color-gris py-1" asp-controller="TipoInmueble" asp-action="Crear">Crear</a>
+              </li>
+              <li><a class="nav-link color-gris py-1" asp-controller="TipoInmueble" asp-action="Listar">Lista
+                  Gestion</a></li>
+            </ul>
+          </div>
+        </li>
+      }
+
+      <li class="nav-item mb-1">
+        <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#contratoMenu">Contrato</a>
+        <div class="collapse" id="contratoMenu">
+          <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+            <li><a class="nav-link color-gris py-1" asp-controller="Contrato" asp-action="Crear">Crear</a></li>
+            <li><a class="nav-link color-gris py-1" asp-controller="Contrato" asp-action="Listar">Lista Gestion</a></li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="nav-item mb-1">
+        <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#pagoMenu">Pago</a>
+        <div class="collapse" id="pagoMenu">
+          <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+            <li><a class="nav-link color-gris py-1" asp-controller="Pago" asp-action="Crear">Crear</a></li>
+            <li><a class="nav-link color-gris py-1" asp-controller="Pago" asp-action="Listar">Lista Gestion</a></li>
+          </ul>
+        </div>
+      </li>
+      @if (User.IsInRole("Administrador"))
+      {
+        // solo el suario con el rol administrador tendra acceso a los Usuarios
+        <li class="nav-item mb-1">
+          <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#usuarioMenu">Usuarios</a>
+          <div class="collapse" id="usuarioMenu">
+            <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
+              <li><a class="nav-link color-gris py-1" asp-controller="Usuario" asp-action="Registrar">Crear</a>
+              </li>
+              <li><a class="nav-link color-gris py-1" asp-controller="Usuario" asp-action="Listar">Lista
+                  Gestion</a></li>
+            </ul>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+</nav>
