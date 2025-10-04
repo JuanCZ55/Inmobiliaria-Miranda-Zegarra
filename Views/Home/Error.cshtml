@@ -1,0 +1,31 @@
+@model Inmobiliaria.Models.ErrorViewModel
+@{
+  ViewData["Title"] = "Error";
+}
+
+<div class="container text-center mt-5">
+  <div class="card border-danger shadow-sm mx-auto" style="max-width: 600px;">
+    <div class="card-header bg-danger text-white">
+      <h1 class="h3 m-0">🛑 Ocurrió un Error</h1>
+    </div>
+    <div class="card-body p-4">
+      <p class="lead">
+        Lamentamos, se produjo un error al procesar tu solicitud.
+      </p>
+
+
+      @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+      {
+        <div class="alert alert-warning mt-3">
+          <strong>Detalle:</strong> @Model.ErrorMessage
+        </div>
+      }
+    </div>
+    <div class="card-footer text-muted">
+      @if (Model.ShowRequestId)
+      {
+        <small><strong>ID de la Solicitud:</strong> <code>@Model.RequestId</code></small>
+      }
+    </div>
+  </div>
+</div>
