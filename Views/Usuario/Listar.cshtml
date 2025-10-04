@@ -114,7 +114,7 @@
             <td>@i.Nombre</td>
             <td>@i.Apellido</td>
             <td>@i.Email</td>
-            <td>@i.Rol</td>
+            <td>@(i.Rol == 1 ? "Administrador" : i.Rol == 2 ? "Empleado" : "Desconocido")</td>
             <td>@(i.Estado == 1 ? "Activo" : "Inactivo")</td>
             <td class="d-flex justify-content-center align-items-center">
               <a asp-action="Ver" asp-route-IdUsuario="@i.IdUsuario" data-bs-toggle="tooltip" title="Gestionar Usuario">
