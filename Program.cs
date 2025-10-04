@@ -6,10 +6,15 @@ using Microsoft.AspNetCore.DataProtection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews()
+builder
+    .Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.PropertyNamingPolicy = System
+            .Text
+            .Json
+            .JsonNamingPolicy
+            .CamelCase;
     });
 
 /*
@@ -19,17 +24,17 @@ builder.Services.AddControllersWithViews()
 builder.Services.AddDataProtection().UseEphemeralDataProtectionProvider();
 */
 
-
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-  .AddCookie(options =>
-  {
-        options.LoginPath = "/Usuario/Login"; // Ruta a la que se redirige si no está autenticado.
+builder
+    .Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Home/Login"; // Ruta a la que se redirige si no está autenticado.
         options.LogoutPath = "/Usuario/Logout"; // Ruta que se usa para cerrar sesión.
-        options.AccessDeniedPath = "/Home/Index"; // Ruta a la que se redirige si no tiene permisos.
+        options.AccessDeniedPath = "/Home/AccesoDenegado"; // Ruta a la que se redirige si no tiene permisos.
         options.Cookie.Name = "Inmo.Session"; // Cambiamos el nombre para invalidar cookies antiguas.
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
         options.SlidingExpiration = true;
-  });
+    });
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Administrador", policy => policy.RequireRole("Administrador"));
@@ -52,12 +57,13 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-  app.UseExceptionHandler("/Home/Error");
-  app.UseHsts();
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseStatusCodePagesWithReExecute("/Home/Error404");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
