@@ -14,6 +14,7 @@ CREATE TABLE `usuario` (
   `rol` tinyint NOT NULL COMMENT '1=administrador, 2=empleado',
   `nombre` varchar(100) NOT NULL,
   `apellido` varchar(100) NOT NULL,
+  `genero` int NOT NULL COMMENT '1=masculino, 2=femenino',
   `url` varchar(255),
   `estado` tinyint NOT NULL DEFAULT '1' COMMENT '1=activo, 2=inactivo',
   `created_at` datetime NOT NULL DEFAULT (now()),
