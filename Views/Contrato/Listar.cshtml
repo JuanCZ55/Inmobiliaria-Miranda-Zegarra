@@ -57,7 +57,7 @@
       <div class="col-md-2">
         <div class="zeg-field">
           <select class="zeg-input" name="tipo">
-            <option value="">&nbsp;&nbsp;Todos</option>
+            <option value=" " selected="@string.IsNullOrEmpty(tipo)">Todos</option>
             @if (tipo == "1")
             {
               <option value="1" selected>Pago Total</option>
@@ -111,7 +111,7 @@
       <div class="col-md-2">
         <div class="zeg-field">
           <select class="zeg-input" name="estado">
-            <option value="">&nbsp;&nbsp;Todos</option>
+            <option value=" " selected="@string.IsNullOrEmpty(estado)">Todos</option>
             @if (estado == "1")
             {
               <option value="1" selected>Vigente</option>

@@ -76,7 +76,7 @@
   border: 2px solid #bbb;
 }
 .zeg-field .zeg-input:focus:not(.no-active) {
-  border: 2px solid #00ffff;
+  border: 2px solid #0084ff;
   box-shadow: 0 0 6px rgba(0, 255, 255, 0.08);
 }
 .zeg-field input.zeg-input:focus ~ label,
@@ -90,7 +90,7 @@
 .zeg-field input.zeg-input:not(:placeholder-shown),
 .zeg-field textarea.zeg-input:not(:placeholder-shown),
 .zeg-field .zeg-input.active {
-  border: 2px solid #00ffff;
+  border: 2px solid #0084ff;
 }
 .zeg-field select.zeg-input {
   position: relative;
@@ -109,11 +109,11 @@
   transition: border 0.2s, box-shadow 0.15s;
 }
 .zeg-field select.zeg-input:focus:not(.no-active) {
-  border: 2px solid #00ffff;
+  border: 2px solid #0084ff;
   box-shadow: 0 0 6px rgba(0, 255, 255, 0.06);
 }
 .zeg-field select.zeg-input.active {
-  border: 2px solid #00ffff;
+  border: 2px solid #0084ff;
 }
 .zeg-field select.zeg-input.active ~ label {
   top: -0.5em;
@@ -140,7 +140,7 @@
 }
 
 .zeg-field .zeg-input-date.active {
-  border: 2px solid #00ffff;
+  border: 2px solid #0084ff;
   box-shadow: 0 0 6px rgba(0, 255, 255, 0.08);
 }
 
@@ -349,4 +349,55 @@ header {
 }
 .adio {
   visibility: hidden;
+}
+
+.btn-sesion {
+  background-color: rgb(6, 82, 117);
+  border: 1px solid rgb(90, 187, 244);
+  color: rgb(90, 187, 244);
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+  padding-left: 0.66rem;
+  padding-right: 0.66rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.btn-sesion:hover{
+  background-color:rgb(90, 187, 244);
+  color: rgb(6, 82, 117);
+  border: 1px solid rgb(6, 82, 117);
+}
+
+.btn-ingresar{
+  background: rgba(13, 24, 54, 0.877);
+  border: 1px solid rgba(13, 24, 54, 0.877);
+  color: #fff;
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+  padding-left: 0.66rem;
+  padding-right: 0.66rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.btn-ingresar:hover{
+  background: rgb(6, 82, 117);
+  border: 1px solid rgb(6, 82, 117);
+  color: #fff;
+}
+
+.modal-login{
+  height: 40rem;
+  width: 80rem
 }
