@@ -1,0 +1,309 @@
+@model Inmobiliaria.Models.Usuario
+@{
+  ViewData["Title"] = Model.IdUsuario == 0 ? "Crear Usuario" : "Gestionar Usuario";
+  ViewData["SubTitle"] = "Usuarios";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container h-100">
+  <div class="row justify-content-center h-100 p-4">
+    <div class="col-lg-10 col-xl-9 h-100">
+      <div class="shadow-lg rounded border bg-light p-4 p-md-5 h-100">
+        <form asp-action="@(Model.IdUsuario == 0 ? "Registrar" : "ModificarUsuario")" method="post"
+          enctype="multipart/form-data" class="h-100 d-flex flex-column">
+          <h2 class="text-center mb-4">@(Model.IdUsuario == 0 ? "Nuevo Usuario" : "Editar Usuario")</h2>
+
+          @if (Model.IdUsuario != 0)
+          {
+            <input type="hidden" asp-for="IdUsuario" />
+          }
+
+          <!-- Fila para Avatar y Datos Principales -->
+          <div class="row align-items-center">
+            <!-- Columna para el Avatar -->
+            <div class="col-md-4 text-center mb-4 mb-md-0">
+              <div id="avatarPreviewContainer" class="mb-2">
+                <img id="avatarPreviewImage"
+                  src="@(string.IsNullOrEmpty(Model.AvatarURL) ? "/images/user/AvatarMasculino.png" : Model.AvatarURL)"
+                  alt="Avatar" class="img-fluid rounded-circle"
+                  style="width: 150px; height: 150px; object-fit: cover;" />
+              </div>
+              <label for="AvatarFile" class="btn btn-sm btn-outline-primary">Subir Imagen</label>
+              <button type="button" id="cancelAvatarChange"
+                class="btn btn-sm btn-outline-danger d-none ms-1">Quitar</button>
+              <input type="file" id="AvatarFile" name="AvatarFile" class="d-none" accept="image/*" />
+              <input type="hidden" name="AvatarURL" id="AvatarURL" value="@Model.AvatarURL" />
+            </div>
+
+            <!-- Columna para Nombre y Apellido -->
+            <div class="col-md-8">
+              <div class="mb-3">
+                <label asp-for="Nombre" class="form-label">Nombre</label>
+                <input asp-for="Nombre" class="form-control" required />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+              </div>
+              <div class="mb-3">
+                <label asp-for="Apellido" class="form-label">Apellido</label>
+                <input asp-for="Apellido" class="form-control" required />
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+              </div>
+            </div>
+          </div>
+          <hr class="my-4">
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label asp-for="Genero" class="form-label">Género</label>
+              <select asp-for="Genero" class="form-select">
+                <option value="">No especificado</option>
+                <option value="1">Masculino</option>
+                <option value="2">Femenino</option>
+              </select>
+              <span asp-validation-for="Genero" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label asp-for="Email" class="form-label">Email</label>
+              <input asp-for="Email" type="email" class="form-control" required />
+              <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label asp-for="Rol" class="form-label">Rol</label>
+              <select asp-for="Rol" class="form-select" required>
+                <option value="">Seleccione un rol</option>
+                <option value="1">Administrador</option>
+                <option value="2">Empleado</option>
+              </select>
+              <span asp-validation-for="Rol" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label asp-for="Estado" class="form-label">Estado</label>
+              @{
+                var idUsuarioLogueado = ViewBag.IdUsuarioLogueado ?? -1;
+                var esUsuarioActual = Model.IdUsuario == idUsuarioLogueado;
+              }
+              @if (esUsuarioActual)
+              {
+                <input type="text" class="form-control" value="@(Model.Estado == 1 ? "Activo" : "Inactivo")" readonly />
+                <input type="hidden" asp-for="Estado" />
+              }
+              else
+              {
+                <select asp-for="Estado" class="form-select" required>
+                  <option value="">Seleccione un Estado</option>
+                  <option value="1">Activo</option>
+                  <option value="2">Inactivo</option>
+                </select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
+              }
+            </div>
+          </div>
+
+          @if (Model.IdUsuario == 0)
+          {
+            <div class="mb-3">
+              <label asp-for="Password" class="form-label">Contraseña</label>
+              <input asp-for="Password" id="PasswordRegister" type="password" class="form-control" required />
+              <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+              <label for="ConfirmPassword" class="form-label">Confirmar Contraseña</label>
+              <input name="ConfirmPassword" id="ConfirmPasswordRegister" type="password" class="form-control" required />
+              <span class="text-danger" data-valmsg-for="ConfirmPassword"></span>
+            </div>
+          }
+          else
+          {
+            <div class="mb-3">
+              <div class="d-flex align-items-center justify-content-between">
+                <label for="NewPassword" class="form-label mb-0">Nueva Contraseña (opcional)</label>
+                <span class="form-text mt-0 ms-2">Dejar en blanco para no cambiar la contraseña actual.</span>
+              </div>
+              <input name="NewPassword" id="NewPassword" type="password" class="form-control" />
+              <span class="text-danger" data-valmsg-for="NewPassword"></span>
+            </div>
+            <div class="mb-3">
+              <label for="ConfirmPasswordModify" class="form-label">Confirmar Nueva Contraseña</label>
+              <input name="ConfirmPasswordModify" id="ConfirmPasswordModify" type="password" class="form-control" />
+              <span class="text-danger" data-valmsg-for="ConfirmPasswordModify"></span>
+            </div>
+          }
+
+          <div class="d-flex justify-content-between mt-auto">
+            @if (Model.IdUsuario == 0)
+            {
+              <button type="submit" class="btn btn-success">Crear Usuario</button>
+            }
+            else
+            {
+              <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+
+              @if (!esUsuarioActual)
+              {
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal"
+                  title="Eliminar usuario">
+                  Eliminar
+                </button>
+              }
+            }
+            <a href="@Url.Action("Listar")" class="btn btn-secondary">Volver</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (Model.IdUsuario > 0)
+{
+  <!-- Modal para confirmar eliminación -->
+  <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="deleteUserModalLabel">Eliminar Usuario</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Estás seguro de que deseas eliminar al usuario <strong>@Model.Nombre @Model.Apellido</strong>?</p>
+          <p class="small text-muted">Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <form asp-action="Eliminar" method="post">
+            <input type="hidden" name="id" value="@Model.IdUsuario" />
+            <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@section Scripts {
+  {
+  await Html.RenderPartialAsync("_ValidationScriptsPartial");
+  }
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const avatarFileInput = document.getElementById('AvatarFile');
+      const avatarPreviewImage = document.getElementById('avatarPreviewImage');
+      const cancelAvatarButton = document.getElementById('cancelAvatarChange');
+      const avatarUrlInput = document.getElementById('AvatarURL');
+      const originalAvatarURL = avatarPreviewImage.src;
+      const defaultMaleAvatar = '@Url.Content("~/images/user/AvatarMasculino.png")';
+      const defaultFemaleAvatar = '@Url.Content("~/images/user/AvatarFemenino.png")';
+
+      const isDefaultAvatar = originalAvatarURL.endsWith(defaultMaleAvatar) || originalAvatarURL.endsWith(defaultFemaleAvatar);
+      if (!isDefaultAvatar) {
+        cancelAvatarButton.classList.remove('d-none');
+      }
+
+      if (avatarFileInput && avatarPreviewImage && cancelAvatarButton) {
+        avatarFileInput.addEventListener('change', function (event) {
+          const file = event.target.files[0];
+          if (file && file.type.startsWith('image/')) {
+            avatarPreviewImage.src = URL.createObjectURL(file);
+            cancelAvatarButton.classList.remove('d-none');
+          }
+        });
+
+        cancelAvatarButton.addEventListener('click', function () {
+          if (avatarFileInput.files.length > 0) {
+            // Caso 1: Cancelar la selección de un archivo nuevo
+            avatarFileInput.value = '';
+            avatarPreviewImage.src = originalAvatarURL;
+            avatarUrlInput.value = originalAvatarURL;
+            if (isDefaultAvatar) {
+              cancelAvatarButton.classList.add('d-none');
+            }
+          } else {
+            // Caso 2: Marcar para eliminar el avatar existente
+            avatarUrlInput.value = "-1";
+            const genero = document.getElementById('Genero').value;
+            avatarPreviewImage.src = (genero === '2') ? defaultFemaleAvatar : defaultMaleAvatar;
+            cancelAvatarButton.classList.add('d-none');
+          }
+        });
+
+        if (avatarFileInput.value) {
+          cancelAvatarButton.classList.remove('d-none');
+        }
+      }
+
+      const generoSelect = document.getElementById('Genero');
+      if (generoSelect) {
+        generoSelect.addEventListener('change', function () {
+          if (avatarFileInput.files.length > 0) {
+            return;
+          }
+
+          const isDefaultAvatar = avatarPreviewImage.src.endsWith(defaultMaleAvatar) || avatarPreviewImage.src.endsWith(defaultFemaleAvatar);
+
+          if (isDefaultAvatar) {
+            avatarPreviewImage.src = (generoSelect.value === '2') ? defaultFemaleAvatar : defaultMaleAvatar;
+          }
+        });
+      }
+
+      // Validación de contraseñas
+      const form = document.querySelector('form');
+      const isRegisterMode = @(Model.IdUsuario == 0 ? "true" : "false");
+
+      let passwordInput, confirmPasswordInput, passwordErrorSpan, confirmErrorSpan;
+
+      if (isRegisterMode) {
+        passwordInput = document.getElementById('PasswordRegister');
+        confirmPasswordInput = document.getElementById('ConfirmPasswordRegister');
+        passwordErrorSpan = document.querySelector(`[data-valmsg-for="${passwordInput.name}"]`);
+      } else {
+        passwordInput = document.getElementById('NewPassword');
+        confirmPasswordInput = document.getElementById('ConfirmPasswordModify');
+        passwordErrorSpan = document.querySelector(`[data-valmsg-for="${passwordInput.name}"]`);
+      }
+      confirmErrorSpan = document.querySelector(`[data-valmsg-for="${confirmPasswordInput.name}"]`);
+
+      const validatePasswords = () => {
+        if (!isRegisterMode && passwordInput.value === '' && confirmPasswordInput.value === '') {
+          passwordErrorSpan.textContent = '';
+          confirmErrorSpan.textContent = '';
+          return true;
+        }
+
+        // Validación de longitud mínima
+        if (passwordInput.value.length > 0 && passwordInput.value.length < 8) {
+          passwordErrorSpan.textContent = 'La contraseña debe tener al menos 8 caracteres.';
+          confirmErrorSpan.textContent = '';
+          return false;
+        }
+
+        if (passwordInput.value !== confirmPasswordInput.value) {
+          const errorMessage = 'Las contraseñas no coinciden.';
+          passwordErrorSpan.textContent = errorMessage;
+          confirmErrorSpan.textContent = errorMessage;
+          return false;
+        } else {
+          passwordErrorSpan.textContent = '';
+          confirmErrorSpan.textContent = '';
+          return true;
+        }
+      };
+
+      // Validar mientras se escribe
+      passwordInput.addEventListener('input', validatePasswords);
+      confirmPasswordInput.addEventListener('input', validatePasswords);
+
+      // Validar al enviar el formulario
+      form.addEventListener('submit', function (event) {
+        if (!validatePasswords()) {
+          event.preventDefault();
+          confirmPasswordInput.focus();
+        }
+      });
+
+    });
+  </script>
+}
