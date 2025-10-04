@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Inmobiliaria.Models;
 using Inmobiliaria.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 
 namespace Inmobiliaria.Controllers
@@ -35,6 +35,11 @@ namespace Inmobiliaria.Controllers
             this.repoPropietario = repoPropietario;
             this.config = config;
             this._fileService = fileService;
+        }
+
+        public IActionResult Index()
+        {
+            return RedirectToAction("Listar");
         }
 
         // GET: Inmueble/Crear

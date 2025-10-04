@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Inmobiliaria.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Inmobiliaria.Controllers
 {
@@ -35,7 +35,7 @@ namespace Inmobiliaria.Controllers
 
         public IActionResult Index()
         {
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Listar");
         }
 
         [HttpGet]
@@ -85,7 +85,6 @@ namespace Inmobiliaria.Controllers
                         ViewBag.MultaPagada = "Sin Multa";
                         pago.Monto = pago.contrato?.Monto ?? 0;
                         pago.numeroPago = repositorio.CantidadPago(idContrato) + 1;
-
                     }
                     return View("Gestion", pago);
                 }
@@ -248,7 +247,7 @@ namespace Inmobiliaria.Controllers
                     Monto = (decimal)contrato.Multa,
                     FechaPago = DateTime.Today,
                     numeroPago = repositorio.CantidadPago(IdContrato) + 1,
-                    Concepto = "Multa de Cancelacion"
+                    Concepto = "Multa de Cancelacion",
                 };
                 int id = repositorio.Crear(pago);
                 if (id <= 0)
@@ -303,7 +302,10 @@ namespace Inmobiliaria.Controllers
                     TempData["Error"] = "No se pueden modificar pagos de contratos finalizado";
                     return RedirectToAction("Ver", "Pago", new { id = idPago });
                 }
-                else if (pago.contrato.Estado == "No se pueden modificar pagos de contratos cancelados con multa saldada")
+                else if (
+                    pago.contrato.Estado
+                    == "No se pueden modificar pagos de contratos cancelados con multa saldada"
+                )
                 {
                     TempData["Error"] = "Contrato Cancelado con Multa Saldada";
                     return RedirectToAction("Ver", "Pago", new { id = idPago });
@@ -318,6 +320,5 @@ namespace Inmobiliaria.Controllers
                 return RedirectToAction("Ver", "Pago", new { id = idPago });
             }
         }
-
     }
 }

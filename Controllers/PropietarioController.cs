@@ -1,6 +1,6 @@
 using Inmobiliaria.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Inmobiliaria.Controllers
 {
@@ -19,7 +19,7 @@ namespace Inmobiliaria.Controllers
 
         public IActionResult Index()
         {
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Listar");
         }
 
         // GET: Propietario/Crear

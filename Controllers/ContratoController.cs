@@ -1,8 +1,8 @@
+using System.Security.Claims;
 using System.Text.Json;
 using Inmobiliaria.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Inmobiliaria.Controllers
 {
@@ -34,7 +34,7 @@ namespace Inmobiliaria.Controllers
 
         public IActionResult Index()
         {
-            return View("~/Views/Home/Index.cshtml");
+            return RedirectToAction("Listar");
         }
 
         [HttpGet]
@@ -104,7 +104,8 @@ namespace Inmobiliaria.Controllers
                 }
                 else
                 {
-                    TempData["Error"] = "No se pudo identificar al usuario creador. Sesión inválida.";
+                    TempData["Error"] =
+                        "No se pudo identificar al usuario creador. Sesión inválida.";
                     return RedirectToAction("Crear");
                 }
 
@@ -549,7 +550,8 @@ namespace Inmobiliaria.Controllers
                 }
                 else
                 {
-                    TempData["Error"] = "No se pudo identificar al usuario para finalizar el contrato. Sesión inválida.";
+                    TempData["Error"] =
+                        "No se pudo identificar al usuario para finalizar el contrato. Sesión inválida.";
                     return RedirectToAction("Ver", "Contrato", new { id = idContrato });
                 }
 
@@ -566,7 +568,7 @@ namespace Inmobiliaria.Controllers
                     };
                     repositorio.CancelarContratoConPago(contrato, pago);
                     TempData["Success"] = "Contrato cancelado";
-                    return RedirectToAction("Ver", "Contrato", new { id=idContrato });
+                    return RedirectToAction("Ver", "Contrato", new { id = idContrato });
                 }
                 var resultado = repositorio.Cancelado(contrato);
                 if (resultado > 0)

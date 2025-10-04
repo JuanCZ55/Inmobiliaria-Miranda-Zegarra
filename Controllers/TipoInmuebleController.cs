@@ -1,6 +1,6 @@
 using Inmobiliaria.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Mysqlx.Crud;
 
@@ -11,6 +11,7 @@ namespace Inmobiliaria.Controllers
     {
         private readonly IRepositorioTipoInmueble repositorio;
         private readonly IConfiguration config;
+
         public TipoInmuebleController(IRepositorioTipoInmueble repositorio, IConfiguration config)
         {
             this.repositorio = repositorio;
@@ -20,7 +21,7 @@ namespace Inmobiliaria.Controllers
         // GET: TipoInmueble
         public IActionResult Index()
         {
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Listar");
         }
 
         // GET: TipoInmueble/Crear
@@ -159,6 +160,5 @@ namespace Inmobiliaria.Controllers
                 return View(new List<TipoInmueble>());
             }
         }
-
     }
 }
