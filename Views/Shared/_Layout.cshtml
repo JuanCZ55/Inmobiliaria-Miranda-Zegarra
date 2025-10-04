@@ -14,8 +14,7 @@
 
 <body class="h-100">
   <!-- Alertas Globales -->
-  <div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x"
-    style="z-index: 2001; width: 90%; max-width: 600px; pointer-events: none;">
+  <div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x" style="z-index: 2001; width: 90%; max-width: 600px;">
 
     @if (TempData["Success"] != null || TempData["MensajeSuccess"] != null)
     {
@@ -48,124 +47,15 @@
 
 
   <div class="d-flex">
-    <nav id="sidebar" class="d-flex flex-column p-2">
-      <button class="btn btn-sm btn-secondary mb-3" id="toggleSidebar">
-        <i class="bi bi-list"></i>
-      </button>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+      <partial name="Siderbar" />
+    }
 
-      <button class="btn btn-sm btn-light mb-2 d-md-none ms-auto" id="mobileClose" aria-label="Cerrar menú">
-        <i class="bi bi-x-lg"> X </i>
-      </button>
-      <div class="sidebar-content">
-        <ul class="nav nav-pills flex-column pt-5">
-          <li class="nav-item mb-1">
-            <a class="nav-link d-flex align-items-center" href="/">Inicio</a>
-          </li>
-
-          <li class="nav-item mb-1">
-            <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse"
-              href="#propietarioMenu">Propietarios</a>
-            <div class="collapse" id="propietarioMenu">
-              <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
-                <li><a class="nav-link color-gris py-1" asp-controller="Propietario" asp-action="Crear">Crear</a>
-                </li>
-                <li><a class="nav-link color-gris py-1" asp-controller="Propietario" asp-action="Listar">Lista
-                    Gestion</a></li>
-              </ul>
-            </div>
-          </li>
-
-          <li class="nav-item mb-1">
-            <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#inquilinoMenu">Inquilinos</a>
-            <div class="collapse" id="inquilinoMenu">
-              <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
-                <li><a class="nav-link color-gris py-1" asp-controller="Inquilino" asp-action="Crear">Crear</a></li>
-                <li><a class="nav-link color-gris py-1" asp-controller="Inquilino" asp-action="Listar">Lista
-                    Gestion</a></li>
-              </ul>
-            </div>
-          </li>
-
-          <li class="nav-item mb-1">
-            <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#inmuebleMenu">Inmuebles</a>
-            <div class="collapse" id="inmuebleMenu">
-              <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
-                <li><a class="nav-link color-gris py-1" asp-controller="Inmueble" asp-action="Crear">Crear</a></li>
-                <li><a class="nav-link color-gris py-1" asp-controller="Inmueble" asp-action="Listar">Lista
-                    Gestion</a></li>
-              </ul>
-            </div>
-          </li>
-
-          <li class="nav-item mb-1">
-            <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#tipoMenu">Tipos de
-              Inmueble</a>
-            <div class="collapse" id="tipoMenu">
-              <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
-                <li><a class="nav-link color-gris py-1" asp-controller="TipoInmueble" asp-action="Crear">Crear</a>
-                </li>
-                <li><a class="nav-link color-gris py-1" asp-controller="TipoInmueble" asp-action="Listar">Lista
-                    Gestion</a></li>
-              </ul>
-            </div>
-          </li>
-
-          <li class="nav-item mb-1">
-            <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#contratoMenu">Contrato</a>
-            <div class="collapse" id="contratoMenu">
-              <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
-                <li><a class="nav-link color-gris py-1" asp-controller="Contrato" asp-action="Crear">Crear</a></li>
-                <li><a class="nav-link color-gris py-1" asp-controller="Contrato" asp-action="Listar">Lista
-                    Gestion</a></li>
-              </ul>
-            </div>
-          </li>
-
-          <li class="nav-item mb-1">
-            <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#pagoMenu">Pago</a>
-            <div class="collapse" id="pagoMenu">
-              <ul class="btn-toggle-nav list-unstyled fw-normal small ps-4">
-                <li><a class="nav-link color-gris py-1" asp-controller="Pago" asp-action="Crear">Crear</a></li>
-                <li><a class="nav-link color-gris py-1" asp-controller="Pago" asp-action="Listar">Lista Gestion</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-
-        </ul>
-      </div>
-
-    </nav>
-
-    <div class="flex-grow-1">
+    <div class="@(User.Identity?.IsAuthenticated == true ? "flex-grow-1" : "w-100 align-items-center")">
       <header class="d-flex justify-content-between align-items-center shadow-sm py-3 m-0 border-bottom">
-        <div class="d-flex align-items-center">
-          <button class="btn btn-outline-light d-md-none me-2" id="mobileToggle">
-            <i class="bi bi-list"></i>
-          </button>
-          <h4 class="mb-0 fw-bold color-gris">@ViewData["SubTitle"]</h4>
-        </div>
-
-        <div class="d-flex align-items-center">
-          <div class="dropdown">
-            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown"
-              data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="~/images/user.png" alt="Usuario" width="32" height="32" class="rounded-circle me-2">
-              <span class="fw-semibold color-gris">Usuario</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-              <li><a class="dropdown-item" href="#">Perfil</a></li>
-              <li><a class="dropdown-item" href="#">Configuración</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="#">Cerrar sesión</a></li>
-            </ul>
-          </div>
-        </div>
+        <partial name="Header" />
       </header>
-
-
 
 
       <main role="main " class="container-fluid p-4 bg-light">
@@ -174,24 +64,30 @@
 
     </div>
   </div>
+  @if (User.Identity?.IsAuthenticated == true)
+  {
+    <partial name="Perfil" />
 
-
+  }
 
   <script src="~/lib/jquery/dist/jquery.min.js"></script>
   <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
   @await RenderSectionAsync("Scripts", required: false)
-  <partial name="_ValidationScriptsPartial" />
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
       tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el))
       const sidebar = document.getElementById('sidebar');
+      // Si el sidebar no existe (usuario no logueado), no continuamos.
+      if (!sidebar) return;
+
       const toggleBtn = document.getElementById('toggleSidebar');
       const mobileToggle = document.getElementById('mobileToggle');
       const mobileClose = document.getElementById('mobileClose');
       const content = document.querySelector('.flex-grow-1');
       const sidebarContent = sidebar.querySelector('.sidebar-content');
-
+      
       let backdrop = document.querySelector('.sidebar-backdrop');
       function ensureBackdrop() {
         if (!backdrop) {
@@ -222,20 +118,23 @@
         }
       }
 
-      document.querySelectorAll('#sidebar .nav-link').forEach(a => {
-        if (a.querySelector('span')) return;
-        const textParts = Array.from(a.childNodes)
-          .filter(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim().length)
-          .map(n => n.textContent.trim());
-        if (textParts.length) {
-          Array.from(a.childNodes)
-            .filter(n => n.nodeType === Node.TEXT_NODE)
-            .forEach(n => n.remove());
-          const span = document.createElement('span');
-          span.textContent = textParts.join(' ');
-          a.appendChild(span);
-        }
-      });
+      // FIX: Asegurarse de que este bloque solo se ejecute si el sidebar existe.
+      if (sidebar) {
+        sidebar.querySelectorAll('.nav-link').forEach(a => {
+          if (a.querySelector('span')) return;
+          const textParts = Array.from(a.childNodes)
+            .filter(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim().length)
+            .map(n => n.textContent.trim());
+          if (textParts.length) {
+            Array.from(a.childNodes)
+              .filter(n => n.nodeType === Node.TEXT_NODE)
+              .forEach(n => n.remove());
+            const span = document.createElement('span');
+            span.textContent = textParts.join(' ');
+            a.appendChild(span);
+          }
+        });
+      }
 
       if (sidebar.classList.contains('collapsed')) {
         sidebarContent.classList.add('d-none');
@@ -254,6 +153,8 @@
         });
       }
 
+      // FIX: mobileToggle no existe en el HTML, por lo que se debe verificar si es nulo
+      // antes de intentar agregarle un event listener.
       if (mobileToggle) {
         mobileToggle.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -261,6 +162,7 @@
           else openMobileSidebar();
         });
       }
+
 
       if (mobileClose) {
         mobileClose.addEventListener('click', (e) => {
@@ -271,9 +173,10 @@
 
       document.addEventListener('click', (e) => {
         if (window.innerWidth <= 768 && sidebar.classList.contains('show')) {
-          const clickedInside = sidebar.contains(e.target);
-          const clickedToggle = mobileToggle && mobileToggle.contains(e.target);
-          if (!clickedInside && !clickedToggle) closeMobileSidebar();
+          // Si el clic fue fuera del sidebar y no fue en el botón que lo abre, ciérralo.
+          if (!sidebar.contains(e.target) && e.target !== mobileToggle && (!mobileToggle || !mobileToggle.contains(e.target))) {
+            closeMobileSidebar();
+          }
         }
       }, true);
 
@@ -309,17 +212,20 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // Buscamos las alertas que renderizó el servidor (con TempData)
       const alerts = document.querySelectorAll(".alertaTemp");
       alerts.forEach(alert => {
         setTimeout(() => {
-          alert.classList.add("fade");
-          alert.classList.add("show");
-          setTimeout(() => alert.remove(), 500); // se elimina tras la animación
-        }, 5000); // 5 segundos
+          alert.remove(); // Simplemente eliminamos la alerta después de 5 segundos.
+        }, 5000);
       });
     });
   </script>
 
+  @if (User.Identity?.IsAuthenticated == true)
+  {
+    <script src="~/js/perfil.js" asp-append-version="true"></script>
+  }
 
 </body>
 
