@@ -484,7 +484,51 @@ public class UsuarioController : Controller
     }
   }
 
-  
+
+  [HttpPost]
+  [Authorize(Roles = "Administrador")]
+  [ValidateAntiForgeryToken]
+  public IActionResult Eliminar(int id)
+  {
+    try
+    {
+      var idUsuarioLogueadoClaim = User.FindFirstValue("IdUsuario");
+      if (int.TryParse(idUsuarioLogueadoClaim, out int idUsuarioLogueado) && id == idUsuarioLogueado)
+      {
+        TempData["Error"] = "No puedes eliminarte a ti mismo.";
+        return RedirectToAction("Listar");
+      }
+
+      var usuarioAEliminar = repositorio.ObtenerPorId(id);
+      if (usuarioAEliminar == null || usuarioAEliminar.IdUsuario == 0)
+      {
+        TempData["Error"] = "El usuario no fue encontrado.";
+        return RedirectToAction("Listar");
+      }
+
+      if (!string.IsNullOrEmpty(usuarioAEliminar.AvatarURL) && !usuarioAEliminar.AvatarURL.Contains("AvatarMasculino.png") && !usuarioAEliminar.AvatarURL.Contains("AvatarFemenino.png"))
+      {
+            var nombreArchivo = usuarioAEliminar.AvatarURL.Split('/').Last();
+            _fileService.BorrarArchivo(nombreArchivo, RUTA_CARPETA_AVATAR);
+      }
+
+      if (repositorio.Eliminar(id) > 0)
+      {
+        TempData["Success"] = "Usuario eliminado correctamente.";
+      }
+      else
+      {
+        TempData["Error"] = "No se pudo eliminar el usuario.";
+      }
+      return RedirectToAction("Listar");
+    }
+    catch (Exception)
+    {
+      TempData["Error"] = "Ocurrió un error al eliminar el usuario ";
+      return RedirectToAction("Listar");
+    }
+  }
+
   [HttpPost]
   [Authorize(Roles = "Administrador,Empleado")]
   [ValidateAntiForgeryToken]
