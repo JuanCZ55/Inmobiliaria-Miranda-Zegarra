@@ -11,7 +11,6 @@ namespace Inmobiliaria.Models
     [Display(Name = "Codigo")]
     public int IdPago { get; set; }
 
-    [Required(ErrorMessage = "El número de pago es obligatorio")]
     public int numeroPago { get; set; }
 
     [Required(ErrorMessage = "Fecha de pago es obligatoria")]
