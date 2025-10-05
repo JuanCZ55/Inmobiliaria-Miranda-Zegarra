@@ -5,9 +5,9 @@ namespace Inmobiliaria.Models
     using Microsoft.Extensions.Configuration;
     using MySql.Data.MySqlClient;
 
-    public class RepositorioContraro : RepositorioBase, IRepositorioContrato
+    public class RepositorioContrato : RepositorioBase, IRepositorioContrato
     {
-        public RepositorioContraro(IConfiguration configuration)
+        public RepositorioContrato(IConfiguration configuration)
             : base(configuration) { }
 
         public int Crear(Contrato contrato)
@@ -50,7 +50,10 @@ namespace Inmobiliaria.Models
                 {
                     cmd.Parameters.AddWithValue("@fecha_fin", DateTime.Now);
                     cmd.Parameters.AddWithValue("@multa", contrato.Multa ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@id_usuario_finalizador", contrato.IdUsuarioFinalizador);
+                    cmd.Parameters.AddWithValue(
+                        "@id_usuario_finalizador",
+                        contrato.IdUsuarioFinalizador
+                    );
                     cmd.Parameters.AddWithValue("@id_contrato", contrato.IdContrato);
                     conn.Open();
                     res = cmd.ExecuteNonQuery();
@@ -668,7 +671,10 @@ namespace Inmobiliaria.Models
                             );
                             cmdContrato.Parameters.AddWithValue("@monto_mensual", contrato.Monto);
                             cmdContrato.Parameters.AddWithValue("@tipo", contrato.Tipo);
-                            cmdContrato.Parameters.AddWithValue("@id_usuario_creador", contrato.IdUsuarioCreador);
+                            cmdContrato.Parameters.AddWithValue(
+                                "@id_usuario_creador",
+                                contrato.IdUsuarioCreador
+                            );
                             contrato.IdContrato = Convert.ToInt32(cmdContrato.ExecuteScalar());
                         }
 
@@ -685,7 +691,10 @@ namespace Inmobiliaria.Models
                             cmdPago.Parameters.AddWithValue("@fecha_pago", pago.FechaPago);
                             cmdPago.Parameters.AddWithValue("@concepto", pago.Concepto);
                             cmdPago.Parameters.AddWithValue("@monto", pago.Monto);
-                            cmdPago.Parameters.AddWithValue("@id_usuario", contrato.IdUsuarioCreador);
+                            cmdPago.Parameters.AddWithValue(
+                                "@id_usuario",
+                                contrato.IdUsuarioCreador
+                            );
                             cmdPago.Parameters.AddWithValue("@estado", 1);
                             pago.IdPago = Convert.ToInt32(cmdPago.ExecuteScalar());
                         }
@@ -801,8 +810,14 @@ namespace Inmobiliaria.Models
                         {
                             cmdContrato.Parameters.AddWithValue("@fecha_fin", DateTime.Today);
                             cmdContrato.Parameters.AddWithValue("@multa", contrato.Multa);
-                            cmdContrato.Parameters.AddWithValue("@id_usuario_finalizador", contrato.IdUsuarioFinalizador);
-                            cmdContrato.Parameters.AddWithValue("@id_contrato",contrato.IdContrato);
+                            cmdContrato.Parameters.AddWithValue(
+                                "@id_usuario_finalizador",
+                                contrato.IdUsuarioFinalizador
+                            );
+                            cmdContrato.Parameters.AddWithValue(
+                                "@id_contrato",
+                                contrato.IdContrato
+                            );
                             cmdContrato.ExecuteNonQuery();
                         }
 
@@ -819,7 +834,10 @@ namespace Inmobiliaria.Models
                             cmdPago.Parameters.AddWithValue("@fecha_pago", pago.FechaPago);
                             cmdPago.Parameters.AddWithValue("@concepto", pago.Concepto);
                             cmdPago.Parameters.AddWithValue("@monto", pago.Monto);
-                            cmdPago.Parameters.AddWithValue("@id_usuario", contrato.IdUsuarioFinalizador);
+                            cmdPago.Parameters.AddWithValue(
+                                "@id_usuario",
+                                contrato.IdUsuarioFinalizador
+                            );
                             cmdPago.Parameters.AddWithValue("@estado", 1);
                             pago.IdPago = Convert.ToInt32(cmdPago.ExecuteScalar());
                         }
