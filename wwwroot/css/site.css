@@ -368,13 +368,13 @@ header {
   font-weight: 500;
 }
 
-.btn-sesion:hover{
-  background-color:rgb(90, 187, 244);
+.btn-sesion:hover {
+  background-color: rgb(90, 187, 244);
   color: rgb(6, 82, 117);
   border: 1px solid rgb(6, 82, 117);
 }
 
-.btn-ingresar{
+.btn-ingresar {
   background: rgba(13, 24, 54, 0.877);
   border: 1px solid rgba(13, 24, 54, 0.877);
   color: #fff;
@@ -391,13 +391,24 @@ header {
   font-weight: 500;
 }
 
-.btn-ingresar:hover{
+.btn-ingresar:hover {
   background: rgb(6, 82, 117);
   border: 1px solid rgb(6, 82, 117);
   color: #fff;
 }
 
-.modal-login{
+.modal-login {
   height: 40rem;
-  width: 80rem
+  width: 80rem;
+}
+.clickable-badge {
+  cursor: pointer;
+
+  transition: transform 0.15s ease-in-out, filter 0.15s ease-in-out;
+}
+
+.clickable-badge:hover {
+  transform: scale(1.05);
+
+  filter: brightness(1.1);
 }
