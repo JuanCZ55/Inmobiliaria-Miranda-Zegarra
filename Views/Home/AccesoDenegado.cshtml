@@ -1,7 +1,24 @@
 @{
-  ViewData["Title"] = "Acceso denegado";
+  ViewData["Title"] = "Acceso Denegado";
 }
 
-<h1>403 - Acceso denegado</h1>
-<p>No tenes permisos para acceder a esta seccion.</p>
-<a asp-controller="Home" asp-action="Index">Volver al inicio</a>
+<div class="container text-center d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+  <div class="col-lg-8 mx-auto">
+    <h1 class="display-1 fw-bold">403</h1>
+    <p class="fs-3">
+      <span class="text-warning">Acceso Prohibido</span>
+    </p>
+    <p class="lead text-muted mb-4">
+      Tu usuario actual no tiene autorización para acceder a este ruta.
+    </p>
+
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+      <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-lg px-4 gap-3">
+        Ir a la página de inicio
+      </a>
+
+    </div>
+
+
+  </div>
+</div>

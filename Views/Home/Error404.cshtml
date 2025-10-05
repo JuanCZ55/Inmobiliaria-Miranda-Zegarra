@@ -2,6 +2,23 @@
   ViewData["Title"] = "Página no encontrada";
 }
 
-<h1>404 - Página no encontrada</h1>
-<p>La ruta que intentaste acceder no existe.</p>
-<a asp-controller="Home" asp-action="Index">Volver al inicio</a>
+<div class="container text-center d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+  <div class="col-lg-8 mx-auto">
+    <h1 class="display-1 fw-bold text-body-emphasis">404</h1>
+    <p class="fs-3">
+      <span class="text-danger">Oops!</span> Página no encontrada.
+    </p>
+    <p class="lead text-muted mb-4">
+      La página que buscas no existe. Quizás puedas encontrarla usando nuestro buscador.
+    </p>
+
+
+
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+      <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-lg px-4 gap-3">
+        Ir a la página de inicio
+      </a>
+
+    </div>
+  </div>
+</div>

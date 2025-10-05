@@ -1,17 +1,32 @@
 @{
-  ViewData["Title"] = "Acceso Requerido";
+  ViewData["Title"] = "Inicia Sesion";
 }
 
-<div class="container text-center mt-5">
-  <div class="card shadow-sm mx-auto" style="max-width: 500px;">
-    <div class="card-body p-5">
-      <h1 class="card-title h3 mb-3">🔒 Acceso Requerido</h1>
-      <p class="card-text">
-        Para ver esta página, primero necesitas iniciar sesión.
+<div class="d-flex align-items-center justify-content-center" style="min-height: 70vh;">
+  <div class="text-center p-3">
+
+    <div class="ratio ratio-1x1 mx-auto" style="max-width: 250px;">
+      <img src="https://juancz55.github.io/Imagenes/logoInmo.png" class="img-fluid object-fit-cover">
+    </div>
+
+    <h1 class="display-6 mt-4">Aun no has iniciado sesión.</h1>
+    <p class="lead text-muted mt-2">
+      Logueate con tu mail y contraseña.
+    </p>
+
+    <div class="mt-3">
+      <p class="h5">
+        Debes
+        <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill px-3 py-2 clickable-badge"
+          data-bs-toggle="modal" data-bs-target="#loginModal">
+          Iniciar Sesión
+        </span>
+        para poder acceder.
       </p>
-      <p class="lead">
-        👉 Por favor, utiliza el formulario de inicio de sesión ubicado en la <strong>esquina superior derecha</strong>.
+      <p class="small text-muted mt-2">
+        Si desea una cuenta, pídela al administrador.
       </p>
     </div>
+
   </div>
 </div>
