@@ -1,8 +1,102 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+  ViewData["Title"] = "Bienvenido al Sistema";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid pt-0">
+
+  <div class="text-center mb-1">
+    <h1 class="display-5">¡Hola, @User.FindFirst("Nombre")?.Value</h1>
+    <p class="lead text-muted">
+      Bienvenido al panel de control de la inmobiliaria. Aquí tienes un resumen de lo que puedes hacer en cada sección.
+    </p>
+  </div>
+
+  <div class="row">
+
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <div class="display-4 text-primary mb-3"><i class="bi bi-person-badge"></i></div>
+          <h5 class="card-title">Propietarios</h5>
+          <p class="card-text">Registra nuevos dueños, edita su información y consulta la lista de inmuebles a su
+            nombre.</p>
+        </div>
+        <div class="card-footer bg-white border-0 text-center">
+          <a asp-controller="Propietario" asp-action="Index" class="btn btn-outline-primary">Ir a Propietarios</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <div class="display-4 text-primary mb-3"><i class="bi bi-person-vcard"></i></div>
+          <h5 class="card-title">Inquilinos</h5>
+          <p class="card-text">Administra la información de los inquilinos, consulta su historial de contratos y datos
+            de contacto.</p>
+        </div>
+        <div class="card-footer bg-white border-0 text-center">
+          <a asp-controller="Inquilino" asp-action="Index" class="btn btn-outline-primary">Ir a Inquilinos</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <div class="display-4 text-primary mb-3"><i class="bi bi-house-door-fill"></i></div>
+          <h5 class="card-title">Inmuebles</h5>
+          <p class="card-text">Carga nuevas propiedades, actualiza sus detalles, precios, fotos y gestiona su
+            disponibilidad.</p>
+        </div>
+        <div class="card-footer bg-white border-0 text-center">
+          <a asp-controller="Inmueble" asp-action="Index" class="btn btn-outline-primary">Ir a Inmuebles</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <div class="display-4 text-primary mb-3"><i class="bi bi-file-text-fill"></i></div>
+          <h5 class="card-title">Contratos</h5>
+          <p class="card-text">Crea y administra los contratos de alquiler, incluyendo fechas, montos y cancelaciones.
+          </p>
+        </div>
+        <div class="card-footer bg-white border-0 text-center">
+          <a asp-controller="Contrato" asp-action="Index" class="btn btn-outline-primary">Ir a Contratos</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <div class="display-4 text-primary mb-3"><i class="bi bi-cash-stack"></i></div>
+          <h5 class="card-title">Pagos</h5>
+          <p class="card-text">Registra los pagos de alquiler de cada contrato y consulta los pagos.
+          </p>
+        </div>
+        <div class="card-footer bg-white border-0 text-center">
+          <a asp-controller="Pago" asp-action="Index" class="btn btn-outline-primary">Ir a Pagos</a>
+        </div>
+      </div>
+    </div>
+
+    @if (User.IsInRole("Administrador"))
+    {
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 shadow border-danger">
+          <div class="card-body text-center">
+            <div class="display-4 text-danger mb-3"><i class="bi bi-people-fill"></i></div>
+            <h5 class="card-title">Gestión de Usuarios</h5>
+            <p class="card-text">Crea nuevas cuentas, cambia roles y gestiona los accesos de los empleados al sistema.</p>
+          </div>
+          <div class="card-footer bg-white border-0 text-center">
+            <a asp-controller="Usuario" asp-action="Index" class="btn btn-danger">Administrar Usuarios</a>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
 </div>
