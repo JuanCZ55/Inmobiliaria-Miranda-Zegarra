@@ -126,6 +126,8 @@ namespace Inmobiliaria.Models
             c.id_inmueble, 
             c.id_inquilino, 
             c.created_at, 
+            c.id_usuario_creador,
+            c.id_usuario_finalizador,
             c.updated_at,
             CASE
                 WHEN c.fecha_terminacion_anticipada IS NULL 
@@ -248,6 +250,12 @@ namespace Inmobiliaria.Models
                                 },
                                 CreatedAt = reader.GetDateTime("created_at"),
                                 UpdatedAt = reader.GetDateTime("updated_at"),
+                                IdUsuarioCreador = reader.GetInt32("id_usuario_creador"),
+                                IdUsuarioFinalizador = reader.IsDBNull(
+                                    reader.GetOrdinal("id_usuario_finalizador")
+                                )
+                                    ? (int?)null
+                                    : reader.GetInt32("id_usuario_finalizador"),
                             };
                         }
                     }

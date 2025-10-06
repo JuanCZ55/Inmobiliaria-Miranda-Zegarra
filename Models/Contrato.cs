@@ -50,7 +50,7 @@ namespace Inmobiliaria.Models
 
         public int IdUsuarioCreador { get; set; }
 
-        public int IdUsuarioFinalizador { get; set; }
+        public int? IdUsuarioFinalizador { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 

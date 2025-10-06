@@ -13,6 +13,7 @@ namespace Inmobiliaria.Controllers
         private readonly IRepositorioPago repositorioPago;
         private readonly IRepositorioInmueble repositorioInmueble;
         private readonly IRepositorioInquilino repositorioInquilino;
+        private readonly IRepositorioUsuario repositorioUsuario;
 
         private readonly IConfiguration config;
 
@@ -22,6 +23,7 @@ namespace Inmobiliaria.Controllers
             IRepositorioPago repositorioPago,
             IRepositorioInmueble repositorioInmueble,
             IRepositorioInquilino repositorioInquilino,
+            IRepositorioUsuario repositorioUsuario,
             IConfiguration config
         )
         {
@@ -29,6 +31,7 @@ namespace Inmobiliaria.Controllers
             this.repositorioPago = repositorioPago;
             this.repositorioInmueble = repositorioInmueble;
             this.repositorioInquilino = repositorioInquilino;
+            this.repositorioUsuario = repositorioUsuario;
             this.config = config;
         }
 
@@ -208,6 +211,19 @@ namespace Inmobiliaria.Controllers
                         repositorioPago.BuscarPorContrato(contrato.IdContrato).Count == 1;
                     contrato.Estado = "Vigente";
                     contrato.Multa = CalcularMulta(contrato);
+                }
+                if (User.IsInRole("Administrador"))
+                {
+                    if (contrato.IdUsuarioCreador > 0)
+                    {
+                        var usuarioCreador = repositorioUsuario.ObtenerPorId(contrato.IdUsuarioCreador);
+                        ViewBag.UsuarioCreador = usuarioCreador;
+                    }
+                    if (contrato.IdUsuarioFinalizador.HasValue && contrato.IdUsuarioFinalizador.Value > 0)
+                    {
+                        var usuarioFinalizador = repositorioUsuario.ObtenerPorId(contrato.IdUsuarioFinalizador.Value);
+                        ViewBag.UsuarioFinalizador = usuarioFinalizador;
+                    }
                 }
                 ViewBag.ReturnUrl = returnUrl ?? Url.Action("Listar");
                 return View("Gestion", contrato);

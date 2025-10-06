@@ -50,7 +50,7 @@
                   <label class="form-label">Tipo de Pago</label>
                   <select asp-for="Tipo" class="form-select">
                     <option value="0"> Selecciona una opción </option>
-                    <option value="1">Pago Total</option>
+                    <option value="1">Pago Total (Diario)</option>
                     <option value="2">Pagos Mensuales</option>
                   </select>
                   <span asp-validation-for="Tipo" class="text-danger"></span>
@@ -61,7 +61,7 @@
                 <div class="col-12 mb-3">
                   <label class="form-label">Tipo de Pago</label>
                   <input class="form-control" type="text" readonly
-                    value="@(Model.Tipo == 1 ? "Pago Total" : Model.Tipo == 2 ? "Pagos Mensuales" : "")" />
+                    value="@(Model.Tipo == 1 ? "Pago Total (Diario)" : Model.Tipo == 2 ? "Pagos Mensuales" : "")" />
                 </div>
               }
 
@@ -117,6 +117,36 @@
                     <span asp-validation-for="Multa" class="text-danger"></span>
                   </div>
                 }
+
+                @if (User.IsInRole("Administrador"))
+                {
+                  var creador = ViewBag.UsuarioCreador as Inmobiliaria.Models.Usuario;
+                  var finalizador = ViewBag.UsuarioFinalizador as Inmobiliaria.Models.Usuario;
+
+                  @if (creador != null)
+                  {
+                    <div class="col-6 mb-3">
+                      <label class="form-label">Usuario Creador</label>
+                      <div class="input-group">
+                        <input class="form-control" type="text" value="@creador.Nombre @creador.Apellido" readonly />
+                        <a class="btn btn-outline-secondary" asp-controller="Usuario" asp-action="Ver"
+                          asp-route-IdUsuario="@creador.IdUsuario" title="Ver perfil del creador">Ver</a>
+                      </div>
+                    </div>
+                  }
+                  @if (finalizador != null)
+                  {
+                    <div class="col-6 mb-3">
+                      <label class="form-label">Usuario Finalizador</label>
+                      <div class="input-group">
+                        <input class="form-control" type="text" value="@finalizador.Nombre @finalizador.Apellido" readonly />
+                        <a class="btn btn-outline-secondary" asp-controller="Usuario" asp-action="Ver"
+                          asp-route-IdUsuario="@finalizador.IdUsuario" title="Ver perfil del finalizador">Ver</a>
+                      </div>
+                    </div>
+                  }
+                }
+
               </div>
             }
           </div>
@@ -152,16 +182,13 @@
                       data-bs-target="#editContratoModal" id="btnOpenEditModal"
                       onclick="traerFechas(@Model.IdInmueble, @Model.IdContrato)">Editar</button>
                   </div>
-                  <div class="">
-                    <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal"
-                      data-bs-target="#deleteContratoModal" id="btnOpenDeleteModal">Eliminar</button>
-                  </div>
                 }
               }
               @if (Model.Estado == "Cancelado con Multa Pendiente")
               {
                 <div class="">
-                  <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#pagarMultaModal">
+                  <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal"
+                    data-bs-target="#pagarMultaModal">
                     Pagar Multa
                   </button>
                 </div>
@@ -173,6 +200,13 @@
                     data-bs-target="#renovarContratoModal" onclick="traerFechas(@Model.IdInmueble, null)">
                     Renovar
                   </button>
+                </div>
+              }
+              if (User.IsInRole("Administrador"))
+              {
+                <div class="">
+                  <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal"
+                    data-bs-target="#deleteContratoModal" id="btnOpenDeleteModal">Eliminar</button>
                 </div>
               }
               <div class="">
@@ -351,7 +385,7 @@
                   <div class="col-12 mb-3">
                     <label class="form-label">Tipo de Pago</label>
                     <select name="Tipo" class="form-select" id="TipoModal">
-                      <option value="1" selected=@(Model.Tipo == 1 ? "selected" : null)>Pago Total</option>
+                      <option value="1" selected=@(Model.Tipo == 1 ? "selected" : null)>Pago Total (Diario)</option>
                       <option value="2" selected=@(Model.Tipo == 2 ? "selected" : null)>Pagos Mensuales</option>
                     </select>
                   </div>
@@ -439,11 +473,11 @@
                   <select name="Tipo" class="form-select" required>
                     @if (Model.Tipo == 1)
                     {
-                      <option value="1" selected)>Pago Total</option>
+                      <option value="1" selected)>Pago Total (Diario)</option>
                     }
                     else
                     {
-                      <option value="1" )>Pago Total</option>
+                      <option value="1" )>Pago Total (Diario)</option>
                     }
                     @if (Model.Tipo == 2)
                     {
@@ -674,7 +708,7 @@
             contratosExistentes = JSON.parse('@Html.Raw(ViewBag.ListFechas)');
           </text>
       }
-      var pickers = {};
+          var pickers = {};
 
       function buildDisabledRanges(contratos) {
         if (!Array.isArray(contratos)) return [];
