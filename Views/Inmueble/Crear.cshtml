@@ -127,7 +127,13 @@
       </div>
       @* ---IMAGENES--- *@
       <br />
-      <div class="d-flex justify-content-end align-items-center">
+      <br />
+      <br />
+      <br />
+      <br />
+      <div class="d-flex justify-content-between">
+
+        <a asp-controller="Inmueble" asp-action="Index" class="btn btn-secondary">Volver</a>
         <button type="submit" class="btn btn-success">Crear Inmueble</button>
       </div>
 
@@ -147,19 +153,19 @@
   <script src="~/js/manejo-imagenes-crear.js"></script>
   <script src="~/js/inmueble-form.js""></script>
 
-        <script>
-          document.addEventListener('DOMContentLoaded', () => {
-            //select2+ mapa
-            inicializarFormularioInmueble();
-            inicializarGestionImagenes({
-              idInputPortada: 'input-portada-crear',
-              idPreviewPortada: 'preview-portada-crear',
-              idInputGaleria: 'input-galeria-crear',
-              idCarouselInner: 'carousel-inner-galeria',
-              idCarousel: 'carouselGaleria' // El ID del div principal del carrusel
-            });
-          });
-        </script>
+                                        <script>
+                                          document.addEventListener('DOMContentLoaded', () => {
+                                            //select2+ mapa
+                                            inicializarFormularioInmueble();
+                                            inicializarGestionImagenes({
+                                              idInputPortada: 'input-portada-crear',
+                                              idPreviewPortada: 'preview-portada-crear',
+                                              idInputGaleria: 'input-galeria-crear',
+                                              idCarouselInner: 'carousel-inner-galeria',
+                                              idCarousel: 'carouselGaleria' // El ID del div principal del carrusel
+                                            });
+                                          });
+                                        </script>
 
 
 }
