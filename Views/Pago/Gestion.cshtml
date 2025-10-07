@@ -3,8 +3,7 @@
   ViewData["Title"] = "Crear Contrato";
   ViewData["SubTitle"] = "Pagos";
   Layout = "~/Views/Shared/_Layout.cshtml";
-  var actionForm = Model.IdPago == 0 ? "Crear" : Model.Estado == 1 ? "CancelarPago" : Model.Estado == 2 ? "ActivarPago" :
-  null;
+  var actionForm = Model.IdPago == 0 ? "Crear" : null;
 }
 <div class="row h-100">
   <!-- COLUMNA IZQUIERDA -->
@@ -32,21 +31,20 @@
 
             <div class="col-md-12">
               <label asp-for="Concepto" class="form-label">Concepto</label>
-              @if (Model.IdPago > 0)
-              {
-                <input asp-for="Concepto" type="text" class="form-control" readonly />
-              }
-              else
-              {
-                <select asp-for="Concepto" class="form-select">
-                  <option value="">-- Seleccione un concepto --</option>
-                  <option value="Alquiler mensual">Alquiler (mensual)</option>
-                  <option value="Alquiler adelantado">Alquiler (adelantado)</option>
-                  <option value="Alquiler proporcional">Alquiler (proporcional)</option>
-                  <option value="Expensas ordinarias">Expensas (ordinarias)</option>
-                  <option value="Expensas extraordinarias">Expensas (extraordinarias)</option>
-                </select>
-              }
+              <input asp-for="Concepto" class="form-control" list="conceptos-list"
+                placeholder="-- Seleccione o escriba un concepto --">
+              <datalist id="conceptos-list">
+                <option value="Alquiler mensual"></option>
+                <option value="Alquiler adelantado"></option>
+                <option value="Alquiler proporcional"></option>
+                <option value="Expensas ordinarias"></option>
+                <option value="Expensas extraordinarias"></option>
+                @if (Model.contrato?.Estado == "Cancelado con Multa Pendiente")
+                {
+                  <option value="Multa de Cancelacion"></option>
+                }
+              </datalist>
+
             </div>
             <div class="col-md-12">
               <label asp-for="FechaPago" class="form-label">Fecha de Pago</label>
@@ -63,7 +61,8 @@
                 <input class="form-control" type="text" readonly
                   value="@(Model.Estado == 1 ? "Activo" : Model.Estado == 2 ? "Cancelado" : "")" />
               </div>
-              <input asp-for="IdPago" type="hidden" id="IdContrato" />
+              <input asp-for="IdContrato" type="hidden" />
+              <input asp-for="IdPago" type="hidden" />
             }
           </div>
         </div>
@@ -71,28 +70,23 @@
           @if (Model.IdPago <= 0)
           {
             <button type="submit" class="btn btn-success">Crear</button>
-
           }
           else
           {
+            <button type="button" class="btn btn-primary" data-action="ModificarPago">Modificar Pago</button>
             @if (Model.Estado == 1)
             {
-              <form asp-action="CancelarPago" method="post">
-                <input name="idPago" value="@Model.IdPago" type="hidden" id="IdContrato" />
-                <button type="submit" class="btn btn-outline-danger" @(Model.contrato?.Estado == "Finalizado" || Model.contrato?.Estado == "Cancelado con Multa Saldada" ? "disabled" : "")>
-                  Cancelar Pago
-                </button>
-
-              </form>
+              <button type="button" class="btn btn-outline-danger" data-action="CancelarPago"
+              @(Model.contrato?.Estado == "Finalizado" || Model.contrato?.Estado == "Cancelado con Multa Saldada" ? "disabled" : "")>
+                Cancelar Pago
+              </button>
             }
             else if (Model.Estado == 2)
             {
-              <form asp-action="ActivarPago" method="post">
-                <input name="idPago" value="@Model.IdPago" type="hidden" id="IdContrato" />
-                <button type="submit" class="btn btn-outline-success" @(Model.contrato?.Estado == "Finalizado" || Model.contrato?.Estado == "Cancelado con Multa Saldada" ? "disabled" : "")>
-                  Activar Pago
-                </button>
-              </form>
+              <button type="button" class="btn btn-outline-success" data-action="ActivarPago"
+              @(Model.contrato?.Estado == "Finalizado" || Model.contrato?.Estado == "Cancelado con Multa Saldada" ? "disabled" : "")>
+                Activar Pago
+              </button>
             }
           }
           <a href="/Pago/Listar" class="btn btn-secondary">Volver</a>
@@ -291,4 +285,18 @@
       }
     </script>
   }
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById('formPago');
+      if (form) {
+        document.querySelectorAll('button[data-action]').forEach(button => {
+          button.addEventListener('click', function () {
+            const action = this.getAttribute('data-action');
+            form.action = `/Pago/${action}`;
+            form.submit();
+          });
+        });
+      }
+    });
+  </script>
 }

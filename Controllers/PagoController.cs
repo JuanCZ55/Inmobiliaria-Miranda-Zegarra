@@ -164,6 +164,53 @@ namespace Inmobiliaria.Controllers
             }
         }
 
+        [HttpPost]
+        public IActionResult ModificarPago(Pago pago)
+        {
+            try
+            {
+                if (pago.IdPago <= 0)
+                {
+                    TempData["Error"] = "ID de pago inválido.";
+                    return RedirectToAction("Listar");
+                }
+
+                Pago pagoExistente = repositorio.ObtenerPorID(pago.IdPago);
+                if (pagoExistente == null)
+                {
+                    TempData["Error"] = "El pago que intenta modificar no existe.";
+                    return RedirectToAction("Listar");
+                }
+
+                Contrato contrato = repositorioContraro.ObtenerPorID(pagoExistente.IdContrato);
+                if (contrato.Estado == "Finalizado" || contrato.Estado == "Cancelado con Multa Saldada")
+                {
+                    TempData["Error"] = "No se pueden modificar pagos de un contrato que ya ha finalizado o ha sido cancelado.";
+                    return RedirectToAction("Ver", new { id = pago.IdPago });
+                }
+
+                pagoExistente.Concepto = pago.Concepto;
+
+                int resultado = repositorio.Modificar(pagoExistente);
+
+                if (resultado > 0)
+                {
+                    TempData["Success"] = "El pago se modificó correctamente.";
+                }
+                else
+                {
+                    TempData["Error"] = "No se pudo modificar el pago.";
+                }
+                return RedirectToAction("Ver", new { id = pago.IdPago });
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "Ocurrió un error inesperado al modificar el pago.";
+                return RedirectToAction("Ver", new { id = pago.IdPago });
+            }
+        }
+
+
         // GET: Pago/Listar
         [HttpGet]
         public IActionResult Listar(

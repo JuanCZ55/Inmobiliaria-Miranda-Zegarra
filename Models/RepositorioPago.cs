@@ -52,10 +52,9 @@ namespace Inmobiliaria.Models
         {
           cmd.Parameters.AddWithValue("@concepto", pago.Concepto);
           cmd.Parameters.AddWithValue("@estado", pago.Estado);
-          cmd.Parameters.AddWithValue("@estado", pago.IdPago);
+          cmd.Parameters.AddWithValue("@id", pago.IdPago);
           conn.Open();
-          res = System.Convert.ToInt32(cmd.ExecuteScalar());
-          pago.IdContrato = res;
+          res = cmd.ExecuteNonQuery();
           conn.Close();
         }
       }
