@@ -51,121 +51,132 @@
       </tr>
     </thead>
     <tbody class="text-center">
-      @foreach (var i in Model)
-      {
-        <tr>
-          <td>@i.IdInquilino</td>
-          <td>@i.Dni</td>
-          <td>@i.Nombre</td>
-          <td>@i.Apellido</td>
-          <td>@i.Telefono</td>
-          <td>@i.Email</td>
-          <td>@i.Direccion</td>
-          <td class="d-flex justify-content-center">
-            <a href="/Contrato/Listar?dniInquilino=@i.Dni" class="btn btn-link" data-bs-toggle="tooltip"
-              title="Ver Contratos">
-              <img src="~/images/icon/Contrato.png" alt="">
-            </a>
-            <a asp-action="Modificar" asp-route-id="@i.IdInquilino" class="btn btn-link" data-bs-toggle="tooltip"
-              title="Modificar Inquilino">
-              <img src="~/images/icon/Editar.png" alt="Editar">
-            </a>
-            @if (User.IsInRole("Administrador")){
-              <form asp-action="Eliminar" asp-route-id="@i.IdInquilino" method="post">
-                <button type="submit" class="btn btn-link" data-bs-toggle="tooltip" title="Eliminar Inquilino">
-                  <img src="~/images/icon/Eliminar.png" alt="Eliminar" />
-                </button>
-              </form>
-            }
-          </td>
-        </tr>
-      }
-    </tbody>
+@if (Model != null && Model.Any())
+{
+  @foreach (var i in Model)
+  {
+          <tr>
+            <td>@i.IdInquilino</td>
+            <td>@i.Dni</td>
+            <td>@i.Nombre</td>
+            <td>@i.Apellido</td>
+            <td>@i.Telefono</td>
+            <td>@i.Email</td>
+            <td>@i.Direccion</td>
+            <td class="d-flex justify-content-center">
+              <a href="/Contrato/Listar?dniInquilino=@i.Dni" class="btn btn-link" data-bs-toggle="tooltip"
+                title="Ver Contratos">
+                <img src="~/images/icon/Contrato.png" alt="">
+              </a>
+              <a asp-action="Modificar" asp-route-id="@i.IdInquilino" class="btn btn-link" data-bs-toggle="tooltip"
+                title="Modificar Inquilino">
+                <img src="~/images/icon/Editar.png" alt="Editar">
+              </a>
+              @if (User.IsInRole("Administrador"))
+              {
+                <form asp-action="Eliminar" asp-route-id="@i.IdInquilino" method="post">
+                  <button type="submit" class="btn btn-link" data-bs-toggle="tooltip" title="Eliminar Inquilino">
+                    <img src="~/images/icon/Eliminar.png" alt="Eliminar" />
+                  </button>
+                </form>
+              }
+            </td>
+          </tr>
+  } 
+}
+  else
+  {
+    <tr>
+      <td colspan="8">No se encontraron inquilino.</td>
+    </tr>
+   }
+  </tbody>
   </table>
 
-</div>
+  </div>
 
-@if (totalPaginas > 1)
-{
-  <nav aria-label="Paginación" class="mt-3">
-    <ul class="pagination justify-content-center">
+  @if (totalPaginas > 1)
+  {
+    <nav aria-label="Paginación" class="mt-3">
+      <ul class="pagination justify-content-center">
 
-      @* Botón al inicio "<" *@
-      <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
-        <a class="page-link" asp-action="Listar" asp-route-dni="@dniFiltro" asp-route-PaginaActual="1">&lt;</a>
-      </li>
+        @* Botón al inicio "<" *@
+        <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+          <a class="page-link" asp-action="Listar" asp-route-dni="@dniFiltro" asp-route-PaginaActual="1">&lt;</a>
+        </li>
 
-      @{
-        int botonesCentrales = 8; // cantidad de botones centrales
-        int mitad = botonesCentrales / 2;
+        @{
+          int botonesCentrales = 8; // cantidad de botones centrales
+          int mitad = botonesCentrales / 2;
 
-        int inicio = Math.Max(paginaActual - mitad + 1, 1);
-        int fin = inicio + botonesCentrales - 1;
+          int inicio = Math.Max(paginaActual - mitad + 1, 1);
+          int fin = inicio + botonesCentrales - 1;
 
-        if (fin > totalPaginas - 2)
-        {
-          fin = totalPaginas - 2; // reservamos espacio para los dos últimos
-          inicio = Math.Max(fin - botonesCentrales + 1, 1);
+          if (fin > totalPaginas - 2)
+          {
+            fin = totalPaginas - 2; // reservamos espacio para los dos últimos
+            inicio = Math.Max(fin - botonesCentrales + 1, 1);
+          }
+
+          // Botones centrales
+          for (int i = inicio; i <= fin; i++)
+          {
+            <li class="page-item @(i == paginaActual ? "active" : "")">
+              <a class="page-link" asp-action="Listar" asp-route-dni="@dniFiltro" asp-route-PaginaActual="@i">@i</a>
+            </li>
+          }
+
+          @* Botón "..." *@
+          @if (fin < totalPaginas - 2)
+          {
+            <li class="page-item disabled"><span class="page-link">…</span></li>
+          }
+
+          @* Dos últimos botones *@
+          for (int i = Math.Max(totalPaginas - 1, fin + 1); i <= totalPaginas; i++)
+          {
+            <li class="page-item @(i == paginaActual ? "active" : "")">
+              <a class="page-link" asp-action="Listar" asp-route-dni="@dniFiltro" asp-route-PaginaActual="@i">@i</a>
+            </li>
+          }
         }
 
-        // Botones centrales
-        for (int i = inicio; i <= fin; i++)
-        {
-          <li class="page-item @(i == paginaActual ? "active" : "")">
-            <a class="page-link" asp-action="Listar" asp-route-dni="@dniFiltro" asp-route-PaginaActual="@i">@i</a>
-          </li>
+        @* Botón final ">" *@
+        <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+          <a class="page-link" asp-action="Listar" asp-route-dni="@dniFiltro"
+            asp-route-PaginaActual="@totalPaginas">&gt;</a>
+        </li>
+
+      </ul>
+    </nav>
+  }
+
+  @if (TempData["Mensaje"] != null)
+  {
+    <div id="mensajeAlerta" class="alert alert-success">@TempData["Mensaje"]</div>
+    <script>
+      setTimeout(function () {
+        var alerta = document.getElementById("mensajeAlerta");
+        if (alerta) {
+          alerta.style.transition = "opacity 0.5s ease";
+          alerta.style.opacity = "0";
+          setTimeout(() => alerta.remove(), 500);
         }
+      }, 5000);
+    </script>
+  }
 
-        @* Botón "..." *@
-        @if (fin < totalPaginas - 2)
-        {
-          <li class="page-item disabled"><span class="page-link">…</span></li>
+  @if (TempData["InquilinoCreado"] != null)
+  {
+    <div id="mensajeAlerta" class="alert alert-primary">@TempData["InquilinoCreado"]</div>
+    <script>
+      setTimeout(function () {
+        var alerta = document.getElementById("mensajeAlerta");
+        if (alerta) {
+          alerta.style.transition = "opacity 0.5s ease";
+          alerta.style.opacity = "0";
+          setTimeout(() => alerta.remove(), 500);
         }
-
-        @* Dos últimos botones *@
-        for (int i = Math.Max(totalPaginas - 1, fin + 1); i <= totalPaginas; i++)
-        {
-          <li class="page-item @(i == paginaActual ? "active" : "")">
-            <a class="page-link" asp-action="Listar" asp-route-dni="@dniFiltro" asp-route-PaginaActual="@i">@i</a>
-          </li>
-        }
-      }
-
-      @* Botón final ">" *@
-      <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
-        <a class="page-link" asp-action="Listar" asp-route-dni="@dniFiltro" asp-route-PaginaActual="@totalPaginas">&gt;</a>
-      </li>
-
-    </ul>
-  </nav>
-}
-
-@if (TempData["Mensaje"] != null)
-{
-  <div id="mensajeAlerta" class="alert alert-success">@TempData["Mensaje"]</div>
-  <script>
-    setTimeout(function () {
-      var alerta = document.getElementById("mensajeAlerta");
-      if (alerta) {
-        alerta.style.transition = "opacity 0.5s ease";
-        alerta.style.opacity = "0";
-        setTimeout(() => alerta.remove(), 500);
-      }
-    }, 5000);
-  </script>
-}
-
-@if (TempData["InquilinoCreado"] != null)
-{
-  <div id="mensajeAlerta" class="alert alert-primary">@TempData["InquilinoCreado"]</div>
-  <script>
-    setTimeout(function () {
-      var alerta = document.getElementById("mensajeAlerta");
-      if (alerta) {
-        alerta.style.transition = "opacity 0.5s ease";
-        alerta.style.opacity = "0";
-        setTimeout(() => alerta.remove(), 500);
-      }
-    }, 5000);
-  </script>
-}
+      }, 5000);
+    </script>
+  }
