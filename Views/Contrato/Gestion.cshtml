@@ -174,8 +174,7 @@
                     Cancelar
                   </button>
                 </div>
-
-                @if (Model.CreatedAt.Date == DateTime.Today && ViewBag.Pagos)
+                if (Model.IdContrato > 0)
                 {
                   <div class="">
                     <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal"
@@ -183,6 +182,7 @@
                       onclick="traerFechas(@Model.IdInmueble, @Model.IdContrato)">Editar</button>
                   </div>
                 }
+
               }
               @if (Model.Estado == "Cancelado con Multa Pendiente")
               {
@@ -365,7 +365,7 @@
         </div>
       </div>
     </div>
-    @if (Model.CreatedAt.Date == DateTime.Today)
+    @if (Model.IdContrato > 0)
     {
       <div class="modal fade" id="editContratoModal" tabindex="-1" aria-labelledby="editContratoModalLabel"
         aria-hidden="true">
@@ -708,7 +708,7 @@
             contratosExistentes = JSON.parse('@Html.Raw(ViewBag.ListFechas)');
           </text>
       }
-          var pickers = {};
+              var pickers = {};
 
       function buildDisabledRanges(contratos) {
         if (!Array.isArray(contratos)) return [];
