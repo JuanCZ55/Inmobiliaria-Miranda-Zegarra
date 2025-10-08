@@ -120,21 +120,7 @@
               <a asp-action="Ver" asp-route-IdUsuario="@i.IdUsuario" data-bs-toggle="tooltip" title="Gestionar Usuario">
                 <img src="~/images/icon/Gestionar.png" alt="Gestionar" />
               </a>
-              @if (User.FindFirst("IdUsuario")?.Value != i.IdUsuario.ToString())
-              {
-                <form asp-action="Eliminar" method="post">
-                  <input type="hidden" name="id" value="@i.IdUsuario" />
-                  <button type="submit" class="btn btn-link" data-bs-toggle="tooltip" title="Eliminar Usuario">
-                    <img src="~/images/icon/Eliminar.png" alt="Eliminar" />
-                  </button>
-                </form>
-              }
-              else
-              {
-                <button class="btn btn-link fake-disabled" data-bs-toggle="tooltip" title="No puedes eliminarte asi mismo">
-                  <img src="~/images/icon/Eliminar.png" alt="Eliminar" />
-                </button>
-              }
+
             </td>
           </tr>
         }
