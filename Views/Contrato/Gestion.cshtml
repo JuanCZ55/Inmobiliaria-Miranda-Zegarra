@@ -594,6 +594,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     @if (Model?.IdContrato == 0)
     {
+      <script src="/js/monto.js"></script>
 
       <script>
         async function buscarInquilino() {
@@ -708,7 +709,7 @@
             contratosExistentes = JSON.parse('@Html.Raw(ViewBag.ListFechas)');
           </text>
       }
-              var pickers = {};
+                              var pickers = {};
 
       function buildDisabledRanges(contratos) {
         if (!Array.isArray(contratos)) return [];

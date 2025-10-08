@@ -216,12 +216,19 @@ namespace Inmobiliaria.Controllers
                 {
                     if (contrato.IdUsuarioCreador > 0)
                     {
-                        var usuarioCreador = repositorioUsuario.ObtenerPorId(contrato.IdUsuarioCreador);
+                        var usuarioCreador = repositorioUsuario.ObtenerPorId(
+                            contrato.IdUsuarioCreador
+                        );
                         ViewBag.UsuarioCreador = usuarioCreador;
                     }
-                    if (contrato.IdUsuarioFinalizador.HasValue && contrato.IdUsuarioFinalizador.Value > 0)
+                    if (
+                        contrato.IdUsuarioFinalizador.HasValue
+                        && contrato.IdUsuarioFinalizador.Value > 0
+                    )
                     {
-                        var usuarioFinalizador = repositorioUsuario.ObtenerPorId(contrato.IdUsuarioFinalizador.Value);
+                        var usuarioFinalizador = repositorioUsuario.ObtenerPorId(
+                            contrato.IdUsuarioFinalizador.Value
+                        );
                         ViewBag.UsuarioFinalizador = usuarioFinalizador;
                     }
                 }
@@ -324,6 +331,19 @@ namespace Inmobiliaria.Controllers
                         pago.Concepto = "Deposito de dos meses";
                         pago.Monto = contrato.Monto * 2;
                     }
+                }
+
+                var idUsuarioClaim = User.FindFirstValue("IdUsuario");
+                if (int.TryParse(idUsuarioClaim, out int idUsuario))
+                {
+                    contrato.IdUsuarioCreador = idUsuario;
+                }
+                else
+                {
+                    TempData["Error"] =
+                        "No se pudo identificar al usuario creador. Sesión inválida.";
+                    TempData["Contrato"] = JsonSerializer.Serialize(contrato);
+                    return RedirectToAction("Ver", "Contrato", new { id });
                 }
                 var idContrato = repositorio.CrearContratoConPago(contrato, pago);
                 if (idContrato <= 0)
