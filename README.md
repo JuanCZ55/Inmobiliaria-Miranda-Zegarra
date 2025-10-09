@@ -6,7 +6,11 @@ Una aplicación web para gestionar propiedades, contratos, inquilinos y pagos.
 
 - Ariel Ismael Miranda Salmin
 - Juan Cruz Zegarra
-
+  
+## Credenciales
+- Administrador: user01@gmail.com   
+- Empleado: user02@gmail.com   
+- Contraseña: 123456789
 ## Descripción
 
 Esta aplicación permite a administradores y agentes gestionar una cartera de inmuebles, registrar y mantener inquilinos, crear y controlar contratos de arrendamiento, registrar pagos y generar vistas de calendario y listados. Está pensada para pequeñas inmobiliarias y administradores de propiedades que necesitan centralizar la información y agilizar procesos administrativos.
