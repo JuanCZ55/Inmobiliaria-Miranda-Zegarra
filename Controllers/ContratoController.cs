@@ -488,6 +488,11 @@ namespace Inmobiliaria.Controllers
         public List<string> ValidarFechaContrato(Contrato contrato)
         {
             var errores = new List<string>();
+            if (contrato.FechaInicio > contrato.FechaCancelacion)
+            {
+                errores.Add("Fechas invalidas");
+                return errores;
+            }
             try
             {
                 if (repositorio.ValidarSolapamiento(contrato) != 0)
