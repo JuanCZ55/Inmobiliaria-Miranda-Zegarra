@@ -4,8 +4,8 @@ Una aplicación web para gestionar propiedades, contratos, inquilinos y pagos.
 
 ## Autor
 
-Ariel Ismael Miranda Salmin
-Juan Cruz Zegarra
+- Ariel Ismael Miranda Salmin
+- Juan Cruz Zegarra
 
 ## Descripción
 
@@ -74,21 +74,3 @@ Breve descripción de carpetas relevantes:
 - `wwwroot/` - Archivos estáticos: CSS, JS e imágenes.
 - `Services/` - Servicios auxiliares (por ejemplo: manejo de archivos/imagenes).
 
-## Cómo contribuir
-
-Las contribuciones son bienvenidas. Pasos recomendados:
-
-1. Haz un fork del repositorio.
-2. Crea una rama con la descripción del cambio: `git checkout -b feat/nombre-caracteristica`.
-3. Realiza commits claros y atómicos.
-4. Envía un Pull Request describiendo los cambios y el motivo.
-
-Antes de enviar cambios mayores, abre un issue para discutir la propuesta.
-
-## Despliegue (opcional)
-
-Recomendaciones rápidas para producción:
-
-- Configura una instancia de SQL Server administrada o Azure SQL.
-- Usa variables de entorno para cadenas de conexión y secretos.
-- Publica la aplicación con `dotnet publish -c Release` y despliega en IIS, Azure App Service o un contenedor Docker.
