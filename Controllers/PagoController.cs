@@ -2,6 +2,7 @@ using System.Text.Json;
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Inmobiliaria.Controllers
 {
@@ -13,6 +14,7 @@ namespace Inmobiliaria.Controllers
         private readonly IRepositorioInmueble repositorioInmueble;
         private readonly IRepositorioInquilino repositorioInquilino;
         private readonly IRepositorioContrato repositorioContraro;
+        private readonly IRepositorioUsuario repositorioUsuario;
         private readonly IConfiguration config;
 
         // GET: Contrato
@@ -22,6 +24,7 @@ namespace Inmobiliaria.Controllers
             IRepositorioInmueble repositorioInmueble,
             IRepositorioInquilino repositorioInquilino,
             IRepositorioContrato repositorioContraro,
+            IRepositorioUsuario repositorioUsuario,
             IConfiguration config
         )
         {
@@ -30,6 +33,7 @@ namespace Inmobiliaria.Controllers
             this.repositorioInmueble = repositorioInmueble;
             this.repositorioInquilino = repositorioInquilino;
             this.repositorioContraro = repositorioContraro;
+            this.repositorioUsuario = repositorioUsuario;
             this.config = config;
         }
 
@@ -104,6 +108,10 @@ namespace Inmobiliaria.Controllers
             {
                 pago = repositorio.ObtenerPorID(id);
                 pago.contrato = repositorioContraro.ObtenerPorID(pago.IdContrato);
+                if (User.IsInRole("Administrador"))
+                {
+                    pago.user = repositorioUsuario.ObtenerPorId(pago.IdUsuario);
+                }
                 return View("Gestion", pago);
             }
             catch (System.Exception)
@@ -121,37 +129,54 @@ namespace Inmobiliaria.Controllers
             {
                 TempData["MensajeError"] = "Modelo invalido";
                 TempData["Pago"] = JsonSerializer.Serialize(pago);
-                return RedirectToAction("Crear");
+                return RedirectToAction("Crear", new { idContrato=pago.IdContrato });
             }
             try
             {
                 Contrato contrato = repositorioContraro.ObtenerPorID(pago.IdContrato);
-                if (contrato.Estado == "Finalizado")
-                {
-                    TempData["MensajeError"] = "Contrato Finalizado";
-                    TempData["Pago"] = JsonSerializer.Serialize(pago);
-                    return RedirectToAction("Crear");
-                }
-                if (contrato.Estado == "Cancelado con Multa Saldada")
-                {
-                    TempData["MensajeError"] = "Contrato Cancelado";
-                    TempData["Pago"] = JsonSerializer.Serialize(pago);
-                    return RedirectToAction("Crear");
-                }
-
                 if (pago.FechaPago != DateTime.Today)
                 {
                     TempData["MensajeError"] = "Fachas Invalidas";
                     TempData["Pago"] = JsonSerializer.Serialize(pago);
-                    return RedirectToAction("Crear");
+                    return RedirectToAction("Crear", new { idContrato=pago.IdContrato });
                 }
                 pago.numeroPago = repositorio.CantidadPago(pago.IdContrato) + 1;
+
+                var idUsuarioClaim = User.FindFirstValue("IdUsuario");
+                if (int.TryParse(idUsuarioClaim, out int idUsuario))
+                {
+                    pago.IdUsuario = idUsuario;
+                }
+                else
+                {
+                    TempData["Error"] =
+                        "No se pudo identificar al usuario creador. Sesión inválida.";
+                    return RedirectToAction("Crear", new { idContrato=pago.IdContrato });
+                }
+
+
+                if (pago.Concepto == "Multa de Cancelacion")
+                {
+                    if (contrato.Estado != "Cancelado con Multa Pendiente" || contrato.Estado != "Cancelado con Multa Saldada")
+                    {
+                        TempData["Error"] =
+                            "Ese concepto de pago es unicamente para los contratos Cancelados";
+                        return RedirectToAction("Crear", new { idContrato=pago.IdContrato });
+                    }   
+                    if ( pago.Monto < contrato.Multa)
+                    {
+                        TempData["Error"] =
+                            "La multa se debe pagar en un unico pago";
+                        return RedirectToAction("Crear", new { idContrato=pago.IdContrato });
+                    }   
+                }
+
                 var idPago = repositorio.Crear(pago);
                 if (idPago <= 0)
                 {
                     TempData["MensajeError"] = "Error al crear el pago";
                     TempData["Pago"] = JsonSerializer.Serialize(pago);
-                    return RedirectToAction("Crear");
+                    return RedirectToAction("Crear", new { idContrato=pago.IdContrato });
                 }
                 TempData["Success"] = "Pago Creado";
                 return RedirectToAction("Ver", new { id = idPago });
@@ -160,7 +185,7 @@ namespace Inmobiliaria.Controllers
             {
                 TempData["MensajeError"] = "Modelo invalido";
                 TempData["Pago"] = JsonSerializer.Serialize(pago);
-                return RedirectToAction("Crear");
+                return RedirectToAction("Crear", new { idContrato=pago.IdContrato });
             }
         }
 
@@ -183,7 +208,7 @@ namespace Inmobiliaria.Controllers
                 }
 
                 Contrato contrato = repositorioContraro.ObtenerPorID(pagoExistente.IdContrato);
-                if (contrato.Estado == "Finalizado" || contrato.Estado == "Cancelado con Multa Saldada")
+                if (contrato.Estado == "Cancelado con Multa Pendiente" || contrato.Estado == "Cancelado con Multa Saldada")
                 {
                     TempData["Error"] = "No se pueden modificar pagos de un contrato que ya ha finalizado o ha sido cancelado.";
                     return RedirectToAction("Ver", new { id = pago.IdPago });
@@ -209,7 +234,6 @@ namespace Inmobiliaria.Controllers
                 return RedirectToAction("Ver", new { id = pago.IdPago });
             }
         }
-
 
         // GET: Pago/Listar
         [HttpGet]
@@ -296,6 +320,17 @@ namespace Inmobiliaria.Controllers
                     numeroPago = repositorio.CantidadPago(IdContrato) + 1,
                     Concepto = "Multa de Cancelacion",
                 };
+                var idUsuarioClaim = User.FindFirstValue("IdUsuario");
+                if (int.TryParse(idUsuarioClaim, out int idUsuario))
+                {
+                    pago.IdUsuario = idUsuario;
+                }
+                else
+                {
+                    TempData["Error"] =
+                        "No se pudo identificar al usuario creador. Sesión inválida.";
+                    return RedirectToAction("Ver", "Contrato", new { id = IdContrato });
+                }
                 int id = repositorio.Crear(pago);
                 if (id <= 0)
                 {
@@ -312,6 +347,7 @@ namespace Inmobiliaria.Controllers
             }
         }
 
+        [HttpPost]
         public IActionResult CancelarPago(int idPago)
         {
             try
@@ -333,6 +369,8 @@ namespace Inmobiliaria.Controllers
             }
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public IActionResult ActivarPago(int idPago)
         {
             try
