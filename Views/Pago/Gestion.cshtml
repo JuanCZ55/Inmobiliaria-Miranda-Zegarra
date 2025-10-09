@@ -63,6 +63,17 @@
               </div>
               <input asp-for="IdContrato" type="hidden" />
               <input asp-for="IdPago" type="hidden" />
+              if (User.IsInRole("Administrador"))
+              {
+                <div class="col-12 mb-3">
+                  <label class="form-label">Usuario Creador</label>
+                  <div class="input-group">
+                    <input class="form-control" type="text" value="@Model.user?.Nombre @Model.user?.Apellido" readonly />
+                    <a class="btn btn-outline-secondary" asp-controller="Usuario" asp-action="Ver"
+                      asp-route-IdUsuario="@Model.IdUsuario" title="Ver perfil del creador">Ver</a>
+                  </div>
+                </div>
+              }
             }
           </div>
         </div>
@@ -76,15 +87,13 @@
             <button type="button" class="btn btn-primary" data-action="ModificarPago">Modificar Pago</button>
             @if (Model.Estado == 1)
             {
-              <button type="button" class="btn btn-outline-danger" data-action="CancelarPago"
-              @(Model.contrato?.Estado == "Finalizado" || Model.contrato?.Estado == "Cancelado con Multa Saldada" ? "disabled" : "")>
+              <button type="button" class="btn btn-outline-danger" data-action="CancelarPago">
                 Cancelar Pago
               </button>
             }
-            else if (Model.Estado == 2)
+            else if (Model.Estado == 2 && User.IsInRole("Administrador"))
             {
-              <button type="button" class="btn btn-outline-success" data-action="ActivarPago"
-              @(Model.contrato?.Estado == "Finalizado" || Model.contrato?.Estado == "Cancelado con Multa Saldada" ? "disabled" : "")>
+              <button type="button" class="btn btn-outline-success" data-action="ActivarPago">
                 Activar Pago
               </button>
             }
