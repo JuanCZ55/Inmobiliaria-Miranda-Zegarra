@@ -11,7 +11,7 @@
     <div class="col-md-10 shadow-lg rounded border bg-light p-5 h-100">
       <form asp-action="@(Model.IdContrato == 0 ? "CrearContrato" : null)" method="post"
         class="h-100 d-flex flex-column justify-content-center">
-        <div class="h-100 px-5 d-flex flex-column justify-content-between">
+        <div class="h-100 d-flex flex-column justify-content-between">
           <div>
             <h2 class="text-center mb-4">Contrato</h2>
 
@@ -65,7 +65,7 @@
                 </div>
               }
 
-              <div class="row">
+              <div class="row pe-0">
                 <div class="col-6 mb-3">
                   <label asp-for="FechaInicio" class="form-label">Fecha Desde</label>
                   <input asp-for="FechaInicio" class="form-control bg-white" type="date"
@@ -75,7 +75,7 @@
 
                   <span asp-validation-for="FechaInicio" class="text-danger"></span>
                 </div>
-                <div class="col-6 mb-3">
+                <div class="col-6 mb-3 pe-0">
                   <label asp-for="FechaFinalizacion" class="form-label">Fecha Hasta</label>
                   <input asp-for="FechaFinalizacion" class="form-control bg-white" type="date"
                     id="@(Model.Estado == "Finalizado" ? "fechaInicioMain" : "fechaFin")" data-new="true"
@@ -85,7 +85,7 @@
                   <span asp-validation-for="FechaFinalizacion" class="text-danger"></span>
                 </div>
 
-                <div class="col-12 mb-3">
+                <div class="col-12 mb-3 pe-0">
                   <label asp-for="Monto" class="form-label">Monto</label>
                   <input asp-for="Monto" type="number" class="form-control" readonly=@(Model.IdContrato > 0) />
                   <span asp-validation-for="Monto" class="text-danger"></span>
@@ -163,26 +163,22 @@
               <div class="">
                 <a class="btn btn-outline-success" href="/Pago/Listar?idContrato=@Model.IdContrato">Pagos</a>
               </div>
+              <div class="">
+                <a class="btn btn-outline-primary" href="/Pago/Crear?idContrato=@Model.IdContrato">Pagar</a>
+              </div>
               @if (Model.Estado == "Vigente")
               {
-                <div class="">
-                  <a class="btn btn-outline-primary" href="/Pago/Crear?idContrato=@Model.IdContrato">Pagar</a>
-                </div>
                 <div class="">
                   <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal"
                     data-bs-target="#cancelContratoModal">
                     Cancelar
                   </button>
                 </div>
-                if (Model.IdContrato > 0)
-                {
-                  <div class="">
-                    <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal"
-                      data-bs-target="#editContratoModal" id="btnOpenEditModal"
-                      onclick="traerFechas(@Model.IdInmueble, @Model.IdContrato)">Editar</button>
-                  </div>
-                }
-
+                <div class="">
+                  <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal"
+                    data-bs-target="#editContratoModal" id="btnOpenEditModal"
+                    onclick="traerFechas(@Model.IdInmueble, @Model.IdContrato)">Editar</button>
+                </div>
               }
               @if (Model.Estado == "Cancelado con Multa Pendiente")
               {
@@ -365,91 +361,88 @@
         </div>
       </div>
     </div>
-    @if (Model.IdContrato > 0)
-    {
-      <div class="modal fade" id="editContratoModal" tabindex="-1" aria-labelledby="editContratoModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header bg-azul-oscuro color-gris">
-              <h5 class="modal-title" id="editContratoModalLabel">Editar contrato</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-              <form asp-action="ModificarContrato" method="post">
-                <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
-                <input type="hidden" name="IdInmueble" value="@Model.IdInmueble" />
-                <input type="hidden" name="IdInquilino" value="@Model.IdInquilino" />
+    <div class="modal fade" id="editContratoModal" tabindex="-1" aria-labelledby="editContratoModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-azul-oscuro color-gris">
+            <h5 class="modal-title" id="editContratoModalLabel">Editar contrato</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <form asp-action="ModificarContrato" method="post">
+              <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
+              <input type="hidden" name="IdInmueble" value="@Model.IdInmueble" />
+              <input type="hidden" name="IdInquilino" value="@Model.IdInquilino" />
 
-                <div class="row">
-                  <div class="col-12 mb-3">
-                    <label class="form-label">Tipo de Pago</label>
-                    <select name="Tipo" class="form-select" id="TipoModal">
-                      <option value="1" selected=@(Model.Tipo == 1 ? "selected" : null)>Pago Total (Diario)</option>
-                      <option value="2" selected=@(Model.Tipo == 2 ? "selected" : null)>Pagos Mensuales</option>
-                    </select>
-                  </div>
-
-                  <div class="col-12 mb-3">
-                    <label class="form-label">Fecha Desde</label>
-                    <input name="FechaInicio" type="date" class="form-control" id="fechaInicioModal"
-                      value="@(Model.FechaInicio.ToString("yyyy-MM-dd"))" data-new="false" required />
-                    <span asp-validation-for="FechaInicio" class="text-danger"></span>
-                  </div>
-
-                  <div class="col-12 mb-3">
-                    <label class="form-label">Fecha Hasta</label>
-                    <input name="FechaFinalizacion" type="date" class="form-control" id="fechaFinModal"
-                      value="@(Model.FechaFinalizacion.ToString("yyyy-MM-dd"))" data-new="false" required />
-                    <span asp-validation-for="FechaFinalizacion" class="text-danger"></span>
-                  </div>
-
-                  <div class="col-12 mb-3">
-                    <label class="form-label">Monto</label>
-                    <input name="Monto" type="text" class="form-control"
-                      value="@(Model.Monto.ToString(System.Globalization.CultureInfo.InvariantCulture))" required />
-                    <span asp-validation-for="Monto" class="text-danger"></span>
-                  </div>
+              <div class="row">
+                <div class="col-12 mb-3">
+                  <label class="form-label">Tipo de Pago</label>
+                  <select name="Tipo" class="form-select" id="TipoModal">
+                    <option value="1" selected=@(Model.Tipo == 1 ? "selected" : null)>Pago Total (Diario)</option>
+                    <option value="2" selected=@(Model.Tipo == 2 ? "selected" : null)>Pagos Mensuales</option>
+                  </select>
                 </div>
 
-                <div class="d-flex justify-content-end">
-                  <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cerrar</button>
-                  <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                <div class="col-12 mb-3">
+                  <label class="form-label">Fecha Desde</label>
+                  <input name="FechaInicio" type="date" class="form-control" id="fechaInicioModal"
+                    value="@(Model.FechaInicio.ToString("yyyy-MM-dd"))" data-new="false" required />
+                  <span asp-validation-for="FechaInicio" class="text-danger"></span>
                 </div>
-              </form>
-            </div>
+
+                <div class="col-12 mb-3">
+                  <label class="form-label">Fecha Hasta</label>
+                  <input name="FechaFinalizacion" type="date" class="form-control" id="fechaFinModal"
+                    value="@(Model.FechaFinalizacion.ToString("yyyy-MM-dd"))" data-new="false" required />
+                  <span asp-validation-for="FechaFinalizacion" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 mb-3">
+                  <label class="form-label">Monto</label>
+                  <input name="Monto" type="text" class="form-control"
+                    value="@(Model.Monto.ToString(System.Globalization.CultureInfo.InvariantCulture))" required />
+                  <span asp-validation-for="Monto" class="text-danger"></span>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cerrar</button>
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
-      @if (ViewBag.Pagos)
-      {
-        <div class="modal fade" id="deleteContratoModal" tabindex="-1" aria-labelledby="deleteContratoModalLabel"
-          aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteContratoModalLabel">Eliminar Contrato</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-              </div>
-              <div class="modal-body">
-                <p>¿Estás seguro de que deseas eliminar este contrato?</p>
-                <p>Al confirmar, también se eliminarán <strong>todos los pagos</strong> asociados a este contrato.</p>
-                <p class="small text-muted">Esta acción no se puede deshacer.</p>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-
-                <form asp-action="EliminarContrato" method="post" class="d-inline">
-                  <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
-                  <button type="submit" class="btn btn-danger">Eliminar</button>
-                </form>
-              </div>
-            </div>
+    </div>
+  }
+  @if (User.IsInRole("Administrador"))
+  {
+    <div class="modal fade" id="deleteContratoModal" tabindex="-1" aria-labelledby="deleteContratoModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="deleteContratoModalLabel">Eliminar Contrato</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p>¿Estás seguro de que deseas eliminar este contrato?</p>
+            <p>Al confirmar, también se eliminarán <strong>todos los pagos</strong> asociados a este contrato.</p>
+            <p class="small text-muted">Esta acción no se puede deshacer.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <form asp-action="EliminarContrato" method="post" class="d-inline">
+              <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
           </div>
         </div>
-      }
-    }
+      </div>
+    </div>
   }
+
   @if (Model.Estado == "Finalizado")
   {
     <div class="modal fade" id="renovarContratoModal" tabindex="-1" aria-labelledby="renovarContratoModalLabel"
@@ -586,8 +579,7 @@
       })();
     </script>
   }
-  @if (Model?.IdContrato == 0 || (Model?.Estado == "Vigente" && Model?.CreatedAt.Date == DateTime.Today && ViewBag.Pagos)
-  || Model?.Estado == "Finalizado")
+  @if (Model?.IdContrato == 0 || Model?.Estado == "Vigente" || Model?.Estado == "Finalizado")
   {
 
 
@@ -687,6 +679,29 @@
         }
       </script>
     }
+    @if(Model?.Estado=="Vigente"){
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            const fechaInicioInput = document.getElementById('fechaInicioModal');
+            const fechaFinInput = document.getElementById('fechaFinModal');
+
+            if (!fechaInicioInput || !fechaFinInput) return;
+
+            // Deshabilitamos el campo de fecha fin al cargar el modal
+            fechaFinInput.disabled = true;
+
+            // Habilitar solo si el usuario cambia la fecha de inicio
+            fechaInicioInput.addEventListener('change', function () {
+              if (fechaInicioInput.value) {
+                fechaFinInput.disabled = false;
+              } else {
+                fechaFinInput.disabled = true;
+              }
+            });
+          });
+        </script>
+
+    }
     <script>
       async function traerFechas(idInmueble, idContrato = '') {
         if (!idInmueble) return; // nada que consultar
@@ -695,6 +710,7 @@
           const resp = await fetch(url);
           if (!resp.ok) { console.error("Error fetch fechas:", resp.status); return; }
           contratosExistentes = await resp.json(); // [{ inicio:'YYYY-MM-DD', fin:'YYYY-MM-DD' }, ...]
+          console.log(contratosExistentes);
           initAllCalendars(); // re-crea/actualiza calendarios con los datos nuevos
         } catch (err) {
           console.error("traerFechas error", err);
@@ -709,7 +725,7 @@
             contratosExistentes = JSON.parse('@Html.Raw(ViewBag.ListFechas)');
           </text>
       }
-                              var pickers = {};
+                                      var pickers = {};
 
       function buildDisabledRanges(contratos) {
         if (!Array.isArray(contratos)) return [];
