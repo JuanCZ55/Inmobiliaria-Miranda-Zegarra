@@ -754,13 +754,17 @@ namespace Inmobiliaria.Models
                     {
                         while (reader.Read())
                         {
-                            contratos.Add(
-                                new Contrato
+                            var fechaDesde = reader.GetDateTime("fecha_desde");
+                            var fechaHasta = reader.GetDateTime("fecha_hasta");
+
+                            if (fechaDesde <= fechaHasta)
+                            {
+                                contratos.Add(new Contrato
                                 {
-                                    FechaInicio = reader.GetDateTime("fecha_desde"),
-                                    FechaFinalizacion = reader.GetDateTime("fecha_hasta"),
-                                }
-                            );
+                                    FechaInicio = fechaDesde,
+                                    FechaFinalizacion = fechaHasta
+                                });
+                            }
                         }
                     }
                 }
