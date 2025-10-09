@@ -140,14 +140,6 @@
             else
             {
               <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-
-              @if (!esUsuarioActual)
-              {
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal"
-                  title="Eliminar usuario">
-                  Eliminar
-                </button>
-              }
             }
             <a href="@Url.Action("Listar")" class="btn btn-secondary">Volver</a>
           </div>
