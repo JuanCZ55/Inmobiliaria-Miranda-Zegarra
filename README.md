@@ -1,4 +1,4 @@
-# Sisitema de Inmobiliaria
+# Sistema de Inmobiliaria
 
 Una aplicación web para gestionar propiedades, contratos, inquilinos y pagos.
 
