@@ -10,7 +10,7 @@
   <div class="col-md-6 py-5 d-flex justify-content-center">
     <div class="col-md-10 shadow-lg rounded border bg-light p-5 h-100">
       <form asp-action="@(Model.IdContrato == 0 ? "CrearContrato" : null)" method="post"
-        class="h-100 d-flex flex-column justify-content-center">
+        class="h-100 d-flex flex-column justify-content-center" autocomplete="off">
         <div class="h-100 d-flex flex-column justify-content-between">
           <div>
             <h2 class="text-center mb-4">Contrato</h2>
@@ -71,7 +71,7 @@
                   <input asp-for="FechaInicio" class="form-control bg-white" type="date"
                     id="@(Model.Estado == "Finalizado" ? "fechaInicioMain" : "fechaInicio")" data-new="true"
                     disabled=@(Model.IdContrato > 0)
-                    value="@(Model.IdContrato == 0 ? "" : Model.FechaInicio.ToString("yyyy-MM-dd"))" />
+                    value="@(Model.IdContrato == 0 ?  Model.FechaInicio.ToString("yyyy-MM-dd") : "")" />
 
                   <span asp-validation-for="FechaInicio" class="text-danger"></span>
                 </div>
@@ -166,14 +166,17 @@
               <div class="">
                 <a class="btn btn-outline-primary" href="/Pago/Crear?idContrato=@Model.IdContrato">Pagar</a>
               </div>
-              @if (Model.Estado == "Vigente")
+              @if (Model.Estado == "Vigente" || Model?.Estado == "Finalizado")
               {
-                <div class="">
-                  <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal"
-                    data-bs-target="#cancelContratoModal">
-                    Cancelar
-                  </button>
-                </div>
+                @if (Model.Estado == "Vigente")
+                {
+                  <div class="">
+                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal"
+                      data-bs-target="#cancelContratoModal">
+                      Cancelar
+                    </button>
+                  </div>
+                }
                 <div class="">
                   <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal"
                     data-bs-target="#editContratoModal" id="btnOpenEditModal"
@@ -286,7 +289,7 @@
     <div class="modal fade" id="pagarMultaModal" tabindex="-1" aria-labelledby="pagarMultaModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <form asp-controller="Pago" asp-action="PagarMulta" method="post" id="pagarMultaForm" novalidate>
+          <form asp-controller="Pago" asp-action="PagarMulta" method="post" id="pagarMultaForm" novalidate autocomplete="off">
             <div class="modal-header bg-warning text-dark">
               <h5 class="modal-title" id="pagarMultaModalLabel">Pagar multa</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -308,59 +311,60 @@
       </div>
     </div>
   }
-  @if (Model.Estado == "Vigente")
+  @if (Model.Estado == "Vigente" || Model.Estado == "Finalizado")
   {
-    <div class="modal fade" id="cancelContratoModal" tabindex="-1" aria-labelledby="cancelContratoModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <form asp-action="CancelarContrato" method="post" id="cancelContratoForm" novalidate>
-            <div class="modal-header bg-warning text-dark">
-              <h5 class="modal-title" id="cancelContratoModalLabel">Cancelar contrato</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-
-            <div class="modal-body">
-              <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
-
-              <p class="mb-2">¿Seguro que deseas cancelar este contrato?</p>
-
-              @if (Model.Tipo == 1)
-              {
-                <div class="alert alert-warning py-2 mb-0" role="alert">
-                  Se perderá lo que quede del <strong>depósito</strong>.
-                </div>
-              }
-              else
-              {
-                <div class="alert alert-danger py-2 mb-0" role="alert">
-                  Tendrá que pagar una <strong>multa</strong>.
-                </div>
-              }
-              <p class="small text-muted mb-1">Esta acción no se puede deshacer.</p>
-
-              <div class="mb-1">
-                <label for="MultaInput" class="form-label mb-0 fw-bold">Multa</label>
+    @if (Model.Estado == "Vigente")
+    {
+      <div class="modal fade" id="cancelContratoModal" tabindex="-1" aria-labelledby="cancelContratoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <form asp-action="CancelarContrato" method="post" id="cancelContratoForm" novalidate autocomplete="off">
+              <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="cancelContratoModalLabel">Cancelar contrato</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
               </div>
-              <input id="MultaInput" name="Multa" value="@Model.Multa" class="form-control" min="0" step="0.01" required />
-              @if (Model.Tipo == 1)
-              {
-                <div class="form-text mt-0">Puedes cobrarle una multa por cancelar el contrato.</div>
-              }
-              else
-              {
-                <div class="form-text mt-0">Valor de multa sugerido: $ @Model.Multa</div>
-              }
-            </div>
+              <div class="modal-body">
+                <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
 
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
-              <button type="submit" class="btn btn-warning">Confirmar cancelación</button>
-            </div>
-          </form>
+                <p class="mb-2">¿Seguro que deseas cancelar este contrato?</p>
+
+                @if (Model.Tipo == 1)
+                {
+                  <div class="alert alert-warning py-2 mb-0" role="alert">
+                    Se perderá lo que quede del <strong>depósito</strong>.
+                  </div>
+                }
+                else
+                {
+                  <div class="alert alert-danger py-2 mb-0" role="alert">
+                    Tendrá que pagar una <strong>multa</strong>.
+                  </div>
+                }
+                <p class="small text-muted mb-1">Esta acción no se puede deshacer.</p>
+
+                <div class="mb-1">
+                  <label for="MultaInput" class="form-label mb-0 fw-bold">Multa</label>
+                </div>
+                <input id="MultaInput" name="Multa" value="@Model.Multa" class="form-control" min="0" step="0.01" required />
+                @if (Model.Tipo == 1)
+                {
+                  <div class="form-text mt-0">Puedes cobrarle una multa por cancelar el contrato.</div>
+                }
+                else
+                {
+                  <div class="form-text mt-0">Valor de multa sugerido: $ @Model.Multa</div>
+                }
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+                <button type="submit" class="btn btn-warning">Confirmar cancelación</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    }
     <div class="modal fade" id="editContratoModal" tabindex="-1" aria-labelledby="editContratoModalLabel"
       aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -369,8 +373,14 @@
             <h5 class="modal-title" id="editContratoModalLabel">Editar contrato</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
-          <div class="modal-body">
-            <form asp-action="ModificarContrato" method="post">
+          <div class="p-2 pb-0">
+            <div class="container mb-0 alert alert-warning">
+              <h6 class="card-subtitle">Atención</h6>
+              <span class="small text-muted">Al modificar este contrato, recordá verificar si necesitás registrar un pago adicional o un ajuste para el depósito inicial.</span>
+            </div>
+          </div>
+          <div class="modal-body pt-2">
+            <form asp-action="ModificarContrato" method="post" autocomplete="off">
               <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
               <input type="hidden" name="IdInmueble" value="@Model.IdInmueble" />
               <input type="hidden" name="IdInquilino" value="@Model.IdInquilino" />
@@ -384,14 +394,14 @@
                   </select>
                 </div>
 
-                <div class="col-12 mb-3">
+                <div class="col-6 mb-3">
                   <label class="form-label">Fecha Desde</label>
                   <input name="FechaInicio" type="date" class="form-control" id="fechaInicioModal"
                     value="@(Model.FechaInicio.ToString("yyyy-MM-dd"))" data-new="false" required />
                   <span asp-validation-for="FechaInicio" class="text-danger"></span>
                 </div>
 
-                <div class="col-12 mb-3">
+                <div class="col-6 mb-3">
                   <label class="form-label">Fecha Hasta</label>
                   <input name="FechaFinalizacion" type="date" class="form-control" id="fechaFinModal"
                     value="@(Model.FechaFinalizacion.ToString("yyyy-MM-dd"))" data-new="false" required />
@@ -433,7 +443,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <form asp-action="EliminarContrato" method="post" class="d-inline">
+            <form asp-action="EliminarContrato" method="post" class="d-inline" autocomplete="off">
               <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
               <button type="submit" class="btn btn-danger">Eliminar</button>
             </form>
@@ -454,7 +464,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
 
-          <form asp-action="RenovarContrato" method="post">
+          <form asp-action="RenovarContrato" method="post" autocomplete="off">
             <div class="modal-body">
               <input type="hidden" name="IdContratoOriginal" value="@Model.IdContrato" />
               <input type="hidden" name="IdInmueble" value="@Model.IdInmueble" />
@@ -679,27 +689,28 @@
         }
       </script>
     }
-    @if(Model?.Estado=="Vigente"){
-        <script>
-          document.addEventListener('DOMContentLoaded', function () {
-            const fechaInicioInput = document.getElementById('fechaInicioModal');
-            const fechaFinInput = document.getElementById('fechaFinModal');
+    @if (Model?.Estado == "Vigente" || Model?.Estado == "Finalizado")
+    {
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const fechaInicioInput = document.getElementById('fechaInicioModal');
+          const fechaFinInput = document.getElementById('fechaFinModal');
 
-            if (!fechaInicioInput || !fechaFinInput) return;
+          if (!fechaInicioInput || !fechaFinInput) return;
 
-            // Deshabilitamos el campo de fecha fin al cargar el modal
-            fechaFinInput.disabled = true;
+          // Deshabilitamos el campo de fecha fin al cargar el modal
+          fechaFinInput.disabled = true;
 
-            // Habilitar solo si el usuario cambia la fecha de inicio
-            fechaInicioInput.addEventListener('change', function () {
-              if (fechaInicioInput.value) {
-                fechaFinInput.disabled = false;
-              } else {
-                fechaFinInput.disabled = true;
-              }
-            });
+          // Habilitar solo si el usuario cambia la fecha de inicio
+          fechaInicioInput.addEventListener('change', function () {
+            if (fechaInicioInput.value) {
+              fechaFinInput.disabled = false;
+            } else {
+              fechaFinInput.disabled = true;
+            }
           });
-        </script>
+        });
+      </script>
 
     }
     <script>
@@ -725,7 +736,7 @@
             contratosExistentes = JSON.parse('@Html.Raw(ViewBag.ListFechas)');
           </text>
       }
-                                      var pickers = {};
+                                              var pickers = {};
 
       function buildDisabledRanges(contratos) {
         if (!Array.isArray(contratos)) return [];
