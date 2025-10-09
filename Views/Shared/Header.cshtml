@@ -47,7 +47,7 @@
           <hr class="dropdown-divider">
         </li>
         <li>
-          <form method="post" asp-controller="Usuario" asp-action="Logout">
+          <form method="post" asp-controller="Usuario" asp-action="Logout" autocomplete="off">
             <button class="dropdown-item" type="submit">Cerrar sesión</button>
           </form>
         </li>
@@ -81,7 +81,7 @@
 
         <!-- Body -->
         <div class="modal-body">
-          <form asp-controller="Usuario" asp-action="Login" method="post" class="needs-validation" novalidate>
+          <form asp-controller="Usuario" asp-action="Login" method="post" class="needs-validation" novalidate autocomplete="off">
 
             <div class="mb-3">
               <label for="Email" class="form-label small text-uppercase text-light">Email</label>

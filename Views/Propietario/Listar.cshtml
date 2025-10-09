@@ -19,7 +19,7 @@
 
 
 <div class="d-flex flex-column ">
-  <form method="get" asp-action="Listar" class="row g-2 bg-white shadow-sm rounded p-3">
+  <form method="get" asp-action="Listar" class="row g-2 bg-white shadow-sm rounded p-3" autocomplete="off">
     <div class="row">
       <div class="col-md-12 d-flex justify-content-start align-items-center pb-2">
         <h4 class="ps-2 pe-3 m-0 fw-bold">Filtrar</h4>
@@ -73,7 +73,7 @@
                 <img src="~/images/icon/Editar.png" alt="Editar">
               </a>
               @if (User.IsInRole("Administrador")){
-                <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" style="display:inline;">
+                <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" style="display:inline;" autocomplete="off">
                   <button type="submit" class="btn btn-link" data-bs-toggle="tooltip" title="Eliminar Propietario">
                     <img src="~/images/icon/Eliminar.png" alt="Eliminar" />
                   </button>

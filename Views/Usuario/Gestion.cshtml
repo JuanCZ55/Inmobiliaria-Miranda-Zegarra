@@ -10,7 +10,7 @@
     <div class="col-lg-10 col-xl-9 h-100">
       <div class="shadow-lg rounded border bg-light p-4 p-md-5 h-100">
         <form asp-action="@(Model.IdUsuario == 0 ? "Registrar" : "ModificarUsuario")" method="post"
-          enctype="multipart/form-data" class="h-100 d-flex flex-column">
+          enctype="multipart/form-data" class="h-100 d-flex flex-column" autocomplete="off">
           <h2 class="text-center mb-4">@(Model.IdUsuario == 0 ? "Nuevo Usuario" : "Editar Usuario")</h2>
 
           @if (Model.IdUsuario != 0)
@@ -165,7 +165,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <form asp-action="Eliminar" method="post">
+          <form asp-action="Eliminar" method="post" autocomplete="off">
             <input type="hidden" name="id" value="@Model.IdUsuario" />
             <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
           </form>

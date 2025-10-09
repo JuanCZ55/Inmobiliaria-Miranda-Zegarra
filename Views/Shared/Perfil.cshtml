@@ -29,7 +29,7 @@
               <div class="tab-pane fade show active h-100" id="info-pane" role="tabpanel" aria-labelledby="info-tab">
                 <!-- Contenedor de alertas para la pestaña de perfil -->
                 <div id="profile-alert-container"></div>
-                <form id="profileForm" enctype="multipart/form-data" class="d-flex flex-column h-100">
+                <form id="profileForm" enctype="multipart/form-data" class="d-flex flex-column h-100" autocomplete="off">
                   @Html.AntiForgeryToken()
                   <input type="hidden" name="IdUsuario" id="profileIdUsuario" />
 
@@ -66,7 +66,7 @@
               </div>
               <!-- Pestaña de Cambio de Contraseña -->
               <div class="tab-pane fade h-100" id="password-pane" role="tabpanel" aria-labelledby="password-tab">
-                <form id="passwordForm" class="d-flex flex-column h-100">
+                <form id="passwordForm" class="d-flex flex-column h-100" autocomplete="off">
                   <!-- Contenedor de alertas para la pestaña de contraseña -->
                   <div id="password-alert-container"></div>
 

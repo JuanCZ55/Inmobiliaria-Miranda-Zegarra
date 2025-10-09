@@ -18,14 +18,14 @@
 </div>
 
 <div class="d-flex flex-column">
-  <form method="get" asp-action="Listar" class="row g-2 bg-white shadow-sm rounded p-3">
+  <form method="get" asp-action="Listar" class="row g-2 bg-white shadow-sm rounded p-3" autocomplete="off">
     <div class="row">
       <div class="col-md-12 d-flex justify-content-start align-items-center pb-2">
         <h4 class="ps-2 pe-3 m-0 fw-bold">Filtrar</h4>
       </div>
       <div class="col-md-2">
         <div class="zeg-field" style="max-width: 300px;">
-          <input type="text" id="dni" name="dni" value="@dniFiltro" class="zeg-input" placeholder=" " />
+          <input type="number" id="dni" name="dni" value="@dniFiltro" class="zeg-input" placeholder=" " />
           <label for="dni">Filtrar por DNI</label>
         </div>
       </div>
@@ -74,7 +74,7 @@
               </a>
               @if (User.IsInRole("Administrador"))
               {
-                <form asp-action="Eliminar" asp-route-id="@i.IdInquilino" method="post">
+                <form asp-action="Eliminar" asp-route-id="@i.IdInquilino" method="post" autocomplete="off">
                   <button type="submit" class="btn btn-link" data-bs-toggle="tooltip" title="Eliminar Inquilino">
                     <img src="~/images/icon/Eliminar.png" alt="Eliminar" />
                   </button>
