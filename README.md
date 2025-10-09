@@ -1,4 +1,4 @@
-# [Nombre de tu Proyecto]
+# Sisitema de Inmobiliaria
 
 Una aplicación web para gestionar propiedades, contratos, inquilinos y pagos.
 
