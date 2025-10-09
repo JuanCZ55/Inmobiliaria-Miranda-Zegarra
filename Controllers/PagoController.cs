@@ -382,24 +382,11 @@ namespace Inmobiliaria.Controllers
                     TempData["Error"] = "Pago no activable";
                     return RedirectToAction("Ver", "Pago", new { id = idPago });
                 }
-                if (pago.contrato.Estado == "Finalizado")
-                {
-                    TempData["Error"] = "No se pueden modificar pagos de contratos finalizado";
-                    return RedirectToAction("Ver", "Pago", new { id = idPago });
-                }
-                else if (
-                    pago.contrato.Estado
-                    == "No se pueden modificar pagos de contratos cancelados con multa saldada"
-                )
-                {
-                    TempData["Error"] = "Contrato Cancelado con Multa Saldada";
-                    return RedirectToAction("Ver", "Pago", new { id = idPago });
-                }
                 repositorio.SetEstado(idPago, 1);
                 TempData["Success"] = "Pago Restaurado";
                 return RedirectToAction("Ver", "Pago", new { id = idPago });
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 TempData["Error"] = "Error al intentar cancelar el pago";
                 return RedirectToAction("Ver", "Pago", new { id = idPago });
