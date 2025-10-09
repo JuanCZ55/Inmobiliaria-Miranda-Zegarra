@@ -268,7 +268,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id_usuario`, `email`, `contrasena`, `rol`, `nombre`, `apellido`, `url`, `estado`, `created_at`, `updated_at`, `genero`) VALUES
-(1, 'user01@gmail.com', 'AQAAAAIAAYagAAAAEJe/0FDlu1A56hCXRObw/IQIVvBwuRHpO/rY+VOxw8ovSuBcExD08VeAUC/FVGygHw==', 1, 'El Hechizero', 'El Gran Hechizero', NULL, 1, '2025-10-02 14:49:00', '2025-10-08 20:11:39', 1),
+(1, 'user01@gmail.com', 'AQAAAAIAAYagAAAAEJe/0FDlu1A56hCXRObw/IQIVvBwuRHpO/rY+VOxw8ovSuBcExD08VeAUC/FVGygHw==', 1, 'Pato', 'Lucas', NULL, 1, '2025-10-02 14:49:00', '2025-10-08 20:11:39', 1),
 (13, 'user02@gmail.com', 'AQAAAAIAAYagAAAAEKg5Vve4ODlWkm+bML/CpVDBgCCwaE0JRfUgu5GKAVMSLpzMzJkSxf4UAEBnZJxRTw==', 2, 'Juan', 'Garcia', NULL, 1, '2025-10-04 01:31:48', '2025-10-04 01:31:48', 1),
 (32, 'user03@gmail.com', 'AQAAAAIAAYagAAAAEGIjDl2Ix31csvoXEp8BaHGVkKXN8yexfuWxGPrSRTvzJ3a7W8JgLN0ADuRYswGZbA==', 2, 'Juan', 'Figueroa', NULL, 2, '2025-10-08 19:59:10', '2025-10-08 20:02:16', 1),
 (33, 'user04@gmail.com', 'AQAAAAIAAYagAAAAEC6A03OZhCFYwdO8y0V9Nit5VQhJfwAt1vPZdjAyBdCvc3/S0a60E4cX5OB2ivZLjQ==', 1, 'Filipa', 'Dominguez', NULL, 1, '2025-10-08 20:08:52', '2025-10-08 20:08:52', 2);

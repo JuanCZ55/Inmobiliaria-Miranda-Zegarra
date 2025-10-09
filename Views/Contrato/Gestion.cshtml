@@ -71,7 +71,7 @@
                   <input asp-for="FechaInicio" class="form-control bg-white" type="date"
                     id="@(Model.Estado == "Finalizado" ? "fechaInicioMain" : "fechaInicio")" data-new="true"
                     disabled=@(Model.IdContrato > 0)
-                    value="@(Model.IdContrato == 0 ?  Model.FechaInicio.ToString("yyyy-MM-dd") : "")" />
+                    value="@(Model.IdContrato == 0 ? Model.FechaInicio.ToString("yyyy-MM-dd") : "")" />
 
                   <span asp-validation-for="FechaInicio" class="text-danger"></span>
                 </div>
@@ -183,7 +183,7 @@
                     onclick="traerFechas(@Model.IdInmueble, @Model.IdContrato)">Editar</button>
                 </div>
               }
-              @if (Model.Estado == "Cancelado con Multa Pendiente")
+              @if (Model?.Estado == "Cancelado con Multa Pendiente")
               {
                 <div class="">
                   <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal"
@@ -192,7 +192,7 @@
                   </button>
                 </div>
               }
-              if (Model.Estado == "Finalizado")
+              if (Model?.Estado == "Finalizado")
               {
                 <div class="">
                   <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal"
@@ -289,7 +289,8 @@
     <div class="modal fade" id="pagarMultaModal" tabindex="-1" aria-labelledby="pagarMultaModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <form asp-controller="Pago" asp-action="PagarMulta" method="post" id="pagarMultaForm" novalidate autocomplete="off">
+          <form asp-controller="Pago" asp-action="PagarMulta" method="post" id="pagarMultaForm" novalidate
+            autocomplete="off">
             <div class="modal-header bg-warning text-dark">
               <h5 class="modal-title" id="pagarMultaModalLabel">Pagar multa</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -376,7 +377,8 @@
           <div class="p-2 pb-0">
             <div class="container mb-0 alert alert-warning">
               <h6 class="card-subtitle">Atención</h6>
-              <span class="small text-muted">Al modificar este contrato, recordá verificar si necesitás registrar un pago adicional o un ajuste para el depósito inicial.</span>
+              <span class="small text-muted">Al modificar este contrato, recordá verificar si necesitás registrar un pago
+                adicional o un ajuste para el depósito inicial.</span>
             </div>
           </div>
           <div class="modal-body pt-2">
@@ -736,7 +738,7 @@
             contratosExistentes = JSON.parse('@Html.Raw(ViewBag.ListFechas)');
           </text>
       }
-                                              var pickers = {};
+                                                  var pickers = {};
 
       function buildDisabledRanges(contratos) {
         if (!Array.isArray(contratos)) return [];
