@@ -18,13 +18,14 @@ namespace Inmobiliaria.Models
       using (var conn = new MySqlConnection(connectionString))
       {
         var sql = @"
-            INSERT INTO pago (id_contrato, numero_pago, fecha_pago, concepto, monto, estado) 
-            VALUES (@id_contrato, @numero_pago, @fecha_pago, @concepto, @monto, @estado);
+            INSERT INTO pago (id_contrato, id_usuario, numero_pago, fecha_pago, concepto, monto, estado) 
+            VALUES (@id_contrato, @id_usuario, @numero_pago, @fecha_pago, @concepto, @monto, @estado);
             SELECT LAST_INSERT_ID();";
 
         using (var cmd = new MySqlCommand(sql, conn))
         {
           cmd.Parameters.AddWithValue("@id_contrato", pago.IdContrato);
+          cmd.Parameters.AddWithValue("@id_usuario", pago.IdUsuario);
           cmd.Parameters.AddWithValue("@numero_pago", pago.numeroPago);
           cmd.Parameters.AddWithValue("@fecha_pago", pago.FechaPago);
           cmd.Parameters.AddWithValue("@concepto", pago.Concepto);
@@ -100,7 +101,7 @@ namespace Inmobiliaria.Models
       using (var conn = new MySqlConnection(connectionString))
       {
         var sql = @"
-        SELECT id_Pago, id_Contrato, numero_pago, fecha_pago, concepto, monto, estado, created_at, updated_at
+        SELECT id_Pago, id_Contrato, id_usuario, numero_pago, fecha_pago, concepto, monto, estado, created_at, updated_at
         FROM pago WHERE id_Pago = @id;
         ";
         using (var cmd = new MySqlCommand(sql, conn))
@@ -115,6 +116,7 @@ namespace Inmobiliaria.Models
               {
                 IdPago = reader.GetInt32("id_pago"),
                 IdContrato = reader.GetInt32("id_Contrato"),
+                IdUsuario = reader.GetInt32("id_usuario"),
                 numeroPago = reader.GetInt32("numero_pago"),
                 FechaPago = reader.GetDateTime("fecha_pago"),
                 Concepto = reader.GetString("concepto"),
