@@ -29,12 +29,12 @@ namespace Inmobiliaria.Models
     [BindNever]
     public Contrato? contrato { get; set; }
 
-/*
+
     public int IdUsuario { get; set; }
     [ForeignKey(nameof(IdUsuario))]
     [BindNever]
     public Usuario? user { get; set; }
-*/
+
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
