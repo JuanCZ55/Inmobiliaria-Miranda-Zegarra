@@ -71,7 +71,7 @@
                   <input asp-for="FechaInicio" class="form-control bg-white" type="date"
                     id="@(Model.Estado == "Finalizado" ? "fechaInicioMain" : "fechaInicio")" data-new="true"
                     disabled=@(Model.IdContrato > 0)
-                    value="@(Model.IdContrato == 0 ? Model.FechaInicio.ToString("yyyy-MM-dd") : "")" />
+                    value="@Model.FechaInicio.ToString("yyyy-MM-dd")" />
 
                   <span asp-validation-for="FechaInicio" class="text-danger"></span>
                 </div>

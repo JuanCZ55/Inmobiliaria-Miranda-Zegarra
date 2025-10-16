@@ -49,6 +49,7 @@ namespace Inmobiliaria.Controllers
                 IdContrato = 0,
                 Inquilino = new Inquilino(),
                 Inmueble = new Inmueble(),
+                FechaInicio = DateTime.Today
             };
             string? contratoJson = TempData["Contrato"] as string;
             if (!string.IsNullOrEmpty(contratoJson))
